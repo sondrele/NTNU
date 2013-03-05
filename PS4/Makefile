@@ -15,9 +15,9 @@ INCLUDEPATH=\
     -Iinclude\
     -I/usr/local/include\
 
-CFLAGS+=  -D_POSIX_C_SOURCE -DDUMP_SYMTAB -std=c99 ${INCLUDEPATH}
+CFLAGS+=  -D_POSIX_C_SOURCE -DDUMP_SYMTAB -std=c99 ${INCLUDEPATH} -g
 LDFLAGS+= -L/usr/local/lib -Llib
-LDLIBS+=  -lghthash
+LDLIBS+=  -lghthash64
 YFLAGS+=  --defines=work/parser.h -o y.tab.c
 
 # Targets:
@@ -41,7 +41,7 @@ bin/vslc: obj/vslc $(filter-out $(wildcard bin), bin)
 #
 # The compiler executable depends on everything having turned into object code
 #
-obj/vslc: work/scanner.o work/parser.o obj/vslc.o obj/nodetypes.o obj/tree.o obj/symtab.o src/simplify.o
+obj/vslc: work/scanner.o work/parser.o obj/vslc.o obj/nodetypes.o obj/tree.o obj/symtab.o src/simplify64.o
 
 #
 # For all the handwritten C files, there is a C file in 'src' and a matching

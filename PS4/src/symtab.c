@@ -27,13 +27,9 @@ static int32_t strings_size = 16, strings_index = -1;
 void symtab_init ( void ) {
 	if ( scopes_index == -1 ) {
 		scopes = malloc( scopes_size * sizeof(void *) );
-		// for ( int i = 0; i < scopes_size; i++ )
-		// 	scopes[i] = malloc( hash_t );
 	} else if ( scopes_index == scopes_size ) {
 		scopes_size *= 2;
 		scopes = realloc ( scopes, sizeof(void *) * scopes_size );
-		// for ( int i = scopes_index; i < scopes_size; i++ )
-		// 	scopes[i] = malloc( hash_t );
 	}
 
 	if ( values_size == -1 )
@@ -53,14 +49,25 @@ void symtab_init ( void ) {
 
 
 void symtab_finalize ( void ) {
+	for ( int i = scopes_index; i >= 0; i-- )
+		free ( scopes[scopes_index] );
+	free ( scopes );
 
+	for ( int i = values_index; i >= 0; i-- )
+		free ( values[values_index] );
+	free ( values );
+
+
+	for ( int i = strings_index; i >= 0; i-- )
+		free ( strings[strings_index] );
+	free ( strings );
 }
 
 
 int32_t strings_add ( char *str ) {
 	strings_index += 1;
 	if ( strings_index == strings_size )
-		symtab_init ( void );
+		symtab_init ();
 	
 	strings[strings_index] = str;
 	return strings_index;
@@ -69,12 +76,12 @@ int32_t strings_add ( char *str ) {
 
 void strings_output ( FILE *stream ) {
 	if ( stream != NULL ) {
-		fprintf ( *stream, STREAM_DATA );
-		fprintf ( *stream, STREAM_INTEGER );
+		fprintf ( stream, STREAM_DATA );
+		fprintf ( stream, STREAM_INTEGER );
 		for ( int i = 0; i < strings_index; i++ )
 			fprintf ( stream, STREAM_STRING, i, strings[i] );
 		
-		fprintf ( *stream, STREAM_GLOBL );
+		fprintf ( stream, STREAM_GLOBL );
 	}
 }
 
@@ -82,14 +89,24 @@ void strings_output ( FILE *stream ) {
 void scope_add ( void ) {
 	scopes_index += 1;
 	if ( scopes_index == scopes_size ) 
-		symtab_init ( void );
+		symtab_init ();
 
-	scopes[i] = malloc( sizeof( hash_t ) );
+	scopes[scopes_index] = ght_create ( HASH_BUCKETS );
 }
 
 
 void scope_remove ( void ) {
-	scopes_index -= 1;
+	hash_t *top_scope = scopes[scopes_index--];
+
+	// ght_iterator_t iterator;
+	// void *p_key;
+	// void *p_entry;
+	// for ( p_entry = ght_first ( top_scope, &iterator, &p_key ); 
+	// 		p_entry; p_entry = ght_next ( top_scope, &iterator, &p_key ) ) {
+	// 	free(p_entry);
+	// }
+
+	ght_finalize ( top_scope );
 }
 
 
@@ -98,14 +115,31 @@ void symbol_insert ( char *key, symbol_t *value ) {
 	#ifdef DUMP_SYMTAB
 		fprintf ( stderr, "Inserting (%s,%d)\n", key, value->stack_offset );
 	#endif
+		
+	values_index += 1;
+	if ( values_index == values_size )
+		symtab_init ();
+
+	values[values_index] = value;
+
+	size_t key_len = strlen ( key );
+	hash_t *top_scope = scopes[scopes_index];
+	ght_insert ( top_scope, value, key_len, key );
 }
 
 
 symbol_t *symbol_get ( char *key ) {
+	size_t key_len = strlen ( key );
+	hash_t *top_scope = scopes[scopes_index];
 	symbol_t *result = NULL;
+
+	result = (symbol_t *) ght_get ( top_scope, key_len, key );
+
 	// Keep this for debugging/testing
 	#ifdef DUMP_SYMTAB
 	    if ( result != NULL )
 	        fprintf ( stderr, "Retrieving (%s,%d)\n", key, result->stack_offset );
 	#endif
+
+	return result;
 }
