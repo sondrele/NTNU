@@ -115,11 +115,14 @@ void symbol_insert ( char *key, symbol_t *value ) {
 	#ifdef DUMP_SYMTAB
 		fprintf ( stderr, "Inserting (%s,%d)\n", key, value->stack_offset );
 	#endif
-		
+
 	values_index += 1;
 	if ( values_index == values_size )
 		symtab_init ();
 
+	if ( value->depth == -1 )
+		value->depth = values_index;
+	
 	values[values_index] = value;
 
 	size_t key_len = strlen ( key );
