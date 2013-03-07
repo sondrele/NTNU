@@ -2,7 +2,7 @@
 
 #define STREAM_DATA 				".data\n"
 #define STREAM_INTEGER 				".INTEGER: .string \"%%d \"\n"
-#define STREAM_STRING 				".STRING%d: .string \"%s\"\n"
+#define STREAM_STRING 				".STRING%d: .string %s\n"
 #define STREAM_GLOBL 				".globl main\n"
 
 // static does not mean the same as in Java.
@@ -27,20 +27,21 @@ static int32_t strings_size = 16, strings_index = -1;
 void symtab_init ( void ) {
 	if ( scopes_index == -1 ) {
 		scopes = malloc( scopes_size * sizeof(void *) );
+		scope_add ();
 	} else if ( scopes_index == scopes_size ) {
 		scopes_size *= 2;
 		scopes = realloc ( scopes, sizeof(void *) * scopes_size );
 	}
 
-	if ( values_size == -1 )
+	if ( values_index == -1 )
 		values = malloc( values_size * sizeof(void *) );
 	else if ( values_index == values_size ) {
 		values_size *= 2;
 		values = realloc ( values, sizeof(void *) * values_size );	
 	}	
 
-	if ( strings_size == -1 )
-		strings = malloc( strings_size * sizeof(void *) );
+	if ( strings_index == -1 )
+		strings = malloc( strings_size * sizeof(char *) );
 	else if ( strings_index == strings_size ) {
 		strings_size *= 2;
 		strings = realloc ( strings, sizeof(void *) * strings_size );
@@ -78,7 +79,7 @@ void strings_output ( FILE *stream ) {
 	if ( stream != NULL ) {
 		fprintf ( stream, STREAM_DATA );
 		fprintf ( stream, STREAM_INTEGER );
-		for ( int i = 0; i < strings_index; i++ )
+		for ( int i = 0; i < strings_index + 1; i++ )
 			fprintf ( stream, STREAM_STRING, i, strings[i] );
 		
 		fprintf ( stream, STREAM_GLOBL );
@@ -125,9 +126,8 @@ void symbol_insert ( char *key, symbol_t *value ) {
 	
 	values[values_index] = value;
 
-	size_t key_len = strlen ( key );
 	hash_t *top_scope = scopes[scopes_index];
-	ght_insert ( top_scope, value, key_len, key );
+	ght_insert ( top_scope, value, strlen ( key ), key );
 }
 
 

@@ -67,53 +67,66 @@ void destroy_subtree ( node_t *discard ) {
 
 void bind_names ( node_t *root ) {
 	if ( root != NULL ) {
-		int stack_offset = 0;
-
+		// int stack_offset = 0;
+		
 		switch ( root->type.index ) {
 			case FUNCTION_LIST: {
 				add_functions_to_symtab ( root );
 				break;
 			}
-			case FUNCTION: {
-				add_parameters_to_scope ( root );
-				break;
-			}
-			case BLOCK: {
-				scope_add ();
-				add_declarations_to_symtab ( root->children[0] );
-				break;
-			}
-			case DECLARATION_LIST: {
-				break;
-			}
-			case DECLARATION: {
-				add_variables_to_scope ( root );
-				break;
-			}
-			case PARAMETER_LIST: {
+			// case FUNCTION: {
+			// 	add_parameters_to_scope ( root );
+			// 	break;
+			// }
+			// case BLOCK: {
+			// 	scope_add ();
+			// 	add_declarations_to_symtab ( root->children[0] );
+			// 	break;
+			// }
+			// case DECLARATION_LIST: {
+			// 	break;
+			// }
+			// case DECLARATION: {
+			// 	add_variables_to_scope ( root );
+			// 	break;
+			// }
+			// case PARAMETER_LIST: {
 
-			}
-			case VARIABLE: {
+			// }
+			// case VARIABLE: {
 
-				break;
-			}
+			// 	break;
+			// }
 			case TEXT: {
 				add_text ( root );
 				break; 
 			}
 		}
-		traverse_children ( root );
+		for ( int i = 0; i < root->n_children; i++ ) {
+			bind_names ( root->children[i] );
+		}
 	}
 }
 
 void add_functions_to_symtab ( node_t *function_list_n ) {
 	int stack_offset = 0;
-	for ( int i = 0; i < function_list_n->n_children; i++ ) {
-		node_t *function_n = function_list_n->children[i];
 
-		// Add function to symbol table
-		add_var_to_scope ( function_n, stack_offset );
+	for ( int i = 0; i < function_list_n->n_children; i++ ) {
+		node_t *func = function_list_n->children[i];
+		symbol_t *var = malloc( sizeof( symbol_t ) );
+
+		*var = (symbol_t) {
+			0, 0,
+			(char *) func->children[0]->data
+		};
+		symbol_insert ( var->label, var );
 	}
+}
+
+void add_text ( node_t *text_n ) {
+	int *str_ptr = malloc ( sizeof(int *) );
+	*str_ptr = strings_add ( (char *) text_n->data );
+	text_n->data = str_ptr;
 }
 
 void add_parameters_to_scope ( node_t *function_n ) {
@@ -162,12 +175,6 @@ void add_var_to_scope ( node_t *variable_n, int stack_offset ) {
 		NULL
 	};
 	symbol_insert ( (char *) variable_n->data, var );
-}
-
-void add_text ( node_t *text_n ) {
-	int *str_ptr;
-	*str_ptr = strings_add ( (char *) text_n-> data );
-	text_n->data = str_ptr;
 }
 
 void traverse_children ( node_t *root ) {
