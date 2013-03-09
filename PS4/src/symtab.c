@@ -5,6 +5,8 @@
 #define STREAM_STRING 				".STRING%d: .string %s\n"
 #define STREAM_GLOBL 				".globl main\n"
 
+void print_stackframe ( void );
+
 // static does not mean the same as in Java.
 // For global variables, it means they are only visible in this file.
 
@@ -51,16 +53,15 @@ void symtab_init ( void ) {
 
 void symtab_finalize ( void ) {
 	for ( int i = scopes_index; i >= 0; i-- )
-		free ( scopes[scopes_index] );
+		free ( scopes[i] );
 	free ( scopes );
 
 	for ( int i = values_index; i >= 0; i-- )
-		free ( values[values_index] );
+		free ( values[i] );
 	free ( values );
 
-
 	for ( int i = strings_index; i >= 0; i-- )
-		free ( strings[strings_index] );
+		free ( strings[i] );
 	free ( strings );
 }
 
@@ -97,10 +98,11 @@ void scope_add ( void ) {
 
 
 void scope_remove ( void ) {
-	hash_t *top_scope = scopes[scopes_index--];
+	hash_t *top_scope = scopes[scopes_index];
+	scopes_index -= 1;
 
 	// ght_iterator_t iterator;
-	// void *p_key;
+	// const void *p_key;
 	// void *p_entry;
 	// for ( p_entry = ght_first ( top_scope, &iterator, &p_key ); 
 	// 		p_entry; p_entry = ght_next ( top_scope, &iterator, &p_key ) ) {
@@ -124,19 +126,19 @@ void symbol_insert ( char *key, symbol_t *value ) {
 	if ( value->depth == -1 )
 		value->depth = values_index;
 	
+	ght_insert ( scopes[scopes_index], value, strlen ( key ), key );
 	values[values_index] = value;
-
-	hash_t *top_scope = scopes[scopes_index];
-	ght_insert ( top_scope, value, strlen ( key ), key );
 }
 
 
 symbol_t *symbol_get ( char *key ) {
-	size_t key_len = strlen ( key );
-	hash_t *top_scope = scopes[scopes_index];
 	symbol_t *result = NULL;
+	int i = scopes_index;
 
-	result = (symbol_t *) ght_get ( top_scope, key_len, key );
+	while ( result == NULL ) {
+		result = (symbol_t *) ght_get ( scopes[i], strlen ( key ), key );
+		i -= 1;
+	}
 
 	// Keep this for debugging/testing
 	#ifdef DUMP_SYMTAB
@@ -145,4 +147,20 @@ symbol_t *symbol_get ( char *key ) {
 	#endif
 
 	return result;
+}
+
+void print_stackframe ( void ) {
+	for ( int i = 0; i < scopes_index; i++ ) {
+		printf("SCOPE %d\n", i);
+		hash_t *scope = scopes[i];
+
+		ght_iterator_t iterator;
+		const void *p_key;
+		void *p_entry;
+		int j = 0;
+		for(p_entry = ght_first(scope, &iterator, &p_key); p_entry; p_entry = ght_next(scope, &iterator, &p_key)) {
+			printf("\tVALUE %d: %s\n", j++, (char *)p_key);
+		}
+		printf("\n");
+	}
 }

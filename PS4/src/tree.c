@@ -5,9 +5,7 @@
 
 void add_functions_to_symtab ( node_t *function_list_n );
 void add_parameters_to_scope ( node_t *function_n );
-void add_declarations_to_symtab ( node_t *declaration_list_n );
-void add_variables_to_scope ( node_t *variable_list_n );
-void add_func_to_scope ( node_t *variable_n );
+int add_variables_to_scope ( node_t *variable_list_n, int stack_offset );
 void add_var_to_scope ( node_t *variable_n, int stack_offset );
 void add_text ( node_t *text_n );
 void traverse_children ( node_t *root );
@@ -66,61 +64,95 @@ void destroy_subtree ( node_t *discard ) {
 }
 
 void bind_names ( node_t *root ) {
-	if ( root != NULL ) {
-		// int stack_offset = 0;
-		
-		switch ( root->type.index ) {
-			case FUNCTION_LIST: {
-				add_functions_to_symtab ( root );
-				break;
-			}
-			// case FUNCTION: {
-			// 	add_parameters_to_scope ( root );
-			// 	break;
-			// }
-			// case BLOCK: {
-			// 	scope_add ();
-			// 	add_declarations_to_symtab ( root->children[0] );
-			// 	break;
-			// }
-			// case DECLARATION_LIST: {
-			// 	break;
-			// }
-			// case DECLARATION: {
-			// 	add_variables_to_scope ( root );
-			// 	break;
-			// }
-			// case PARAMETER_LIST: {
+	if (root == NULL) 
+		return;
 
-			// }
-			// case VARIABLE: {
-
-			// 	break;
-			// }
-			case TEXT: {
-				add_text ( root );
-				break; 
+	switch (root->type.index) {
+		case FUNCTION_LIST: {
+			add_functions_to_symtab ( root );
+			traverse_children ( root );
+			break;
+		}
+		case FUNCTION: {
+			scope_add ();
+			add_parameters_to_scope ( root );
+			for ( int i = 2; i < root->n_children; i++ ) 
+				bind_names ( root->children[i] );
+			scope_remove ();
+			break;
+		}
+		case BLOCK: {
+			scope_add ();
+			traverse_children ( root );
+			scope_remove ();
+			break;
+		}
+		case DECLARATION_LIST: {
+			int stack_offset = -VSL_PTR_SIZE;
+			for ( int i = 0; i < root->n_children; i++ ) {
+				node_t *declaration_n = root->children[i];
+				stack_offset = add_variables_to_scope ( declaration_n, stack_offset );
 			}
+			break;
+		}		
+		case VARIABLE: {
+			symbol_t *var = symbol_get ( (char *) root->data );
+			if ( var != NULL ) 
+				root->entry = var;
+			else
+				fprintf(stderr, "The variable %s is not declared.\n", (char *) root->data);
+			traverse_children ( root );
+			break;
 		}
-		for ( int i = 0; i < root->n_children; i++ ) {
-			bind_names ( root->children[i] );
+		case TEXT: {
+			add_text ( root );
+			traverse_children ( root );
+			break; 
 		}
+		default:
+		traverse_children ( root );
 	}
 }
 
 void add_functions_to_symtab ( node_t *function_list_n ) {
-	int stack_offset = 0;
-
 	for ( int i = 0; i < function_list_n->n_children; i++ ) {
 		node_t *func = function_list_n->children[i];
 		symbol_t *var = malloc( sizeof( symbol_t ) );
-
-		*var = (symbol_t) {
-			0, 0,
-			(char *) func->children[0]->data
-		};
+		*var = (symbol_t) { 0, 0, (char *) func->children[0]->data };
+		
 		symbol_insert ( var->label, var );
 	}
+}
+
+void add_parameters_to_scope ( node_t *function_n ) {
+	node_t *params = function_n->children[1];
+
+	if ( params != NULL ) {
+		int stack_offset = ( 1 + params->n_children ) * VSL_PTR_SIZE;
+	
+		for ( int i = 0; i < params->n_children; i++ ) {
+			node_t *variable_n = params->children[i];
+			add_var_to_scope ( variable_n, stack_offset );
+			stack_offset -= VSL_PTR_SIZE;			
+		}
+	}
+}
+
+int add_variables_to_scope ( node_t *declaration_list_n, int stack_offset ) {
+	node_t *variable_list_n = declaration_list_n->children[0];
+
+	for ( int j = 0; j < variable_list_n->n_children; j++ ) {
+		node_t *variable_n = variable_list_n->children[j];
+		add_var_to_scope ( variable_n, stack_offset );
+		stack_offset -= VSL_PTR_SIZE;
+	}
+	return stack_offset;
+}
+
+void add_var_to_scope ( node_t *variable_n, int stack_offset ) {
+	symbol_t *var = malloc( sizeof(symbol_t) );
+	*var = (symbol_t) { stack_offset, -1, NULL };
+	symbol_insert ( (char *) variable_n->data, var );
 }
 
 void add_text ( node_t *text_n ) {
@@ -129,56 +161,7 @@ void add_text ( node_t *text_n ) {
 	text_n->data = str_ptr;
 }
 
-void add_parameters_to_scope ( node_t *function_n ) {
-	int stack_offset = -4;
-	for ( int i = 0; i < function_n->n_children; i++ ) {
-		node_t *variable_n = function_n->children[i];
-
-	}
-}
-
-void add_declarations_to_symtab ( node_t *declaration_list_n ) {
-	int stack_offset = -VSL_PTR_SIZE;
-
-	for ( int i = 0; i < declaration_list_n->n_children; i++ ) {
-		node_t *variable_n = declaration_list_n->children[i];
-		add_var_to_scope ( variable_n, stack_offset );
-		stack_offset -= VSL_PTR_SIZE;
-	}
-}
-
-void add_variables_to_scope ( node_t *variable_list_n ) {
-	int stack_offset = (1 + variable_list_n->n_children) * VSL_PTR_SIZE;
-
-	for ( int i = 0; i < variable_list_n->n_children; i++ ) {
-		node_t *variable_n = variable_list_n->children[i];
-		add_var_to_scope ( variable_n, stack_offset );
-		stack_offset -= VSL_PTR_SIZE;
-	}
-}
-
-void add_func_to_scope ( node_t *variable_n ) {
-	symbol_t *var = malloc( sizeof( symbol_t ) );
-	*var = (symbol_t) {
-		0,
-		0,
-		(char *) variable_n->data
-	};
-	symbol_insert ( var->label, var );
-}
-
-void add_var_to_scope ( node_t *variable_n, int stack_offset ) {
-	symbol_t *var = malloc( sizeof(symbol_t) );
-	*var = (symbol_t) {
-		stack_offset,
-		-1,
-		NULL
-	};
-	symbol_insert ( (char *) variable_n->data, var );
-}
-
 void traverse_children ( node_t *root ) {
-	for ( int i = 0; i < root->n_children; i++ ) {
+	for ( int i = 0; i < root->n_children; i++ )
 		bind_names ( root->children[i] );
-	}
 }
