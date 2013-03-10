@@ -49,7 +49,8 @@ node_t *node_init ( node_t *nd, nodetype_t type, void *data, uint32_t n_children
 
 void node_finalize ( node_t *discard ) {
 	if ( discard != NULL ) {
-		free ( discard->data );
+		if ( discard->data != NULL )
+			free ( discard->data );
 		free ( discard->children );
 		free ( discard );
 	}
@@ -76,8 +77,12 @@ void bind_names ( node_t *root ) {
 		case FUNCTION: {
 			scope_add ();
 			add_parameters_to_scope ( root );
-			for ( int i = 2; i < root->n_children; i++ ) 
-				bind_names ( root->children[i] );
+			if ( root->children[2]->type.index == BLOCK) {
+				bind_names ( root->children[2]->children[0] );
+				bind_names ( root->children[2]->children[1] );
+			} else
+				fprintf(stderr, 
+					"Expected BLOCK-statement after FUNCTION \"%s\"\n", (char *) root->data);
 			scope_remove ();
 			break;
 		}
@@ -100,7 +105,7 @@ void bind_names ( node_t *root ) {
 			if ( var != NULL ) 
 				root->entry = var;
 			else
-				fprintf(stderr, "The variable %s is not declared.\n", (char *) root->data);
+				fprintf(stderr, "The variable \"%s\" is not declared.\n", (char *) root->data);
 			traverse_children ( root );
 			break;
 		}
@@ -141,8 +146,8 @@ void add_parameters_to_scope ( node_t *function_n ) {
 int add_variables_to_scope ( node_t *declaration_list_n, int stack_offset ) {
 	node_t *variable_list_n = declaration_list_n->children[0];
 
-	for ( int j = 0; j < variable_list_n->n_children; j++ ) {
-		node_t *variable_n = variable_list_n->children[j];
+	for ( int i = 0; i < variable_list_n->n_children; i++ ) {
+		node_t *variable_n = variable_list_n->children[i];
 		add_var_to_scope ( variable_n, stack_offset );
 		stack_offset -= VSL_PTR_SIZE;
 	}
