@@ -35,6 +35,7 @@ node_print ( FILE *output, node_t *root, uint32_t nesting ) {
 }
 #endif
 
+
 node_t *node_init ( node_t *nd, nodetype_t type, void *data, uint32_t n_children, ... ) {
 	va_list child_list;
 	*nd = (node_t) { type, data, NULL, n_children,
@@ -47,6 +48,7 @@ node_t *node_init ( node_t *nd, nodetype_t type, void *data, uint32_t n_children
 	return nd;
 }
 
+
 void node_finalize ( node_t *discard ) {
 	if ( discard != NULL ) {
 		if ( discard->data != NULL )
@@ -56,6 +58,7 @@ void node_finalize ( node_t *discard ) {
 	}
 }
 
+
 void destroy_subtree ( node_t *discard ) {
 	if ( discard != NULL ) {
 		for ( uint32_t i = 0; i < discard->n_children; i++ )
@@ -63,6 +66,7 @@ void destroy_subtree ( node_t *discard ) {
 		node_finalize ( discard );
 	}
 }
+
 
 void bind_names ( node_t *root ) {
 	if (root == NULL) 
@@ -119,6 +123,7 @@ void bind_names ( node_t *root ) {
 	}
 }
 
+
 void add_functions_to_symtab ( node_t *function_list_n ) {
 	for ( int i = 0; i < function_list_n->n_children; i++ ) {
 		node_t *func = function_list_n->children[i];
@@ -128,6 +133,7 @@ void add_functions_to_symtab ( node_t *function_list_n ) {
 		symbol_insert ( var->label, var );
 	}
 }
+
 
 void add_parameters_to_scope ( node_t *function_n ) {
 	node_t *params = function_n->children[1];
@@ -143,6 +149,7 @@ void add_parameters_to_scope ( node_t *function_n ) {
 	}
 }
 
+
 int add_variables_to_scope ( node_t *declaration_list_n, int stack_offset ) {
 	node_t *variable_list_n = declaration_list_n->children[0];
 
@@ -154,17 +161,20 @@ int add_variables_to_scope ( node_t *declaration_list_n, int stack_offset ) {
 	return stack_offset;
 }
 
+
 void add_var_to_scope ( node_t *variable_n, int stack_offset ) {
 	symbol_t *var = malloc( sizeof(symbol_t) );
 	*var = (symbol_t) { stack_offset, -1, NULL };
 	symbol_insert ( (char *) variable_n->data, var );
 }
 
+
 void add_text ( node_t *text_n ) {
 	int *str_ptr = malloc ( sizeof(int *) );
 	*str_ptr = strings_add ( (char *) text_n->data );
 	text_n->data = str_ptr;
 }
+
 
 void traverse_children ( node_t *root ) {
 	for ( int i = 0; i < root->n_children; i++ )

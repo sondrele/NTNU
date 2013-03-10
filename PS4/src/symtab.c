@@ -5,6 +5,7 @@
 #define STREAM_STRING 				".STRING%d: .string %s\n"
 #define STREAM_GLOBL 				".globl main\n"
 
+// Functions used for debugging
 void print_status ( void );
 void print_values ( void );
 void print_strings ( void );
@@ -44,7 +45,6 @@ void symtab_init ( void ) {
 
 
 void symtab_finalize ( void ) {
-	// print_status ();
 	scope_remove ();
 	for ( int i = values_index; i >= 0; i-- ) {
 		free ( values[i] );
@@ -58,7 +58,6 @@ void symtab_finalize ( void ) {
 	for ( int i = scopes_index; i >= 0; i-- )
 		free ( scopes[i] );
 	free ( scopes );
-
 }
 
 
@@ -76,17 +75,6 @@ void scope_add ( void ) {
 
 void scope_remove ( void ) {
 	hash_t *top_scope = scopes[scopes_index--];
-	
-	// ght_iterator_t iterator;
-	// const void *p_key;
-	// void *p_entry;
-	// for ( p_entry = ght_first ( top_scope, &iterator, &p_key ); 
-	// 		p_entry; p_entry = ght_next ( top_scope, &iterator, &p_key ) ) {
-	// //	printf("Freeing entry at key=%s\n", p_key);
-	// 	free(p_entry);
-	// }
-	// print_scopes ();
-
 	ght_finalize ( top_scope );
 }
 
@@ -154,11 +142,13 @@ symbol_t *symbol_get ( char *key ) {
 	return result;
 }
 
+
 void print_status ( void ) {
 	print_scopes ();
 	print_values ();
 	print_strings ();
 }
+
 
 void print_scopes ( void ) {
 	printf("-----SCOPES-----\n");
@@ -169,6 +159,7 @@ void print_scopes ( void ) {
 	printf("---END SCOPES---\n");
 }
 
+
 void print_values ( void ) {
 	printf("-----VALUES-----\n");
 	for ( int i = 0; i < values_index+1; i++ ) {
@@ -177,6 +168,7 @@ void print_values ( void ) {
 	}
 	printf("---END VALUES---\n");
 }
+
 
 void print_strings ( void ) {
 	printf("-----STRINGS-----\n");
