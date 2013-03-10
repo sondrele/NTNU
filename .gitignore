@@ -4,7 +4,6 @@
 
 .gdbinit
 Makefile
-PS4/Makefile
 
 ############
 ## Generated test files and directories
