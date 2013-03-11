@@ -46,9 +46,8 @@ void symtab_init ( void ) {
 
 void symtab_finalize ( void ) {
 	scope_remove ();
-	for ( int i = values_index; i >= 0; i-- ) {
+	for ( int i = values_index; i >= 0; i-- )
 		free ( values[i] );
-	}
 	free ( values );
 
 	for ( int i = strings_index; i >= 0; i-- )
