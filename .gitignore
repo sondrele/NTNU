@@ -3,7 +3,6 @@
 ############
 
 .gdbinit
-Makefile
 
 ############
 ## Generated test files and directories
