@@ -118,7 +118,7 @@ void symbol_insert ( char *key, symbol_t *value ) {
 
 
 	if ( value->depth == -1 )
-		value->depth = values_index;
+		value->depth = scopes_index;
 	
 	ght_insert ( scopes[scopes_index], value, strlen ( key ), key );
 	values[values_index] = value;
