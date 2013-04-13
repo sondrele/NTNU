@@ -153,9 +153,9 @@ void generate ( FILE *stream, node_t *root )
 			 * Emit the list of print items, followed by newline (0x0A)
 			 */
 			RECUR ();
-			instruction_add ( PUSH, STRDUP( "0x0A" ), NULL, 0, 0 );
-			instruction_add ( SYSCALL, STRDUP( "printf" ), NULL, 0, 0 );
-			instruction_add ( ADD, STRDUP( "$4" ), STRDUP ( esp ), 0, 0 );
+			// instruction_add ( PUSH, STRDUP( "0x0A" ), NULL, 0, 0 );
+			// instruction_add ( SYSCALL, STRDUP( "printf" ), NULL, 0, 0 );
+			// instruction_add ( ADD, STRDUP( "$4" ), STRDUP ( esp ), 0, 0 );
 			break;
 
 		case PRINT_ITEM: {
@@ -169,8 +169,9 @@ void generate ( FILE *stream, node_t *root )
 			if ( root->children[0]->type.index == TEXT ) {
 				sprintf ( val, "$.STRING%d", *(int *)root->children[0]->data );
 				instruction_add ( PUSH, STRDUP( val ), NULL, 0, 0 );
+				instruction_add ( PUSH, STRDUP( "0x0A" ), NULL, 0, 0 );
 				instruction_add ( SYSCALL, STRDUP( "printf" ), NULL, 0, 0 );
-				instruction_add ( ADD, STRDUP( "$4" ), STRDUP ( esp ), 0, 0 );
+				instruction_add ( ADD, STRDUP( "$8" ), STRDUP ( esp ), 0, 0 );
 			} else {
 				generate ( stream, root->children[0] ); // Will add the expression to the stack
 				instruction_add ( PUSH, STRDUP( "$.INTEGER" ), NULL, 0, 0 );
