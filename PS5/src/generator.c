@@ -103,7 +103,8 @@ void generate ( FILE *stream, node_t *root )
 
 			/* TODO: Insert a call to the first defined function here */
 			node_t *main_func = root->children[0]->children[0];
-			instruction_add ( CALL, STRDUP( (char*) main_func->children[0]->data), NULL, 0, 0);
+			instruction_add ( CALL, STRDUP( (char*) main_func->children[0]->data ),
+					NULL, 0, 0);
 
 			TEXT_TAIL();
 
@@ -116,17 +117,28 @@ void generate ( FILE *stream, node_t *root )
 			 * Function definitions:
 			 * Set up/take down activation record for the function, return value
 			 */
-			 
+			instruction_add ( LABEL, STRDUP ( root->children[0]->data ), NULL, 0, 0 );
+			instruction_add ( PUSH, STRDUP ( ebp ), NULL, 0, 0 );
+			// for ( int i = 0; i < root->children[1]->n_children; i++ ) {
+			// 	instruction_add
+			// }
+			RECUR ();
 			break;
 
-		case BLOCK:
+		case BLOCK: {
 			/*
 			 * Blocks:
 			 * Set up/take down activation record, no return value
 			 */
+			// node_t *declaration_list_n = root->children[0];
+			// node_t *statement_list_n = root->children[1];
 
+			// for ( int i = 0; i < statement_list_n->n_children; i++ ) {
+
+			// }
+			RECUR ();
 			break;
-
+		}
 		case DECLARATION:
 			/*
 			 * Declarations:
@@ -140,7 +152,7 @@ void generate ( FILE *stream, node_t *root )
 			 * Print lists:
 			 * Emit the list of print items, followed by newline (0x0A)
 			 */
-
+			RECUR ();
 			break;
 
 		case PRINT_ITEM: {
@@ -149,13 +161,13 @@ void generate ( FILE *stream, node_t *root )
 			 * Determine what kind of value (string literal or expression)
 			 * and set up a suitable call to printf
 			 */
-			
+			//printf("Print item!\n");
 			char val[30];
 			if ( root->children[0]->type.index == TEXT ) {
-				sprintf ( val, "$.STRING%d", root->children[0]->data );
+				sprintf ( val, "$.STRING%d", *(int *)root->children[0]->data );
 				instruction_add ( PUSH, STRDUP( val ), NULL, 0, 0 );
 				instruction_add ( SYSCALL, STRDUP( "printf" ), NULL, 0, 0 );
-				instruction_add ( ADD, STRDUP( "$4" ), NULL, 0, 0 );
+				instruction_add ( ADD, STRDUP( "$4" ), STRDUP ( esp ), 0, 0 );
 			} else {
 				generate ( stream, root->children[0] ); // Will add the expression to the stack
 				instruction_add ( PUSH, STRDUP( "$.INTEGER" ), NULL, 0, 0 );
@@ -209,7 +221,7 @@ void generate ( FILE *stream, node_t *root )
 			 */
 
 			//int32_t stack_offset = 
-
+			RECUR ();
 			break;
 
 		case INTEGER: {
@@ -233,13 +245,16 @@ void generate ( FILE *stream, node_t *root )
 			root->entry = root->children[0]->entry;
 			break;
 
-		case RETURN_STATEMENT:
+		case RETURN_STATEMENT: {
 			/*
 			 * Return statements:
 			 * Evaluate the expression and put it in EAX
 			 */
+			char str[30];
+			sprintf ( str, "$%d", *(int *)root->children[0]->data );
+			instruction_add ( MOVE, STRDUP ( str ), STRDUP ( eax ), 0, 0 );
 			break;
-
+		}
 		default:
 			/* Everything else can just continue through the tree */
 			RECUR();
