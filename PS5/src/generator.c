@@ -153,9 +153,9 @@ void generate ( FILE *stream, node_t *root )
 			 * Emit the list of print items, followed by newline (0x0A)
 			 */
 			RECUR ();
-			instruction_add(PUSH, STRDUP("$0x0A"), NULL, 0, 0);
-			instruction_add(SYSCALL, STRDUP("printf"), NULL, 0, 0);
-			instruction_add(ADD, STRDUP("$4"), esp, 0, 0);
+			instruction_add ( PUSH, STRDUP( "0x0A" ), NULL, 0, 0 );
+			instruction_add ( SYSCALL, STRDUP( "printf" ), NULL, 0, 0 );
+			instruction_add ( ADD, STRDUP( "$4" ), STRDUP ( esp ), 0, 0 );
 			break;
 
 		case PRINT_ITEM: {
