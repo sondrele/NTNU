@@ -7,7 +7,7 @@ bool peephole = false;
 
 /* Instructions */
 typedef enum {
-	STRING, LABEL, PUSH, POP, MOVE, CALL, SYSCALL, LEAVE, RET,
+	RETURN, STRING, LABEL, PUSH, POP, MOVE, CALL, SYSCALL, LEAVE, RET,
 	ADD, SUB, MUL, DIV, JUMP, JUMPZERO, JUMPNONZ, DECL, CLTD, NEG, CMPZERO, NIL,
 	CMP, SETL, SETG, SETLE, SETGE, SETE, SETNE, CBW, CWDE,JUMPEQ
 } opcode_t;
@@ -164,7 +164,7 @@ void generate ( FILE *stream, node_t *root )
 			//printf("Print item!\n");
 			char val[30];
 			if ( root->children[0]->type.index == TEXT ) {
-				sprintf ( val, "$.STRING%d", *(int *)root->children[0]->data );
+				sprintf ( val, "$.STRING%d\n", *(int *)root->children[0]->data );
 				instruction_add ( PUSH, STRDUP( val ), NULL, 0, 0 );
 				instruction_add ( SYSCALL, STRDUP( "printf" ), NULL, 0, 0 );
 				instruction_add ( ADD, STRDUP( "$4" ), STRDUP ( esp ), 0, 0 );
@@ -253,6 +253,8 @@ void generate ( FILE *stream, node_t *root )
 			char str[30];
 			sprintf ( str, "$%d", *(int *)root->children[0]->data );
 			instruction_add ( MOVE, STRDUP ( str ), STRDUP ( eax ), 0, 0 );
+			instruction_add ( POP, STRDUP ( ebp ), NULL, 0, 0 );
+			instruction_add ( RET, NULL, NULL, 0, 0 );
 			break;
 		}
 		default:

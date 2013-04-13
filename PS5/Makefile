@@ -30,6 +30,11 @@ test: all
 run: all
 	bin/vslc < vsl_programs/${arg}.vsl
 
+upload: all
+	git commit -am "Uploading..."
+	git push
+#scp testOutput/hello.s sondrele@asti.idi.ntnu.no:~
+
 #
 # The binary is built in 'obj' when all the object code is ready.
 # Make a copy of it in 'bin', to leave it around even after cleanup of
