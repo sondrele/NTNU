@@ -153,6 +153,9 @@ void generate ( FILE *stream, node_t *root )
 			 * Emit the list of print items, followed by newline (0x0A)
 			 */
 			RECUR ();
+			instruction_add(PUSH, STRDUP("$.NEWLINE"), NULL, 0, 0);
+			instruction_add(SYSCALL, STRDUP("printf"), NULL, 0, 0);
+			instruction_add(ADD, STRDUP("$4"), esp, 0, 0);
 			break;
 
 		case PRINT_ITEM: {
@@ -164,7 +167,7 @@ void generate ( FILE *stream, node_t *root )
 			//printf("Print item!\n");
 			char val[30];
 			if ( root->children[0]->type.index == TEXT ) {
-				sprintf ( val, "$.STRING%d\n", *(int *)root->children[0]->data );
+				sprintf ( val, "$.STRING%d", *(int *)root->children[0]->data );
 				instruction_add ( PUSH, STRDUP( val ), NULL, 0, 0 );
 				instruction_add ( SYSCALL, STRDUP( "printf" ), NULL, 0, 0 );
 				instruction_add ( ADD, STRDUP( "$4" ), STRDUP ( esp ), 0, 0 );
