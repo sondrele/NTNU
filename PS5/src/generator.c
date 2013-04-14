@@ -121,6 +121,8 @@ void generate ( FILE *stream, node_t *root )
 			instruction_add ( PUSH, STRDUP ( ebp ), NULL, 0, 0 );
 			instruction_add ( MOVE, esp, ebp, 0, 0 );
 			RECUR ();
+			instruction_add ( LEAVE, NULL, NULL, 0, 0 );
+			instruction_add ( RET, NULL, NULL, 0, 0 );
 			// for ( int i = 0; i < root->children[1]->n_children; i++ ) {
 			// 	instruction_add
 			// }
@@ -257,8 +259,7 @@ void generate ( FILE *stream, node_t *root )
 			char str[30];
 			sprintf ( str, "$%d", *(int *)root->children[0]->data );
 			instruction_add ( MOVE, STRDUP ( str ), STRDUP ( eax ), 0, 0 );
-			instruction_add ( POP, STRDUP ( ebp ), NULL, 0, 0 );
-			instruction_add ( RET, NULL, NULL, 0, 0 );
+			//instruction_add ( POP, STRDUP ( ebp ), NULL, 0, 0 );
 			break;
 		}
 		default:
