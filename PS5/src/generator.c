@@ -210,7 +210,7 @@ void generate ( FILE *stream, node_t *root )
 				RECUR ();
 				instruction_add ( POP, ebx, NULL, 0, 0 );
 				instruction_add ( POP, eax, NULL, 0, 0 );
-				
+
 				switch ( *((char *)(root->data) )) {
 					case '+':
 						instruction_add ( ADD, ebx, eax, 0, 0 );
@@ -265,6 +265,7 @@ void generate ( FILE *stream, node_t *root )
 			 * (unwinding if necessary)
 			 */
 
+			// TODO: Fikse riktig stack offset
 			generate ( stream, root->children[1] ); // Evaluate expression
 			root->entry = root->children[0]->entry;
 			instruction_add ( POP, ebp, NULL, -4, 0 );
