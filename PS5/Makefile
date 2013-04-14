@@ -17,7 +17,7 @@ INCLUDEPATH=\
 
 CFLAGS+=  -D_POSIX_C_SOURCE -std=c99 ${INCLUDEPATH} -g
 LDFLAGS+= -L/usr/local/lib -Llib
-LDLIBS+=  -lghthash64
+LDLIBS+=  -lghthash
 YFLAGS+=  --defines=work/parser.h -o y.tab.c
 
 # Targets:
@@ -34,7 +34,12 @@ upload: all
 	git commit -am "Uploading..."
 	git push
 #scp testOutput/hello.s sondrele@asti.idi.ntnu.no:~
-
+download:
+	git checkout .
+	git pull
+	vim Makefile
+status:
+	ls -laS testOutput/*.diff
 #
 # The binary is built in 'obj' when all the object code is ready.
 # Make a copy of it in 'bin', to leave it around even after cleanup of
