@@ -226,6 +226,7 @@ void generate ( FILE *stream, node_t *root )
 						instruction_add ( DIV, ebx, NULL, 0, 0 );
 						break;
 				}
+				instruction_add ( PUSH, eax, NULL, 0, 0 );
 			} else if ( root->data != NULL ) {
 				instruction_add ( POP, eax, NULL, 0, 0 );
 				instruction_add ( NEG, eax, NULL, 0, 0 );

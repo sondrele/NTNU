@@ -17,7 +17,7 @@ INCLUDEPATH=\
 
 CFLAGS+=  -D_POSIX_C_SOURCE -std=c99 ${INCLUDEPATH} -g
 LDFLAGS+= -L/usr/local/lib -Llib
-LDLIBS+=  -lghthash
+LDLIBS+=  -lghthash64
 YFLAGS+=  --defines=work/parser.h -o y.tab.c
 
 # Targets:
