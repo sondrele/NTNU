@@ -7,7 +7,7 @@ bool peephole = false;
 
 /* Instructions */
 typedef enum {
-	RETURN, STRING, LABEL, PUSH, POP, MOVE, CALL, SYSCALL, LEAVE, RET,
+	STRING, LABEL, PUSH, POP, MOVE, CALL, SYSCALL, LEAVE, RET,
 	ADD, SUB, MUL, DIV, JUMP, JUMPZERO, JUMPNONZ, DECL, CLTD, NEG, CMPZERO, NIL,
 	CMP, SETL, SETG, SETLE, SETGE, SETE, SETNE, CBW, CWDE,JUMPEQ
 } opcode_t;
@@ -120,7 +120,9 @@ void generate ( FILE *stream, node_t *root )
 			instruction_add ( LABEL, STRDUP ( root->children[0]->data ), NULL, 0, 0 );
 			instruction_add ( PUSH, STRDUP ( ebp ), NULL, 0, 0 );
 			instruction_add ( MOVE, esp, ebp, 0, 0 );
-			RECUR ();
+			// RECUR ();
+			generate ( stream, root->children[1] );
+			generate ( stream, root->children[2] );
 			instruction_add ( LEAVE, NULL, NULL, 0, 0 );
 			instruction_add ( RET, NULL, NULL, 0, 0 );
 			// for ( int i = 0; i < root->children[1]->n_children; i++ ) {
@@ -142,14 +144,20 @@ void generate ( FILE *stream, node_t *root )
 			RECUR ();
 			break;
 		}
-		case DECLARATION:
+		case DECLARATION: {
 			/*
 			 * Declarations:
 			 * Add space on local stack
 			 */
-
+			// char str[30];
+			int offset = 0;
+			for ( int i = 0; i < root->children[0]->n_children; i++ ) {
+				offset -= 4;
+				// sprintf ( str, "%d(%%esp)", offset );
+				instruction_add ( PUSH, STRDUP( esp ), NULL, offset, 0 );
+			}
 			break;
-
+		}
 		case PRINT_LIST:
 			/*
 			 * Print lists:
@@ -191,16 +199,19 @@ void generate ( FILE *stream, node_t *root )
 			 * (single variables/integers handled in separate switch/cases)
 			 */
 
+			// Expression is a function call
 			if ( root->n_children == 2 && root->children[0]->type.index == VARIABLE ) {
-			
-			}
-			
-			RECUR ();
-			if ( root->n_children == 2 ) { //TODO: Tenk på Variable ( ArgumentList )
+				// Push parameters on stack
+				generate ( stream, root->children[1] );
+				instruction_add ( CALL, STRDUP( (char *) root->children[0]->data ),
+					NULL, 0, 0);
+				instruction_add ( PUSH, STRDUP( eax ), NULL, 0, 0 );
+			} else if ( root->n_children == 2) {
+				// RECUR ();
 				// generate ( stream, root->children[0] );
 				// generate ( stream, root->children[1] );
 				
-				switch ( *((char *)(root->data)) ) {
+				switch ( *((char *)(root->data) )) {
 					case '+':
 						instruction_add ( ADD, ebx, eax, 0, 0 );
 						break;
@@ -215,42 +226,50 @@ void generate ( FILE *stream, node_t *root )
 						instruction_add ( DIV, ebx, NULL, 0, 0 );
 						break;
 				}
+			} else if ( root->data != NULL ) {
+				instruction_add ( POP, STRDUP ( eax ), NULL, 0, 0 );
+				instruction_add ( NEG, STRDUP ( eax ), NULL, 0, 0 );
+				instruction_add ( PUSH, STRDUP ( eax ), NULL, 0, 0 );
 			}
 
 			break;
 
-		case VARIABLE:
+		case VARIABLE: {
 			/*
 			 * Occurrences of variables: (declarations have their own case)
 			 * - Find the variable's stack offset
 			 * - If var is not local, unwind the stack to its correct base
 			 */
 
-			//int32_t stack_offset = 
-			RECUR ();
+			int stack_offset = -4;
+			// stack_offset = root->entry->stack_offset;
+			// TODO: få riktig ebp
+			instruction_add ( PUSH, STRDUP( ebp ), NULL, stack_offset, 0 );
 			break;
-
+		}
 		case INTEGER: {
 			/*
 			 * Integers: constants which can just be put on stack
 			 */
 
-			char *value = root->data;
-			instruction_add ( PUSH, STRDUP( value ), NULL, 0, 0 );
+			char str[30];
+			sprintf ( str, "$%d", *(int *)root->data );
+			instruction_add ( PUSH, STRDUP( str ), NULL, 0, 0 );
 
 			break;
 		}
-		case ASSIGNMENT_STATEMENT:
+		case ASSIGNMENT_STATEMENT: {
 			/*
 			 * Assignments:
 			 * Right hand side is an expression, find left hand side on stack
 			 * (unwinding if necessary)
 			 */
 
-			generate ( stream, root->children[1] );
+			generate ( stream, root->children[1] ); // Evaluate expression
 			root->entry = root->children[0]->entry;
+			instruction_add ( POP, STRDUP( ebp ), NULL, -4, 0 );
 			break;
-
+		}
 		case RETURN_STATEMENT: {
 			/*
 			 * Return statements:
