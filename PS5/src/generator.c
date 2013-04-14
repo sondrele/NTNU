@@ -186,7 +186,7 @@ void generate ( FILE *stream, node_t *root )
 				generate ( stream, root->children[0] ); // Will add the expression to the stack
 				instruction_add ( PUSH, STRDUP( "$.INTEGER" ), NULL, 0, 0 );
 				instruction_add ( SYSCALL, STRDUP( "printf" ), NULL, 0, 0 );
-				instruction_add ( ADD, STRDUP( "$8" ), NULL, 0, 0 );
+				instruction_add ( ADD, STRDUP( "$8" ), esp, 0, 0 );
 			}
 
 			break;
