@@ -200,7 +200,7 @@ void generate ( FILE *stream, node_t *root )
 			 */
 
 			// Expression is a function call
-			if ( root->n_children == 2 && root->children[0]->type.index == VARIABLE ) {
+			if ( root->n_children == 2 && root->children[1]->type.index == ARGUMENT_LIST ) {
 				// Push parameters on stack
 				generate ( stream, root->children[1] );
 				instruction_add ( CALL, STRDUP( (char *) root->children[0]->data ),
