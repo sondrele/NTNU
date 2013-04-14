@@ -207,9 +207,9 @@ void generate ( FILE *stream, node_t *root )
 					NULL, 0, 0);
 				instruction_add ( PUSH, eax, NULL, 0, 0 );
 			} else if ( root->n_children == 2) {
-				// RECUR ();
-				// generate ( stream, root->children[0] );
-				// generate ( stream, root->children[1] );
+				RECUR ();
+				instruction_add ( POP, ebx, NULL, 0, 0 );
+				instruction_add ( POP, eax, NULL, 0, 0 );
 				
 				switch ( *((char *)(root->data) )) {
 					case '+':
