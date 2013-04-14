@@ -117,8 +117,8 @@ void generate ( FILE *stream, node_t *root )
 			 * Function definitions:
 			 * Set up/take down activation record for the function, return value
 			 */
-			instruction_add ( LABEL, STRDUP ( root->children[0]->data ), NULL, 0, 0 );
-			instruction_add ( PUSH, STRDUP ( ebp ), NULL, 0, 0 );
+			instruction_add ( LABEL, STRDUP( root->children[0]->data ), NULL, 0, 0 );
+			instruction_add ( PUSH, ebp, NULL, 0, 0 );
 			instruction_add ( MOVE, esp, ebp, 0, 0 );
 			// RECUR ();
 			generate ( stream, root->children[1] );
@@ -154,7 +154,7 @@ void generate ( FILE *stream, node_t *root )
 			for ( int i = 0; i < root->children[0]->n_children; i++ ) {
 				offset -= 4;
 				// sprintf ( str, "%d(%%esp)", offset );
-				instruction_add ( PUSH, STRDUP( esp ), NULL, offset, 0 );
+				instruction_add ( PUSH, esp, NULL, offset, 0 );
 			}
 			break;
 		}
@@ -166,7 +166,7 @@ void generate ( FILE *stream, node_t *root )
 			RECUR ();
 			instruction_add ( PUSH, STRDUP( "$.NEWLINE" ), NULL, 0, 0 );
 			instruction_add ( SYSCALL, STRDUP( "printf" ), NULL, 0, 0 );
-			instruction_add ( ADD, STRDUP( "$4" ), STRDUP ( esp ), 0, 0 );
+			instruction_add ( ADD, STRDUP( "$4" ), esp, 0, 0 );
 			break;
 
 		case PRINT_ITEM: {
@@ -181,7 +181,7 @@ void generate ( FILE *stream, node_t *root )
 				sprintf ( val, "$.STRING%d", *(int *)root->children[0]->data );
 				instruction_add ( PUSH, STRDUP( val ), NULL, 0, 0 );
 				instruction_add ( SYSCALL, STRDUP( "printf" ), NULL, 0, 0 );
-				instruction_add ( ADD, STRDUP( "$4" ), STRDUP ( esp ), 0, 0 );
+				instruction_add ( ADD, STRDUP( "$4" ), esp, 0, 0 );
 			} else {
 				generate ( stream, root->children[0] ); // Will add the expression to the stack
 				instruction_add ( PUSH, STRDUP( "$.INTEGER" ), NULL, 0, 0 );
@@ -205,7 +205,7 @@ void generate ( FILE *stream, node_t *root )
 				generate ( stream, root->children[1] );
 				instruction_add ( CALL, STRDUP( (char *) root->children[0]->data ),
 					NULL, 0, 0);
-				instruction_add ( PUSH, STRDUP( eax ), NULL, 0, 0 );
+				instruction_add ( PUSH, eax, NULL, 0, 0 );
 			} else if ( root->n_children == 2) {
 				// RECUR ();
 				// generate ( stream, root->children[0] );
@@ -227,9 +227,9 @@ void generate ( FILE *stream, node_t *root )
 						break;
 				}
 			} else if ( root->data != NULL ) {
-				instruction_add ( POP, STRDUP ( eax ), NULL, 0, 0 );
-				instruction_add ( NEG, STRDUP ( eax ), NULL, 0, 0 );
-				instruction_add ( PUSH, STRDUP ( eax ), NULL, 0, 0 );
+				instruction_add ( POP, eax, NULL, 0, 0 );
+				instruction_add ( NEG, eax, NULL, 0, 0 );
+				instruction_add ( PUSH, eax, NULL, 0, 0 );
 			}
 
 			break;
@@ -244,7 +244,7 @@ void generate ( FILE *stream, node_t *root )
 			// int stack_offset = -4;
 			int stack_offset = root->entry->stack_offset;
 			// TODO: få riktig ebp
-			instruction_add ( PUSH, STRDUP( ebp ), NULL, stack_offset, 0 );
+			instruction_add ( PUSH, ebp, NULL, stack_offset, 0 );
 			break;
 		}
 		case INTEGER: {
@@ -267,7 +267,7 @@ void generate ( FILE *stream, node_t *root )
 
 			generate ( stream, root->children[1] ); // Evaluate expression
 			root->entry = root->children[0]->entry;
-			instruction_add ( POP, STRDUP( ebp ), NULL, -4, 0 );
+			instruction_add ( POP, ebp, NULL, -4, 0 );
 			break;
 		}
 		case RETURN_STATEMENT: {
@@ -277,8 +277,8 @@ void generate ( FILE *stream, node_t *root )
 			 */
 			char str[30];
 			sprintf ( str, "$%d", *(int *)root->children[0]->data );
-			instruction_add ( MOVE, STRDUP ( str ), STRDUP ( eax ), 0, 0 );
-			//instruction_add ( POP, STRDUP ( ebp ), NULL, 0, 0 );
+			instruction_add ( MOVE, STRDUP( str ), eax, 0, 0 );
+			//instruction_add ( POP, ebp, NULL, 0, 0 );
 			break;
 		}
 		default:

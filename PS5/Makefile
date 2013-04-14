@@ -29,6 +29,7 @@ test: all
 
 run: all
 	bin/vslc < vsl_programs/${arg}.vsl
+	gcc -g -o ${arg} testOutput/${arg}.s
 
 upload: all
 	git commit -am "Uploading..."
