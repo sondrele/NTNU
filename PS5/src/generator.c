@@ -103,7 +103,7 @@ void generate ( FILE *stream, node_t *root )
 
 			/* TODO: Insert a call to the first defined function here */
 			node_t *main_func = root->children[0]->children[0];
-			instruction_add ( CALL, STRDUP( (char*) main_func->children[0]->data ),
+			instruction_add ( CALL, STRDUP( (char *) main_func->children[0]->data ),
 					NULL, 0, 0);
 
 			TEXT_TAIL();
@@ -119,10 +119,11 @@ void generate ( FILE *stream, node_t *root )
 			 */
 			instruction_add ( LABEL, STRDUP ( root->children[0]->data ), NULL, 0, 0 );
 			instruction_add ( PUSH, STRDUP ( ebp ), NULL, 0, 0 );
+			instruction_add ( MOVE, esp, ebp, 0, 0 );
+			RECUR ();
 			// for ( int i = 0; i < root->children[1]->n_children; i++ ) {
 			// 	instruction_add
 			// }
-			RECUR ();
 			break;
 
 		case BLOCK: {
