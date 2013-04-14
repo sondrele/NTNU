@@ -241,8 +241,8 @@ void generate ( FILE *stream, node_t *root )
 			 * - If var is not local, unwind the stack to its correct base
 			 */
 
-			int stack_offset = -4;
-			// stack_offset = root->entry->stack_offset;
+			// int stack_offset = -4;
+			int stack_offset = root->entry->stack_offset;
 			// TODO: få riktig ebp
 			instruction_add ( PUSH, STRDUP( ebp ), NULL, stack_offset, 0 );
 			break;
