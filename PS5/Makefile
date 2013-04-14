@@ -17,7 +17,7 @@ INCLUDEPATH=\
 
 CFLAGS+=  -D_POSIX_C_SOURCE -std=c99 ${INCLUDEPATH} -g
 LDFLAGS+= -L/usr/local/lib -Llib
-LDLIBS+=  -lghthash64
+LDLIBS+=  -lghthash
 YFLAGS+=  --defines=work/parser.h -o y.tab.c
 
 # Targets:
@@ -28,8 +28,9 @@ test: all
 	./test_runner.sh
 
 run: all
-	bin/vslc < vsl_programs/${arg}.vsl
 	gcc -g -o ${arg} testOutput/${arg}.s
+	bin/vslc < vsl_programs/${arg}.vsl
+	./${arg}
 
 upload: all
 	git commit -am "Uploading..."
