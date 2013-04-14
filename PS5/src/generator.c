@@ -267,8 +267,8 @@ void generate ( FILE *stream, node_t *root )
 
 			// TODO: Fikse riktig stack offset
 			generate ( stream, root->children[1] ); // Evaluate expression
-			root->entry = root->children[0]->entry;
-			instruction_add ( POP, ebp, NULL, -4, 0 );
+			// root->entry = root->children[0]->entry;
+			instruction_add ( POP, ebp, NULL, root->children[0]->entry->stack_offset, 0 );
 			break;
 		}
 		case RETURN_STATEMENT: {
