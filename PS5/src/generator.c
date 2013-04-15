@@ -92,7 +92,6 @@ void generate ( FILE *stream, node_t *root )
 	{
 		case PROGRAM:
 			/* Output the data segment */
-			depth += 1;
 			strings_output ( stream );
 			instruction_add ( STRING, STRDUP( ".text" ), NULL, 0, 0 );
 
@@ -106,7 +105,6 @@ void generate ( FILE *stream, node_t *root )
 
 			instructions_print ( stream );
 			instructions_finalize ();
-			depth -= 1;
 			break;
 
 		case FUNCTION:
@@ -115,6 +113,9 @@ void generate ( FILE *stream, node_t *root )
 			 * Set up/take down activation record for the function, return value
 			 */
 			depth += 1;
+			// char str[30];
+			// sprintf(str, "Depth:%d", depth);
+			// instruction_add ( JUMPZERO, STRDUP( str ), NULL, 0, 0 );
 			instruction_add ( LABEL, STRDUP( root->children[0]->data ), NULL, 0, 0 );
 			instruction_add ( PUSH, ebp, NULL, 0, 0 );
 			instruction_add ( MOVE, esp, ebp, 0, 0 );
@@ -272,10 +273,14 @@ void generate ( FILE *stream, node_t *root )
 			// sprintf ( str, "Stack offset: %d", stack_offset );
 			// instruction_add (JUMPZERO, STRDUP(str), NULL, 0, 0 );
 
+			int stack_offset = root->entry->stack_offset;
 			if ( depth == root->entry->depth ) {
-				int stack_offset = root->entry->stack_offset;
 				instruction_add ( PUSH, ebp, NULL, stack_offset, 0 );
-				
+			} else {
+				instruction_add ( MOVE, ebp, ecx, 0, 0 );
+				for ( int i = depth; i > root->entry->depth; i-- ) {
+
+				}
 			}
 			break;
 		}
