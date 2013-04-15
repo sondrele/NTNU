@@ -166,7 +166,8 @@ void generate ( FILE *stream, node_t *root )
 			RECUR ();
 			// Added a NEWLINE-string in symtab.c, this is printed
 			// whenever a PRINT_LIST occurs
-			instruction_add ( PUSH, STRDUP( "0x0000000a" ), NULL, 0, 0 );
+			instruction_add ( MOVE, STRDUP( "0x0000000a" ), ebx, 0, 0 );
+			instruction_add ( PUSH, ebx, NULL, 0, 0 );
 			instruction_add ( SYSCALL, STRDUP( "putc" ), NULL, 0, 0 );
 			instruction_add ( ADD, STRDUP( "$4" ), esp, 0, 0 );
 			break;
