@@ -227,6 +227,8 @@ void generate ( FILE *stream, node_t *root )
 						instruction_add ( CLTD, NULL, NULL, 0, 0 );
 						instruction_add ( DIV, ebx, NULL, 0, 0 );
 						break;
+					// The following cases is a bit repetative, I know
+					// Maybe gcc will optimize it a bit? ;-)
 					case '=':
 						instruction_add ( CMP, ebx, eax, 0, 0 );
 						instruction_add ( SETE, al, NULL, 0, 0 );
@@ -293,12 +295,13 @@ void generate ( FILE *stream, node_t *root )
 			}
 			break;
 		}
-		case IF_STATEMENT: {
-			// Add expression to stack
-			generate ( stream, root->children[0] );
-
-			break;
-		}
+		// case IF_STATEMENT: {
+		// 	// Add expression to stack
+		// 	generate ( stream, root->children[0] );
+		// 	instruction_add ( POP, eax, NULL, 0, 0 );
+		// 	instruction_add ( JUMPEQ, 0, 0 );
+		// 	break;
+		// }
 		case ASSIGNMENT_STATEMENT: {
 			/*
 			 * Assignments:
