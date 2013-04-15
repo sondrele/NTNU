@@ -275,14 +275,11 @@ void generate ( FILE *stream, node_t *root )
 			// instruction_add ( JUMPZERO, STRDUP( str ), NULL, 0, 0 );
 
 			int stack_offset = root->entry->stack_offset;
-			if (  depth == root->entry->depth ) {
+			if ( depth == root->entry->depth || stack_offset > 0 ) {
 				instruction_add ( PUSH, ebp, NULL, stack_offset, 0 );
-			}
-			// } else {
+			}// } else {
 			// 	instruction_add ( MOVE, ebp, ecx, 0, 0 );
 			// 	for ( int i = depth; i > root->entry->depth; i-- ) {
-
-			// 	}
 			// }
 			break;
 		}
