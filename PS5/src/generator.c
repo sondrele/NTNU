@@ -33,7 +33,7 @@ static instruction_t *start = NULL, *last = NULL;
  * Track the scope depth when traversing the tree - init. value may depend on
  * how the symtab was built
  */ 
-static int32_t depth = 1;
+static int32_t depth = 2;
 
 /* Prototypes for auxiliaries (implemented at the end of this file) */
 static void instruction_add ( opcode_t op, char *arg1, char *arg2, int32_t off1, int32_t off2 );
@@ -113,6 +113,10 @@ void generate ( FILE *stream, node_t *root )
 			 * Set up/take down activation record for the function, return value
 			 */
 			depth += 1;
+			// char str[30];
+			// sprintf(str, "Depth += 1:%d", depth );
+			// instruction_add ( JUMPZERO, STRDUP( str ), NULL, 0, 0 );
+
 			instruction_add ( LABEL, STRDUP( root->children[0]->data ), NULL, 0, 0 );
 			instruction_add ( PUSH, ebp, NULL, 0, 0 );
 			instruction_add ( MOVE, esp, ebp, 0, 0 );
@@ -271,7 +275,7 @@ void generate ( FILE *stream, node_t *root )
 			// instruction_add ( JUMPZERO, STRDUP( str ), NULL, 0, 0 );
 
 			int stack_offset = root->entry->stack_offset;
-			if ( depth == root->entry->depth ) {
+			if (  depth == root->entry->depth ) {
 				instruction_add ( PUSH, ebp, NULL, stack_offset, 0 );
 			}
 			// } else {
