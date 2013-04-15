@@ -90,7 +90,7 @@ void generate ( FILE *stream, node_t *root )
 
 	switch ( root->type.index )
 	{
-		case PROGRAM:
+		case PROGRAM: {
 			/* Output the data segment */
 			strings_output ( stream );
 			instruction_add ( STRING, STRDUP( ".text" ), NULL, 0, 0 );
@@ -106,17 +106,13 @@ void generate ( FILE *stream, node_t *root )
 			instructions_print ( stream );
 			instructions_finalize ();
 			break;
-
-		case FUNCTION:
+		}
+		case FUNCTION: {
 			/*
 			 * Function definitions:
 			 * Set up/take down activation record for the function, return value
 			 */
 			depth += 1;
-			// char str[30];
-			// sprintf(str, "Depth += 1:%d", depth );
-			// instruction_add ( JUMPZERO, STRDUP( str ), NULL, 0, 0 );
-
 			instruction_add ( LABEL, STRDUP( root->children[0]->data ), NULL, 0, 0 );
 			instruction_add ( PUSH, ebp, NULL, 0, 0 );
 			instruction_add ( MOVE, esp, ebp, 0, 0 );
@@ -126,7 +122,7 @@ void generate ( FILE *stream, node_t *root )
 			instruction_add ( RET, NULL, NULL, 0, 0 );
 			depth -= 1;
 			break;
-
+		}
 		case BLOCK: {
 			/*
 			 * Blocks:
@@ -153,7 +149,7 @@ void generate ( FILE *stream, node_t *root )
 			}
 			break;
 		}
-		case PRINT_LIST:
+		case PRINT_LIST: {
 			/*
 			 * Print lists:
 			 * Emit the list of print items, followed by newline (0x0A)
@@ -163,7 +159,7 @@ void generate ( FILE *stream, node_t *root )
 			instruction_add ( SYSCALL, STRDUP( "printf" ), NULL, 0, 0 );
 			instruction_add ( ADD, STRDUP( "$4" ), esp, 0, 0 );
 			break;
-
+		}
 		case PRINT_ITEM: {
 			/*
 			 * Items in print lists:
@@ -186,7 +182,7 @@ void generate ( FILE *stream, node_t *root )
 
 			break;
 		}
-		case EXPRESSION:
+		case EXPRESSION: {
 			/*
 			 * Expressions:
 			 * Handle any nested expressions first, then deal with the
@@ -259,9 +255,8 @@ void generate ( FILE *stream, node_t *root )
 				}
 				instruction_add ( PUSH, eax, NULL, 0, 0 );
 			} 
-
 			break;
-
+		}
 		case VARIABLE: {
 			/*
 			 * Occurrences of variables: (declarations have their own case)
