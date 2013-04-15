@@ -201,7 +201,7 @@ void generate ( FILE *stream, node_t *root )
 
 			// Expression is a function call
 			if ( root->n_children == 2 && root->children[0]->type.index == VARIABLE
-					&& ( root->children[1]->type.index == NULL
+					&& ( root->children[1] == NULL
 					|| root->children[1]->type.index == EXPRESSION_LIST ) ) {
 				// Push parameters on stack
 				generate ( stream, root->children[1] );
