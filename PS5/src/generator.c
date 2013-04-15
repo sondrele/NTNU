@@ -301,7 +301,7 @@ void generate ( FILE *stream, node_t *root )
 			// instruction_add ( POP, ebp, NULL, root->children[0]->entry->stack_offset, 0 );
 			root->entry = root->children[0]->entry;
 			int stack_offset = root->entry->stack_offset;
-			if ( depth == root->entry->depth) {
+			if ( depth == root->entry->depth || stack_offset > 0 ) {
 				instruction_add ( POP, ebp, NULL, stack_offset, 0 );
 				if ( 0 ) {		
 					// char str[30];
