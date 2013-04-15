@@ -50,8 +50,10 @@ static void instructions_finalize ( void );
 	for ( int32_t i=0; i<root->n_children; i++ ){\
 		if ( !returned )\
 			generate ( stream, root->children[i] );\
-		else\
+		else if ( root->type.index == STATEMENT_LIST ) {\
 			returned = 0;\
+			break;\
+		}\
 	}\
 } while(false)
 
