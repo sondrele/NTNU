@@ -299,7 +299,7 @@ void generate ( FILE *stream, node_t *root )
 			// instruction_add ( POP, ebp, NULL, root->children[0]->entry->stack_offset, 0 );
 			root->entry = root->children[0]->entry;
 			int stack_offset = root->entry->stack_offset;
-			if ( depth == root->entry->depth || stack_offset > 0 ) {
+			if ( depth == root->entry->depth) {
 				instruction_add ( POP, ebp, NULL, stack_offset, 0 );
 			} else {
 				// instruction_add ( MOVE, ebp, ecx, 0, 0 );
