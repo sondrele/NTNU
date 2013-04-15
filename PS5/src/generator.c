@@ -279,7 +279,7 @@ void generate ( FILE *stream, node_t *root )
 				// char str[30];
 				// sprintf(str, "Variabel: %s", (char*)(root->data));
 				// instruction_add ( JUMPZERO, STRDUP( str ), NULL, 0, 0 );
-			} else if ( stack_offset > 0 && root->entry->depth == (depth+1)) {
+			} else if ( stack_offset > 0 && root->entry->depth == (depth-1)) {
 				instruction_add ( PUSH, ebp, NULL, stack_offset, 0 );
 			} else {
 				instruction_add(MOVE, ebp, ecx, 0, 0);
