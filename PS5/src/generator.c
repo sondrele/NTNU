@@ -96,13 +96,13 @@ void generate ( FILE *stream, node_t *root )
 			strings_output ( stream );
 			instruction_add ( STRING, STRDUP( ".text" ), NULL, 0, 0 );
 
-			RECUR();
-			TEXT_HEAD();
+			RECUR ();
+			TEXT_HEAD ();
 			/* TODO: Insert a call to the first defined function here */
 			node_t *main_func = root->children[0]->children[0];
 			instruction_add ( CALL, STRDUP( (char *) main_func->children[0]->data ),
 					NULL, 0, 0);
-			TEXT_TAIL();
+			TEXT_TAIL ();
 
 			instructions_print ( stream );
 			instructions_finalize ();
@@ -167,7 +167,7 @@ void generate ( FILE *stream, node_t *root )
 			// Added a NEWLINE-string in symtab.c, this is printed
 			// whenever a PRINT_LIST occurs
 			instruction_add ( PUSH, STRDUP( "$.NEWLINE" ), NULL, 0, 0 );
-			instruction_add ( SYSCALL, STRDUP( "printf" ), NULL, 0, 0 );
+			instruction_add ( SYSCALL, STRDUP( "putc" ), NULL, 0, 0 );
 			instruction_add ( ADD, STRDUP( "$4" ), esp, 0, 0 );
 			break;
 		}
@@ -206,7 +206,7 @@ void generate ( FILE *stream, node_t *root )
 				generate ( stream, root->children[1] );
 				instruction_add ( CALL, STRDUP( (char *) root->children[0]->data ),
 					NULL, 0, 0);
-				// The evaluated expression is pushed to eax
+				// The evaluated expression to the stack
 				instruction_add ( PUSH, eax, NULL, 0, 0 );
 			} else if ( root->n_children == 2) {
 				RECUR ();
@@ -293,6 +293,12 @@ void generate ( FILE *stream, node_t *root )
 			}
 			break;
 		}
+		case IF_STATEMENT: {
+			// Add expression to stack
+			generate ( stream, root->children[0] );
+
+			break;
+		}
 		case ASSIGNMENT_STATEMENT: {
 			/*
 			 * Assignments:
@@ -342,8 +348,6 @@ void generate ( FILE *stream, node_t *root )
 
 
 /* Provided auxiliaries... */
-
-
 static void instruction_append ( instruction_t *next )
 {
 	if ( start != NULL )
