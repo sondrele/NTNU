@@ -27,9 +27,9 @@ all: bin/vslc
 test: all
 	./test_runner.sh
 
-run: all
+run:
+	bin/vslc < vsl_programs/${arg}.vsl | cat > testOutput/${arg}.s
 	gcc -g -o ${arg} testOutput/${arg}.s
-	bin/vslc < vsl_programs/${arg}.vsl
 	./${arg}
 
 upload: all

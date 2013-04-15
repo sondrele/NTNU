@@ -217,7 +217,6 @@ void generate ( FILE *stream, node_t *root )
 				instruction_add ( POP, eax, NULL, 0, 0 );
 
 				char *data = (char *) root->data;
-				printf("DATA!!!: %s\n", data);
 				switch ( data[0] ) {
 					case '+':
 						instruction_add ( ADD, ebx, eax, 0, 0 );
