@@ -113,9 +113,6 @@ void generate ( FILE *stream, node_t *root )
 			 * Set up/take down activation record for the function, return value
 			 */
 			depth += 1;
-			// char str[30];
-			// sprintf(str, "Depth:%d", depth);
-			// instruction_add ( JUMPZERO, STRDUP( str ), NULL, 0, 0 );
 			instruction_add ( LABEL, STRDUP( root->children[0]->data ), NULL, 0, 0 );
 			instruction_add ( PUSH, ebp, NULL, 0, 0 );
 			instruction_add ( MOVE, esp, ebp, 0, 0 );
@@ -276,6 +273,9 @@ void generate ( FILE *stream, node_t *root )
 			int stack_offset = root->entry->stack_offset;
 			// if ( depth == root->entry->depth ) {
 			instruction_add ( PUSH, ebp, NULL, stack_offset, 0 );
+			char str[30];
+			sprintf(str, "Depth:%d", depth);
+			instruction_add ( JUMPZERO, STRDUP( str ), NULL, 0, 0 );
 			// } else {
 			// 	instruction_add ( MOVE, ebp, ecx, 0, 0 );
 			// 	for ( int i = depth; i > root->entry->depth; i-- ) {
