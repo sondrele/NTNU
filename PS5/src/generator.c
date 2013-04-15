@@ -135,13 +135,10 @@ void generate ( FILE *stream, node_t *root )
 			 * Blocks:
 			 * Set up/take down activation record, no return value
 			 */
-			// node_t *declaration_list_n = root->children[0];
-			// node_t *statement_list_n = root->children[1];
-
-			// for ( int i = 0; i < statement_list_n->n_children; i++ ) {
-
-			// }
+			instruction_add ( PUSH, ebp, NULL, 0, 0 );
+			instruction_add ( MOVE, esp, ebp, 0, 0 );
 			RECUR ();
+			instruction_add ( LEAVE, NULL, NULL, 0, 0 );
 			break;
 		}
 		case DECLARATION: {
@@ -274,10 +271,10 @@ void generate ( FILE *stream, node_t *root )
 			 */
 
 			// TODO: få riktig ebp
-			int stack_offset = root->entry->stack_offset;
 			// char str[30];
 			// sprintf ( str, "Stack offset: %d", stack_offset );
 			// instruction_add (JUMPZERO, STRDUP(str), NULL, 0, 0 );
+			int stack_offset = root->entry->stack_offset;
 			instruction_add ( PUSH, ebp, NULL, stack_offset, 0 );
 			break;
 		}
