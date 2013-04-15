@@ -310,9 +310,10 @@ void generate ( FILE *stream, node_t *root )
 			 * Return statements:
 			 * Evaluate the expression and put it in EAX
 			 */
-			char str[30];
-			sprintf ( str, "$%d", *(int *)root->children[0]->data );
-			instruction_add ( MOVE, STRDUP( str ), eax, 0, 0 );
+			// char str[30];
+			// sprintf ( str, "$%d", *(int *)root->children[0]->data );
+			generate ( stream, root->children[0] );
+			//instruction_add ( MOVE, STRDUP( str ), eax, 0, 0 );
 			//instruction_add ( POP, ebp, NULL, 0, 0 );
 			break;
 		}
