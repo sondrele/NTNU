@@ -277,10 +277,37 @@ void generate ( FILE *stream, node_t *root )
 			int stack_offset = root->entry->stack_offset;
 			if ( depth == root->entry->depth || stack_offset > 0 ) {
 				instruction_add ( PUSH, ebp, NULL, stack_offset, 0 );
-			}// } else {
-			// 	instruction_add ( MOVE, ebp, ecx, 0, 0 );
-			// 	for ( int i = depth; i > root->entry->depth; i-- ) {
-			// }
+			} else {
+				// instruction_add ( MOVE, ebp, ecx, 0, 0 );
+				// instruction_add ( PUSH, STRDUP("(%%ebp)"), NULL, 0, 0 );
+				instruction_add(MOVE, ebp, ecx, 0, 0);
+				for (int32_t i = depth; i > root->entry->depth; i--)
+					instruction_add(STRING, STRDUP("\tmovl \t(%ecx),%ecx"), NULL, 0, 0);
+				instruction_add(PUSH, ecx, NULL, stack_offset, 0);
+			}
+			break;
+		}
+		case ASSIGNMENT_STATEMENT: {
+			/*
+			 * Assignments:
+			 * Right hand side is an expression, find left hand side on stack
+			 * (unwinding if necessary)
+			 */
+
+			generate ( stream, root->children[1] ); // Evaluate expression
+			// root->entry = root->children[0]->entry;
+			// instruction_add ( POP, ebp, NULL, root->children[0]->entry->stack_offset, 0 );
+			int stack_offset = root->entry->stack_offset;
+			if ( depth == root->entry->depth || stack_offset > 0 ) {
+				instruction_add ( POP, ebp, NULL, stack_offset, 0 );
+			} else {
+				// instruction_add ( MOVE, ebp, ecx, 0, 0 );
+				// instruction_add ( PUSH, STRDUP("(%%ebp)"), NULL, 0, 0 );
+				instruction_add(MOVE, ebp, ecx, 0, 0);
+				for (int32_t i = depth; i > root->entry->depth; i--)
+					instruction_add(STRING, STRDUP("\tmovl \t(%ecx),%ecx"), NULL, 0, 0);
+				instruction_add(POP, ecx, NULL, stack_offset, 0);
+			}
 			break;
 		}
 		case INTEGER: {
@@ -292,19 +319,6 @@ void generate ( FILE *stream, node_t *root )
 			sprintf ( str, "$%d", *(int *)root->data );
 			instruction_add ( PUSH, STRDUP( str ), NULL, 0, 0 );
 
-			break;
-		}
-		case ASSIGNMENT_STATEMENT: {
-			/*
-			 * Assignments:
-			 * Right hand side is an expression, find left hand side on stack
-			 * (unwinding if necessary)
-			 */
-
-			// TODO: Fikse riktig stack offset
-			generate ( stream, root->children[1] ); // Evaluate expression
-			// root->entry = root->children[0]->entry;
-			instruction_add ( POP, ebp, NULL, root->children[0]->entry->stack_offset, 0 );
 			break;
 		}
 		case RETURN_STATEMENT: {
