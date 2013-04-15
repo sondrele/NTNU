@@ -118,6 +118,7 @@ void generate ( FILE *stream, node_t *root )
 			instruction_add ( LABEL, STRDUP( root->children[0]->data ), NULL, 0, 0 );
 			instruction_add ( PUSH, ebp, NULL, 0, 0 );
 			instruction_add ( MOVE, esp, ebp, 0, 0 );
+			// Generate for the children, except for the BLOCK-statement
 			generate ( stream, root->children[2]->children[0] );
 			generate ( stream, root->children[2]->children[1] );
 			instruction_add ( LEAVE, NULL, NULL, 0, 0 );
@@ -133,8 +134,9 @@ void generate ( FILE *stream, node_t *root )
 			depth += 1;
 			instruction_add ( PUSH, ebp, NULL, 0, 0 );
 			instruction_add ( MOVE, esp, ebp, 0, 0 );
-			//RECUR ();
 			generate ( stream, root->children[0] );
+			// This is done in order to avoid executing any statements in a STATEMENT_LIST,
+			// that is occuring after a RETURN_STATEMENT 
 			node_t *statement_list_n = root->children[1];
 			for ( int i = 0; i < statement_list_n->n_children; i++ ) {
 				generate ( stream, statement_list_n->children[i] );
@@ -150,7 +152,6 @@ void generate ( FILE *stream, node_t *root )
 			 * Declarations:
 			 * Add space on local stack
 			 */
-			// char str[30];
 			int offset = 0;
 			for ( int i = 0; i < root->children[0]->n_children; i++ ) {
 				offset -= 4;
@@ -164,6 +165,8 @@ void generate ( FILE *stream, node_t *root )
 			 * Emit the list of print items, followed by newline (0x0A)
 			 */
 			RECUR ();
+			// Added a NEWLINE-string in symtab.c, this is printed
+			// whenever a PRINT_LIST occurs
 			instruction_add ( PUSH, STRDUP( "$.NEWLINE" ), NULL, 0, 0 );
 			instruction_add ( SYSCALL, STRDUP( "printf" ), NULL, 0, 0 );
 			instruction_add ( ADD, STRDUP( "$4" ), esp, 0, 0 );
@@ -175,11 +178,10 @@ void generate ( FILE *stream, node_t *root )
 			 * Determine what kind of value (string literal or expression)
 			 * and set up a suitable call to printf
 			 */
-			//printf("Print item!\n");
-			char val[30];
+			char str[30];
 			if ( root->children[0]->type.index == TEXT ) {
-				sprintf ( val, "$.STRING%d", *(int *)root->children[0]->data );
-				instruction_add ( PUSH, STRDUP( val ), NULL, 0, 0 );
+				sprintf ( str, "$.STRING%d", *(int *)root->children[0]->data );
+				instruction_add ( PUSH, STRDUP( str ), NULL, 0, 0 );
 				instruction_add ( SYSCALL, STRDUP( "printf" ), NULL, 0, 0 );
 				instruction_add ( ADD, STRDUP( "$4" ), esp, 0, 0 );
 			} else {
