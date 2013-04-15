@@ -185,12 +185,12 @@ void generate ( FILE *stream, node_t *root )
 				instruction_add ( SYSCALL, STRDUP( "printf" ), NULL, 0, 0 );
 				instruction_add ( ADD, STRDUP( "$4" ), esp, 0, 0 );
 			} else {
-				generate ( stream, root->children[0] ); // Will add the expression to the stack
+				// Add expression to top of stack, for use in printf
+				generate ( stream, root->children[0] );
 				instruction_add ( PUSH, STRDUP( "$.INTEGER" ), NULL, 0, 0 );
 				instruction_add ( SYSCALL, STRDUP( "printf" ), NULL, 0, 0 );
 				instruction_add ( ADD, STRDUP( "$8" ), esp, 0, 0 );
 			}
-
 			break;
 		}
 		case EXPRESSION: {
@@ -200,10 +200,8 @@ void generate ( FILE *stream, node_t *root )
 			 * top of the stack according to the kind of expression
 			 * (single variables/integers handled in separate switch/cases)
 			 */
-
-			// Expression is a function call
-			if ( root->n_children == 2 && root->children[0]->type.index == VARIABLE
-					&& ( root->children[1] == NULL
+			// The expression is a function call
+			if ( root->n_children == 2 && ( root->children[1] == NULL
 					|| root->children[1]->type.index == EXPRESSION_LIST ) ) {
 				// Push parameters on stack
 				generate ( stream, root->children[1] );
