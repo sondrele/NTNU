@@ -48,14 +48,16 @@ static void instructions_finalize ( void );
  */
 #define RECUR() do {\
 	for ( int32_t i=0; i<root->n_children; i++ ){\
-		if ( !returned )\
-			generate ( stream, root->children[i] );\
-		else if ( root->type.index == STATEMENT_LIST ) {\
-			returned = 0;\
-			break;\
-		}\
+		generate ( stream, root->children[i] );\
 	}\
 } while(false)
+
+// if ( returned == 0 )\
+		// 	generate ( stream, root->children[i] );\
+		// else if ( returned == 1 && root->type.index == STATEMENT_LIST ) {\
+		// 	returned = 0;\
+		// 	break;\
+		// }\
 
 /*
  * These macros set implement a function to start/stop the program, with
