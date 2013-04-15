@@ -274,13 +274,19 @@ void generate ( FILE *stream, node_t *root )
 			// instruction_add ( JUMPZERO, STRDUP( str ), NULL, 0, 0 );
 
 			int stack_offset = root->entry->stack_offset;
-			if ( depth == root->entry->depth || stack_offset > 0 ) {
+			if ( depth == root->entry->depth  ) {
 				instruction_add ( PUSH, ebp, NULL, stack_offset, 0 );
+				// char str[30];
+				// sprintf(str, "Variabel: %s", (char*)(root->data));
+				// instruction_add ( JUMPZERO, STRDUP( str ), NULL, 0, 0 );
 			} else {
 				instruction_add(MOVE, ebp, ecx, 0, 0);
 				for (int i = depth-1; i >= root->entry->depth; i--)
 					instruction_add(STRING, STRDUP("\tmovl \t(%ecx),%ecx"), NULL, 0, 0);
-				instruction_add(PUSH, ecx, NULL, stack_offset, 0);
+				char str[30];
+				// sprintf(str, "Variabel: %s", (char*)(root->data));
+				// instruction_add ( JUMPZERO, STRDUP( str ), NULL, 0, 0 );
+				// instruction_add(PUSH, ecx, NULL, stack_offset, 0);
 			}
 			break;
 		}
@@ -297,10 +303,18 @@ void generate ( FILE *stream, node_t *root )
 			int stack_offset = root->entry->stack_offset;
 			if ( depth == root->entry->depth) {
 				instruction_add ( POP, ebp, NULL, stack_offset, 0 );
+				if ( 0 ) {		
+					// char str[30];
+					// sprintf(str, "Variabel: %s", (char*)(root->children[0]->data));
+					// instruction_add ( JUMPZERO, STRDUP( str ), NULL, 0, 0 );
+				}
 			} else {
 				instruction_add(MOVE, ebp, ecx, 0, 0);
 				for (int i = depth-1; i >= root->entry->depth; i--)
 					instruction_add(STRING, STRDUP("\tmovl \t(%ecx),%ecx"), NULL, 0, 0);
+				// char str[30];
+				// sprintf(str, "Variabel: %s", (char*)(root->children[0]->data));
+				// instruction_add ( JUMPZERO, STRDUP( str ), NULL, 0, 0 );
 				instruction_add(POP, ecx, NULL, stack_offset, 0);
 			}
 			break;
