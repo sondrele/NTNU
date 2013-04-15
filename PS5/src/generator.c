@@ -121,7 +121,7 @@ void generate ( FILE *stream, node_t *root )
 			instruction_add ( PUSH, ebp, NULL, 0, 0 );
 			instruction_add ( MOVE, esp, ebp, 0, 0 );
 			// RECUR ();
-			generate ( stream, root->children[1] );
+			// generate ( stream, root->children[1] );
 			generate ( stream, root->children[2] );
 			instruction_add ( LEAVE, NULL, NULL, 0, 0 );
 			instruction_add ( RET, NULL, NULL, 0, 0 );
@@ -153,7 +153,6 @@ void generate ( FILE *stream, node_t *root )
 			int offset = 0;
 			for ( int i = 0; i < root->children[0]->n_children; i++ ) {
 				offset -= 4;
-				// sprintf ( str, "%d(%%esp)", offset );
 				instruction_add ( PUSH, esp, NULL, offset, 0 );
 			}
 			break;
@@ -274,9 +273,11 @@ void generate ( FILE *stream, node_t *root )
 			 * - If var is not local, unwind the stack to its correct base
 			 */
 
-			// int stack_offset = -4;
-			int stack_offset = root->entry->stack_offset;
 			// TODO: få riktig ebp
+			int stack_offset = root->entry->stack_offset;
+			// char str[30];
+			// sprintf ( str, "Stack offset: %d", stack_offset );
+			// instruction_add (JUMPZERO, STRDUP(str), NULL, 0, 0 );
 			instruction_add ( PUSH, ebp, NULL, stack_offset, 0 );
 			break;
 		}
