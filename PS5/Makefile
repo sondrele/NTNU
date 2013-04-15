@@ -33,6 +33,7 @@ run:
 	./${arg}
 
 upload: all
+	git checkout Makefile
 	git commit -am "Uploading..."
 	git push
 
