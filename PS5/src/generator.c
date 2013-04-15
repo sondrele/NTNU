@@ -267,16 +267,13 @@ void generate ( FILE *stream, node_t *root )
 
 			// TODO: få riktig ebp
 			// char str[30];
-			// sprintf ( str, "Stack offset: %d", stack_offset );
-			// instruction_add (JUMPZERO, STRDUP(str), NULL, 0, 0 );
+			// sprintf(str, "Depth:%d", depth);
+			// instruction_add ( JUMPZERO, STRDUP( str ), NULL, 0, 0 );
 
 			int stack_offset = root->entry->stack_offset;
 			// if ( depth == root->entry->depth ) {
 			instruction_add ( PUSH, ebp, NULL, stack_offset, 0 );
-			char str[30];
-			sprintf(str, "Depth:%d", depth);
-			instruction_add ( JUMPZERO, STRDUP( str ), NULL, 0, 0 );
-			
+
 			// } else {
 			// 	instruction_add ( MOVE, ebp, ecx, 0, 0 );
 			// 	for ( int i = depth; i > root->entry->depth; i-- ) {
