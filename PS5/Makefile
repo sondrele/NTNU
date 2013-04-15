@@ -39,7 +39,7 @@ upload: all
 download:
 	git checkout .
 	git pull
-	vim Makefile
+	#vim Makefile
 status:
 	ls -laS testOutput/*.diff
 #
