@@ -289,7 +289,6 @@ void generate ( FILE *stream, node_t *root )
 			 */
 
 			generate ( stream, root->children[1] ); // Evaluate expression
-			// instruction_add ( POP, ebp, NULL, root->children[0]->entry->stack_offset, 0 );
 			root->entry = root->children[0]->entry;
 			int stack_offset = root->entry->stack_offset;
 			if ( depth == root->entry->depth ) {
@@ -324,6 +323,7 @@ void generate ( FILE *stream, node_t *root )
 			//instruction_add ( POP, ebp, NULL, 0, 0 );
 			 // generate ( stream, root->children[0] );
 			RECUR ();
+			instruction_add(POP, eax, NULL, 0, 0);
 			break;
 		}
 		default:
