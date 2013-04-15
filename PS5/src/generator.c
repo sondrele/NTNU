@@ -212,7 +212,6 @@ void generate ( FILE *stream, node_t *root )
 				RECUR ();
 				instruction_add ( POP, ebx, NULL, 0, 0 );
 				instruction_add ( POP, eax, NULL, 0, 0 );
-
 				char *data = (char *) root->data;
 				switch ( data[0] ) {
 					case '+':
@@ -288,7 +287,7 @@ void generate ( FILE *stream, node_t *root )
 				// by 1
 				int i = stack_offset > 0 ? -1 : 0;
 				for (i += depth-1; i >= root->entry->depth; i--)
-					instruction_add(MOVE, STRDUP("(%ecx)"), ecx, 0, 0);
+					instruction_add(MOVE, STRDUP("(%ebx)"), ecx, 0, 0);
 				instruction_add(PUSH, ecx, NULL, stack_offset, 0);
 			}
 			break;
@@ -308,7 +307,7 @@ void generate ( FILE *stream, node_t *root )
 			} else {
 				instruction_add(MOVE, ebp, ecx, 0, 0);
 				for (int i = depth-1; i >= root->entry->depth; i--)
-					instruction_add(MOVE, STRDUP("(%ecx)"), ecx, 0, 0);
+					instruction_add(MOVE, STRDUP("(%ebx)"), ecx, 0, 0);
 				instruction_add(POP, ecx, NULL, stack_offset, 0);
 			}
 			break;
