@@ -122,12 +122,10 @@ void generate ( FILE *stream, node_t *root )
 			instruction_add ( MOVE, esp, ebp, 0, 0 );
 			// RECUR ();
 			// generate ( stream, root->children[1] );
-			generate ( stream, root->children[2] );
+			generate ( stream, root->children[2]->children[0] );
+			generate ( stream, root->children[2]->children[1] );
 			instruction_add ( LEAVE, NULL, NULL, 0, 0 );
 			instruction_add ( RET, NULL, NULL, 0, 0 );
-			// for ( int i = 0; i < root->children[1]->n_children; i++ ) {
-			// 	instruction_add
-			// }
 			break;
 
 		case BLOCK: {

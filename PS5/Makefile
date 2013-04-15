@@ -33,12 +33,14 @@ run:
 	./${arg}
 
 upload: all
+	git checkout Makefile
 	git commit -am "Uploading..."
 	git push
 #scp testOutput/hello.s sondrele@asti.idi.ntnu.no:~
 download:
 	git checkout .
 	git pull
+	make test
 	#vim Makefile
 status:
 	ls -laS testOutput/*.diff
