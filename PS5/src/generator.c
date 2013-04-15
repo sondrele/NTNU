@@ -216,7 +216,8 @@ void generate ( FILE *stream, node_t *root )
 				instruction_add ( POP, ebx, NULL, 0, 0 );
 				instruction_add ( POP, eax, NULL, 0, 0 );
 
-				switch ( *((char *)(root->data) )) {
+				char *data = (char *) root->data;
+				switch ( data[0] ) {
 					case '+':
 						instruction_add ( ADD, ebx, eax, 0, 0 );
 						break;
@@ -229,6 +230,36 @@ void generate ( FILE *stream, node_t *root )
 					case '/':
 						instruction_add ( CLTD, NULL, NULL, 0, 0 );
 						instruction_add ( DIV, ebx, NULL, 0, 0 );
+						break;
+					case '=':
+						instruction_add ( CMP, ebx, eax, 0, 0 );
+						instruction_add ( SETE, al, NULL, 0, 0 );
+						instruction_add ( CBW, NULL, NULL, 0, 0 );
+						instruction_add ( CWDE, NULL, NULL, 0, 0 );
+						break;
+					case '>':
+						instruction_add ( CMP, ebx, eax, 0, 0 );
+						if ( strlen( data ) == 2 )
+							instruction_add ( SETGE, al, NULL, 0, 0 );
+						else
+							instruction_add ( SETG, al, NULL, 0, 0 );
+						instruction_add ( CBW, NULL, NULL, 0, 0 );
+						instruction_add ( CWDE, NULL, NULL, 0, 0 );
+						break;
+					case '<':
+						instruction_add ( CMP, ebx, eax, 0, 0 );
+						if ( strlen( data ) == 2 )
+							instruction_add ( SETLE, al, NULL, 0, 0 );
+						else
+							instruction_add ( SETL, al, NULL, 0, 0 );
+						instruction_add ( CBW, NULL, NULL, 0, 0 );
+						instruction_add ( CWDE, NULL, NULL, 0, 0 );
+						break;
+					case '!':
+						instruction_add ( CMP, ebx, eax, 0, 0 );
+						instruction_add ( SETNE, al, NULL, 0, 0 );
+						instruction_add ( CBW, NULL, NULL, 0, 0 );
+						instruction_add ( CWDE, NULL, NULL, 0, 0 );
 						break;
 				}
 				instruction_add ( PUSH, eax, NULL, 0, 0 );

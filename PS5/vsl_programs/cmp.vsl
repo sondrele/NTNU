@@ -1,0 +1,18 @@
+FUNC cmp()
+{
+	VAR a, b, c, d
+	a := 1
+	b := 2
+	c := 1
+
+	PRINT "1 > 2: ", a > b
+	PRINT "2 > 1: ", b > a
+	PRINT "1 == 2: ", a == b
+	PRINT "1 != 2: ", a == b
+	PRINT "1 == 1: ", c == a
+	PRINT "1 != 1: ", c != a
+	PRINT "1 >= 1: ", a >= c
+	PRINT "1 <= 1: ", c <= a
+	PRINT "2 >= 1: ", b >= a
+	PRINT "2 <= 1: ", b <= a
+}
