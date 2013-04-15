@@ -34,7 +34,6 @@ static instruction_t *start = NULL, *last = NULL;
  * how the symtab was built
  */ 
 static int32_t depth = 2;
-static int32_t returned = 0;
 
 /* Prototypes for auxiliaries (implemented at the end of this file) */
 static void instruction_add ( opcode_t op, char *arg1, char *arg2, int32_t off1, int32_t off2 );
@@ -300,8 +299,8 @@ void generate ( FILE *stream, node_t *root )
 			 * Right hand side is an expression, find left hand side on stack
 			 * (unwinding if necessary)
 			 */
-
-			generate ( stream, root->children[1] ); // Evaluate expression
+			// This behaves almost the same as the VARIABLE case
+			generate ( stream, root->children[1] );
 			root->entry = root->children[0]->entry;
 			int stack_offset = root->entry->stack_offset;
 			if ( depth == root->entry->depth ) {
@@ -309,7 +308,7 @@ void generate ( FILE *stream, node_t *root )
 			} else {
 				instruction_add(MOVE, ebp, ecx, 0, 0);
 				for (int i = depth-1; i >= root->entry->depth; i--)
-					instruction_add(STRING, STRDUP("\tmovl \t(%ecx),%ecx"), NULL, 0, 0);
+					instruction_add(MOVE, STRDUP("(%ecx)"), ecx, 0, 0);
 				instruction_add(POP, ecx, NULL, stack_offset, 0);
 			}
 			break;
@@ -331,7 +330,6 @@ void generate ( FILE *stream, node_t *root )
 			 * Evaluate the expression and put it in EAX
 			 */
 			RECUR ();
-			returned = 1;
 			instruction_add(POP, eax, NULL, 0, 0);
 			break;
 		}
