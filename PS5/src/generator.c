@@ -237,6 +237,12 @@ void generate ( FILE *stream, node_t *root )
 						instruction_add ( CBW, NULL, NULL, 0, 0 );
 						instruction_add ( CWDE, NULL, NULL, 0, 0 );
 						break;
+					case '!':
+						instruction_add ( CMP, ebx, eax, 0, 0 );
+						instruction_add ( SETNE, al, NULL, 0, 0 );
+						instruction_add ( CBW, NULL, NULL, 0, 0 );
+						instruction_add ( CWDE, NULL, NULL, 0, 0 );
+						break;
 					case '>':
 						instruction_add ( CMP, ebx, eax, 0, 0 );
 						if ( strlen( data ) == 2 )
@@ -252,12 +258,6 @@ void generate ( FILE *stream, node_t *root )
 							instruction_add ( SETLE, al, NULL, 0, 0 );
 						else
 							instruction_add ( SETL, al, NULL, 0, 0 );
-						instruction_add ( CBW, NULL, NULL, 0, 0 );
-						instruction_add ( CWDE, NULL, NULL, 0, 0 );
-						break;
-					case '!':
-						instruction_add ( CMP, ebx, eax, 0, 0 );
-						instruction_add ( SETNE, al, NULL, 0, 0 );
 						instruction_add ( CBW, NULL, NULL, 0, 0 );
 						instruction_add ( CWDE, NULL, NULL, 0, 0 );
 						break;

@@ -8,7 +8,7 @@ FUNC cmp()
 	PRINT "1 > 2: ", a > b
 	PRINT "2 > 1: ", b > a
 	PRINT "1 == 2: ", a == b
-	PRINT "1 != 2: ", a == b
+	PRINT "1 != 2: ", a != b
 	PRINT "1 == 1: ", c == a
 	PRINT "1 != 1: ", c != a
 	PRINT "1 >= 1: ", a >= c
