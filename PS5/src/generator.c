@@ -47,17 +47,10 @@ static void instructions_finalize ( void );
  * on duplicate code, not really necessary
  */
 #define RECUR() do {\
-	for ( int32_t i=0; i<root->n_children; i++ ){\
+	for ( int32_t i=0; i<root->n_children; i++ )\
 		generate ( stream, root->children[i] );\
-	}\
 } while(false)
 
-// if ( returned == 0 )\
-		// 	generate ( stream, root->children[i] );\
-		// else if ( returned == 1 && root->type.index == STATEMENT_LIST ) {\
-		// 	returned = 0;\
-		// 	break;\
-		// }\
 
 /*
  * These macros set implement a function to start/stop the program, with
@@ -140,7 +133,14 @@ void generate ( FILE *stream, node_t *root )
 			depth += 1;
 			instruction_add ( PUSH, ebp, NULL, 0, 0 );
 			instruction_add ( MOVE, esp, ebp, 0, 0 );
-			RECUR ();
+			//RECUR ();
+			generate ( stream, root->children[0] );
+			node_t *statement_list_n = root->children[1];
+			for ( int i = 0; i < statement_list_n->n_children; i++ ) {
+				generate ( stream, statement_list_n->children[i] );
+				if ( statement_list_n->children[i]->type.index == RETURN_STATEMENT )
+					break;
+			}
 			instruction_add ( LEAVE, NULL, NULL, 0, 0 );
 			depth -= 1;
 			break;
