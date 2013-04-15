@@ -33,7 +33,7 @@ static instruction_t *start = NULL, *last = NULL;
  * Track the scope depth when traversing the tree - init. value may depend on
  * how the symtab was built
  */ 
-static int32_t depth = 0;
+static int32_t depth = -1;
 
 /* Prototypes for auxiliaries (implemented at the end of this file) */
 static void instruction_add ( opcode_t op, char *arg1, char *arg2, int32_t off1, int32_t off2 );
