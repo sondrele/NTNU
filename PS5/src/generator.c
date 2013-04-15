@@ -34,6 +34,7 @@ static instruction_t *start = NULL, *last = NULL;
  * how the symtab was built
  */ 
 static int32_t depth = 2;
+static int32_t returned = 0;
 
 /* Prototypes for auxiliaries (implemented at the end of this file) */
 static void instruction_add ( opcode_t op, char *arg1, char *arg2, int32_t off1, int32_t off2 );
@@ -46,8 +47,12 @@ static void instructions_finalize ( void );
  * on duplicate code, not really necessary
  */
 #define RECUR() do {\
-	for ( int32_t i=0; i<root->n_children; i++ )\
-	generate ( stream, root->children[i] );\
+	for ( int32_t i=0; i<root->n_children; i++ ){\
+		if ( !returned )\
+			generate ( stream, root->children[i] );\
+		else\
+			returned = 0;\
+	}\
 } while(false)
 
 /*
@@ -317,12 +322,8 @@ void generate ( FILE *stream, node_t *root )
 			 * Return statements:
 			 * Evaluate the expression and put it in EAX
 			 */
-			// char str[30];
-			// sprintf ( str, "$%d", *(int *)root->children[0]->data );
-			//instruction_add ( MOVE, STRDUP( str ), eax, 0, 0 );
-			//instruction_add ( POP, ebp, NULL, 0, 0 );
-			 // generate ( stream, root->children[0] );
 			RECUR ();
+			returned = 1;
 			instruction_add(POP, eax, NULL, 0, 0);
 			break;
 		}
