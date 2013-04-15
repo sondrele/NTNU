@@ -262,6 +262,7 @@ void generate ( FILE *stream, node_t *root )
 				}
 				instruction_add ( PUSH, eax, NULL, 0, 0 );
 			} else if ( root->data != NULL && *(char *)root->data == '-' ) {
+				// Unary minus
 				RECUR ();
 				instruction_add ( POP, eax, NULL, 0, 0 );
 				instruction_add ( NEG, eax, NULL, 0, 0 );
@@ -275,17 +276,17 @@ void generate ( FILE *stream, node_t *root )
 			 * - Find the variable's stack offset
 			 * - If var is not local, unwind the stack to its correct base
 			 */
-
-			// char str[30];
-			// sprintf(str, "Depth:%d, VAR:%d", depth, root->entry->depth);
-			// instruction_add ( JUMPZERO, STRDUP( str ), NULL, 0, 0 );
-
 			int stack_offset = root->entry->stack_offset;
+			// If the variable is at right deapth, or it is a function argument, PUSH
+			// the value of variable to the stack
 			if ( depth == root->entry->depth  
 					|| stack_offset > 0 && root->entry->depth == (depth-1) ) {
 				instruction_add ( PUSH, ebp, NULL, stack_offset, 0 );
 			} else {
+				// Else unwind
 				instruction_add(MOVE, ebp, ecx, 0, 0);
+				// If the variable is an argument, the deapth, i.e. 'i', is decreased
+				// by 1
 				int i = stack_offset > 0 ? -1 : 0;
 				for (i += depth-1; i >= root->entry->depth; i--)
 					instruction_add(STRING, STRDUP("\tmovl \t(%ecx),%ecx"), NULL, 0, 0);
