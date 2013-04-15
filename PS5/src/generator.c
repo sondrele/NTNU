@@ -207,6 +207,7 @@ void generate ( FILE *stream, node_t *root )
 				generate ( stream, root->children[1] );
 				instruction_add ( CALL, STRDUP( (char *) root->children[0]->data ),
 					NULL, 0, 0);
+				// The evaluated expression is pushed to eax
 				instruction_add ( PUSH, eax, NULL, 0, 0 );
 			} else if ( root->data != NULL && *(char *)root->data == '-' && root->n_children == 1 ) {
 				RECUR ();
