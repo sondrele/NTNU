@@ -276,6 +276,7 @@ void generate ( FILE *stream, node_t *root )
 			char str[30];
 			sprintf(str, "Depth:%d", depth);
 			instruction_add ( JUMPZERO, STRDUP( str ), NULL, 0, 0 );
+			
 			// } else {
 			// 	instruction_add ( MOVE, ebp, ecx, 0, 0 );
 			// 	for ( int i = depth; i > root->entry->depth; i-- ) {
