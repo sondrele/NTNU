@@ -302,7 +302,7 @@ void generate ( FILE *stream, node_t *root )
 				instruction_add ( POP, ebp, NULL, stack_offset, 0 );
 			} else {
 				instruction_add(MOVE, ebp, ecx, 0, 0);
-				for (int i = depth-1; i > root->entry->depth; i--)
+				for (int i = depth-1; i >= root->entry->depth; i--)
 					instruction_add(STRING, STRDUP("\tmovl \t(%ecx),%ecx"), NULL, 0, 0);
 				instruction_add(POP, ecx, NULL, stack_offset, 0);
 			}
