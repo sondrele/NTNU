@@ -295,19 +295,20 @@ void generate ( FILE *stream, node_t *root )
 			 */
 
 			generate ( stream, root->children[1] ); // Evaluate expression
-			// root->entry = root->children[0]->entry;
-			instruction_add ( POP, ebp, NULL, root->children[0]->entry->stack_offset, 0 );
-			// int stack_offset = root->entry->stack_offset;
-			// if ( depth == root->entry->depth || stack_offset > 0 ) {
-			// 	instruction_add ( POP, ebp, NULL, stack_offset, 0 );
-			// } else {
-			// 	// instruction_add ( MOVE, ebp, ecx, 0, 0 );
-			// 	// instruction_add ( PUSH, STRDUP("(%%ebp)"), NULL, 0, 0 );
-			// 	instruction_add(MOVE, ebp, ecx, 0, 0);
-			// 	for (int32_t i = depth; i > root->entry->depth; i--)
-			// 		instruction_add(STRING, STRDUP("\tmovl \t(%ecx),%ecx"), NULL, 0, 0);
-			// 	instruction_add(POP, ecx, NULL, stack_offset, 0);
-			// }
+			// int stack_offset = root->children[0]->entry->stack_offset;
+			// instruction_add ( POP, ebp, NULL, root->children[0]->entry->stack_offset, 0 );
+			root->entry = root->children[0]->entry;
+			int stack_offset = root->entry->stack_offset;
+			if ( depth == root->entry->depth || stack_offset > 0 ) {
+				instruction_add ( POP, ebp, NULL, stack_offset, 0 );
+			} else {
+				// instruction_add ( MOVE, ebp, ecx, 0, 0 );
+				// instruction_add ( PUSH, STRDUP("(%%ebp)"), NULL, 0, 0 );
+				instruction_add(MOVE, ebp, ecx, 0, 0);
+				for (int32_t i = depth; i > root->entry->depth; i--)
+					instruction_add(STRING, STRDUP("\tmovl \t(%ecx),%ecx"), NULL, 0, 0);
+				instruction_add(POP, ecx, NULL, stack_offset, 0);
+			}
 			break;
 		}
 		case INTEGER: {
