@@ -209,11 +209,6 @@ void generate ( FILE *stream, node_t *root )
 					NULL, 0, 0);
 				// The evaluated expression is pushed to eax
 				instruction_add ( PUSH, eax, NULL, 0, 0 );
-			} else if ( root->data != NULL && *(char *)root->data == '-' && root->n_children == 1 ) {
-				RECUR ();
-				instruction_add ( POP, eax, NULL, 0, 0 );
-				instruction_add ( NEG, eax, NULL, 0, 0 );
-				instruction_add ( PUSH, eax, NULL, 0, 0 );
 			} else if ( root->n_children == 2) {
 				RECUR ();
 				instruction_add ( POP, ebx, NULL, 0, 0 );
@@ -266,7 +261,12 @@ void generate ( FILE *stream, node_t *root )
 						break;
 				}
 				instruction_add ( PUSH, eax, NULL, 0, 0 );
-			} 
+			} else if ( root->data != NULL && *(char *)root->data == '-' ) {
+				RECUR ();
+				instruction_add ( POP, eax, NULL, 0, 0 );
+				instruction_add ( NEG, eax, NULL, 0, 0 );
+				instruction_add ( PUSH, eax, NULL, 0, 0 );
+			}
 			break;
 		}
 		case VARIABLE: {
