@@ -33,7 +33,7 @@ static instruction_t *start = NULL, *last = NULL;
  * Track the scope depth when traversing the tree - init. value may depend on
  * how the symtab was built
  */ 
-static int32_t depth = 1;
+static int32_t depth = 0;
 
 /* Prototypes for auxiliaries (implemented at the end of this file) */
 static void instruction_add ( opcode_t op, char *arg1, char *arg2, int32_t off1, int32_t off2 );
@@ -82,9 +82,6 @@ static void instructions_finalize ( void );
 	instruction_add ( SYSCALL, STRDUP("exit"), NULL, 0, 0 );\
 } while ( false )
 
-
-
-
 void generate ( FILE *stream, node_t *root )
 {
 	int elegant_solution;
@@ -95,21 +92,21 @@ void generate ( FILE *stream, node_t *root )
 	{
 		case PROGRAM:
 			/* Output the data segment */
+			depth += 1;
 			strings_output ( stream );
 			instruction_add ( STRING, STRDUP( ".text" ), NULL, 0, 0 );
 
 			RECUR();
 			TEXT_HEAD();
-
 			/* TODO: Insert a call to the first defined function here */
 			node_t *main_func = root->children[0]->children[0];
 			instruction_add ( CALL, STRDUP( (char *) main_func->children[0]->data ),
 					NULL, 0, 0);
-
 			TEXT_TAIL();
 
 			instructions_print ( stream );
 			instructions_finalize ();
+			depth -= 1;
 			break;
 
 		case FUNCTION:
@@ -117,15 +114,15 @@ void generate ( FILE *stream, node_t *root )
 			 * Function definitions:
 			 * Set up/take down activation record for the function, return value
 			 */
+			depth += 1;
 			instruction_add ( LABEL, STRDUP( root->children[0]->data ), NULL, 0, 0 );
 			instruction_add ( PUSH, ebp, NULL, 0, 0 );
 			instruction_add ( MOVE, esp, ebp, 0, 0 );
-			// RECUR ();
-			// generate ( stream, root->children[1] );
 			generate ( stream, root->children[2]->children[0] );
 			generate ( stream, root->children[2]->children[1] );
 			instruction_add ( LEAVE, NULL, NULL, 0, 0 );
 			instruction_add ( RET, NULL, NULL, 0, 0 );
+			depth -= 1;
 			break;
 
 		case BLOCK: {
@@ -133,10 +130,12 @@ void generate ( FILE *stream, node_t *root )
 			 * Blocks:
 			 * Set up/take down activation record, no return value
 			 */
+			depth += 1;
 			instruction_add ( PUSH, ebp, NULL, 0, 0 );
 			instruction_add ( MOVE, esp, ebp, 0, 0 );
 			RECUR ();
 			instruction_add ( LEAVE, NULL, NULL, 0, 0 );
+			depth -= 1;
 			break;
 		}
 		case DECLARATION: {
@@ -272,8 +271,12 @@ void generate ( FILE *stream, node_t *root )
 			// char str[30];
 			// sprintf ( str, "Stack offset: %d", stack_offset );
 			// instruction_add (JUMPZERO, STRDUP(str), NULL, 0, 0 );
-			int stack_offset = root->entry->stack_offset;
-			instruction_add ( PUSH, ebp, NULL, stack_offset, 0 );
+
+			if ( depth == root->entry->depth ) {
+				int stack_offset = root->entry->stack_offset;
+				instruction_add ( PUSH, ebp, NULL, stack_offset, 0 );
+				
+			}
 			break;
 		}
 		case INTEGER: {
