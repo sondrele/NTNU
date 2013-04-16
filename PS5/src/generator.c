@@ -177,8 +177,8 @@ void generate ( FILE *stream, node_t *root )
 			 * Determine what kind of value (string literal or expression)
 			 * and set up a suitable call to printf
 			 */
-			char str[30];
 			if ( root->children[0]->type.index == TEXT ) {
+				char str[30];
 				sprintf ( str, "$.STRING%d", *(int *)root->children[0]->data );
 				instruction_add ( PUSH, STRDUP( str ), NULL, 0, 0 );
 				instruction_add ( SYSCALL, STRDUP( "printf" ), NULL, 0, 0 );
