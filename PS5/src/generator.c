@@ -142,7 +142,7 @@ void generate ( FILE *stream, node_t *root )
 				if ( statement_list_n->children[i]->type.index == RETURN_STATEMENT )
 					break;
 			}
-			//instruction_add ( PUSH, STRDUP( "$0" ), NULL, 0, 0 );
+			instruction_add ( PUSH, STRDUP( "$0" ), NULL, 0, 0 );
 			instruction_add ( LEAVE, NULL, NULL, 0, 0 );
 			depth -= 1;
 			break;
