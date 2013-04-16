@@ -1,0 +1,16 @@
+FUNC add()
+{
+	VAR a, b
+	a := 1
+	b := addFive(a)
+	PRINT "A: ", a
+}
+
+FUNC addFive(a)
+{
+	RETURN 1 + addFour(a)
+}
+FUNC addFour(a)
+{
+	RETURN 4 + a
+}
