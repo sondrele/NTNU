@@ -63,7 +63,6 @@ strings_output ( FILE *stream )
 {
     fputs (
         ".data\n"
-        ".NEWLINE: .string \"\\n\"\n"
         ".INTEGER: .string \"%d \"\n",
         stream
     );

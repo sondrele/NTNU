@@ -142,6 +142,7 @@ void generate ( FILE *stream, node_t *root )
 				if ( statement_list_n->children[i]->type.index == RETURN_STATEMENT )
 					break;
 			}
+			// Push a dummy value to the stack, so LEAVE works properly
 			instruction_add ( PUSH, STRDUP( "$0" ), NULL, 0, 0 );
 			instruction_add ( LEAVE, NULL, NULL, 0, 0 );
 			depth -= 1;
@@ -165,8 +166,6 @@ void generate ( FILE *stream, node_t *root )
 			 * Emit the list of print items, followed by newline (0x0A)
 			 */
 			RECUR ();
-			// Added a NEWLINE-string in symtab.c, this is printed
-			// whenever a PRINT_LIST occurs
 			instruction_add ( PUSH, STRDUP( "$10" ), NULL, 0, 0 );
 			instruction_add ( SYSCALL, STRDUP( "putchar" ), NULL, 0, 0 );
 			instruction_add ( ADD, STRDUP( "$4" ), esp, 0, 0 );
