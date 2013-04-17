@@ -295,13 +295,6 @@ void generate ( FILE *stream, node_t *root )
 			}
 			break;
 		}
-		// case IF_STATEMENT: {
-		// 	// Add expression to stack
-		// 	generate ( stream, root->children[0] );
-		// 	instruction_add ( POP, eax, NULL, 0, 0 );
-		// 	instruction_add ( JUMPEQ, 0, 0 );
-		// 	break;
-		// }
 		case ASSIGNMENT_STATEMENT: {
 			/*
 			 * Assignments:
