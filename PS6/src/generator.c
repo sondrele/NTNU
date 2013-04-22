@@ -580,7 +580,7 @@ void generate ( FILE *stream, node_t *root )
             // Loop body
             generate ( stream, root->children[2] );
             // Increment counter
-            instruction_add ( ADD, STRDUP( "$1" ), ebx, 0, 0 );
+            instruction_add ( ADD, STRDUP( "$1" ), edi, 0, 0 );
             instruction_add ( PUSH, ebx, NULL, 0, 0 );
             depth_difference = depth - root->children[0]->children[0]->entry->depth;
             instruction_add(PUSH, ebp, NULL, 0,0);
