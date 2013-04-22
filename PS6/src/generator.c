@@ -195,12 +195,12 @@ void generate ( FILE *stream, node_t *root )
              * Emit the list of print items, followed by newline (0x0A)
              */
 
+            instruction_add ( PUSH, ecx, NULL, 0, 0 );
             //Generate code for all the PRINT_ITEMs
             RECUR();
 
             //Print a newline, push the newline, call 'putchar', and pop the argument
             //(overwriting the value returned from putchar...)
-            instruction_add ( PUSH, ecx, NULL, 0, 0 );
             instruction_add(PUSH, STRDUP("$0x0A"), NULL, 0, 0);
             instruction_add(SYSCALL, STRDUP("putchar"), NULL, 0,0);
             instruction_add(POP, eax, NULL, 0,0);
