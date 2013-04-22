@@ -5,7 +5,6 @@ FUNC even(){
 	
 	FOR i := a TO b DO
 	{
-		PRINT i
 		IF i/2 > (i-1)/2 THEN
 			PRINT i
 		FI
