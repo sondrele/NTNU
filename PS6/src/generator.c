@@ -606,19 +606,8 @@ void generate ( FILE *stream, node_t *root )
             sprintf ( _ifend, "_ifend%d", if_label );
             sprintf ( ifelse, "ifelse%d", if_label );
             sprintf ( _ifelse, "_ifelse%d", if_label++ );
-            // IF-THEN-FI
-            if ( root->n_children == 2 ) {
-                // char str[30];
-                // node_t *expr = root->children[0];
-                // sprintf ( str, "expr: n:%d t:%s", expr->n_children , expr->type.text);
-                // instruction_add ( JUMPZERO, STRDUP(str), NULL, 0, 0 );
-                generate ( stream, root->children[0] );
-                instruction_add ( CMPZERO, eax, NULL, 0, 0 );
-                instruction_add ( JUMPZERO,  STRDUP( _ifend ), NULL, 0, 0 );
-                generate ( stream, root->children[1] );
-                instruction_add ( LABEL, STRDUP( ifend ), NULL, 0, 0 );
-            } // IF-THEN-ELSE-FI
-            else {
+            // IF-THEN-ELSE-FI
+            if ( root->n_children == 3 ) {
                 generate ( stream, root->children[0] );
                 instruction_add ( CMPZERO, eax, NULL, 0, 0 );
                 instruction_add ( JUMPZERO,  STRDUP( _ifelse ), NULL, 0, 0 );
@@ -627,6 +616,20 @@ void generate ( FILE *stream, node_t *root )
                 instruction_add ( LABEL, STRDUP( ifelse ), NULL, 0, 0 );
                 generate ( stream, root->children[2] );
                 instruction_add ( JUMP, STRDUP( _ifend ), NULL, 0, 0 );
+                instruction_add ( LABEL, STRDUP( ifend ), NULL, 0, 0 );
+            }// IF-THEN-FI
+            else if (root->children[0]->type.index == EXPRESSION) {
+                generate ( stream, root->children[0] );
+                instruction_add ( CMPZERO, eax, NULL, 0, 0 );
+                instruction_add ( JUMPZERO,  STRDUP( _ifend ), NULL, 0, 0 );
+                generate ( stream, root->children[1] );
+                instruction_add ( LABEL, STRDUP( ifend ), NULL, 0, 0 );
+            } else {
+                generate ( stream, root->children[0] );
+                instruction_add ( POP, eax, NULL, 0, 0 );
+                instruction_add ( CMPZERO, eax, NULL, 0, 0 );
+                instruction_add ( JUMPZERO,  STRDUP( _ifend ), NULL, 0, 0 );
+                generate ( stream, root->children[1] );
                 instruction_add ( LABEL, STRDUP( ifend ), NULL, 0, 0 );
             }
             break;
