@@ -10,7 +10,7 @@ bool peephole = false;
 typedef enum {
     STRING, LABEL, PUSH, POP, MOVE, CALL, SYSCALL, LEAVE, RET,
     ADD, SUB, MUL, DIV, JUMP, JUMPZERO, JUMPNONZ, DECL, CLTD, NEG, CMPZERO, NIL,
-    CMP, SETL, SETG, SETLE, SETGE, SETE, SETNE, CBW, CWDE,JUMPEQ
+    CMP, SETL, SETG, SETLE, SETGE, SETE, SETNE, CBW, CWDE, JUMPEQ, LOOP
 } opcode_t;
 
 /* Registers */
@@ -538,7 +538,7 @@ void generate ( FILE *stream, node_t *root )
             sprintf ( whileend, "whileend%d", while_label );
             sprintf ( _whileend, "_whileend%d", while_label++ );
 
-            instruction_add ( LABEL, STRDUP ( whilestart ), NULL, 0, 0 );
+            instruction_add ( LABEL, STRDUP( whilestart ), NULL, 0, 0 );
     		generate ( stream, root->children[0] );
             instruction_add ( CMPZERO, eax, NULL, 0, 0 );
             instruction_add ( JUMPZERO,  STRDUP( _whileend ), NULL, 0, 0 );
@@ -547,10 +547,31 @@ void generate ( FILE *stream, node_t *root )
             instruction_add ( LABEL, STRDUP( whileend ), NULL, 0, 0 );
             break;
         }
-        case FOR_STATEMENT:  
-        		RECUR();
+        case FOR_STATEMENT: {
+            char forstart[30];
+            char _forstart[30];
+            char forend[30];
+            char _forend[30];
+            sprintf ( forstart, "forstart%d", for_label );
+            sprintf ( _forstart, "_forstart%d", for_label );
+            sprintf ( forend, "forend%d", for_label );
+            sprintf ( _forend, "_forend%d", for_label++ );
+
+            generate ( stream, root->children[0] );
+            instruction_add ( PUSH, eax, NULL, 0, 0 );
+            generate ( stream, root->children[1] );
+            instruction_add ( POP, eax, NULL, 0,0 );
+            instruction_add ( POP, ebx, NULL, 0,0 );
+            instruction_add ( SUB, ebx, eax, 0,0 );
+            instruction_add ( PUSH, eax, NULL, 0,0 );
+            instruction_add ( POP, ecx, NULL, 0, 0 );
+            // Start loop
+            instruction_add ( LABEL, STRDUP( forstart ), NULL, 0, 0 );
+            generate ( stream, root->children[2] );
+            instruction_add ( LOOP, STRDUP( _forstart ), NULL, 0, 0 );
+            //instruction_add ( JUMPZERO, STRDUP( "TEST" ), NULL, 0, 0 );
             break;
-            
+        }
         case IF_STATEMENT: {
             char ifend[30];
             char _ifend[30];
@@ -806,7 +827,9 @@ instructions_print ( FILE *stream )
             case LABEL: 
                 fprintf ( stream, "_%s:\n", this->operands[0] );
                 break;
-
+            case LOOP:
+                fprintf ( stream, "\tloop\t%s\n", this->operands[0] );
+                break;
             case JUMP:
                 fprintf ( stream, "\tjmp\t%s\n", this->operands[0] );
                 break;
