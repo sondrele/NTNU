@@ -575,10 +575,12 @@ void generate ( FILE *stream, node_t *root )
             
             // Start loop
             instruction_add ( LABEL, STRDUP( forstart ), NULL, 0, 0 );
-
+            instruction_add ( PUSH, edi, NULL, 0, 0 );
             instruction_add ( PUSH, ecx, NULL, 0, 0 );
             generate ( stream, root->children[2] );
             instruction_add ( POP, ecx, NULL, 0, 0 );
+            instruction_add ( POP, edi, NULL, 0, 0 );
+
             // Increment counter
             instruction_add ( ADD, STRDUP( "$1" ), edi, 0, 0 );
             instruction_add ( PUSH, edi, NULL, 0, 0 );
