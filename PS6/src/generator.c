@@ -556,7 +556,6 @@ void generate ( FILE *stream, node_t *root )
             char _forend[30];
             sprintf ( forstart, "forst%d", for_label );
             sprintf ( _forstart, "_forst%d", for_label++ );
-
             // Initialize ecx, i.e. the loop counter
             generate ( stream, root->children[0] );
             instruction_add ( PUSH, eax, NULL, 0, 0 );
