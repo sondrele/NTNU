@@ -200,9 +200,11 @@ void generate ( FILE *stream, node_t *root )
 
             //Print a newline, push the newline, call 'putchar', and pop the argument
             //(overwriting the value returned from putchar...)
+            instruction_add ( PUSH, ecx, NULL, 0, 0 );
             instruction_add(PUSH, STRDUP("$0x0A"), NULL, 0, 0);
             instruction_add(SYSCALL, STRDUP("putchar"), NULL, 0,0);
             instruction_add(POP, eax, NULL, 0,0);
+            instruction_add ( POP, ecx, NULL, 0, 0 );
             break;
 
         case PRINT_ITEM:
