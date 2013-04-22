@@ -196,6 +196,7 @@ void generate ( FILE *stream, node_t *root )
              */
 
             instruction_add ( PUSH, ecx, NULL, 0, 0 );
+            instruction_add ( PUSH, edi, NULL, 0, 0 );
             //Generate code for all the PRINT_ITEMs
             RECUR();
 
@@ -204,6 +205,8 @@ void generate ( FILE *stream, node_t *root )
             instruction_add(PUSH, STRDUP("$0x0A"), NULL, 0, 0);
             instruction_add(SYSCALL, STRDUP("putchar"), NULL, 0,0);
             instruction_add(POP, eax, NULL, 0,0);
+            
+            instruction_add ( POP, edi, NULL, 0, 0 );
             instruction_add ( POP, ecx, NULL, 0, 0 );
             break;
 
@@ -555,7 +558,9 @@ void generate ( FILE *stream, node_t *root )
             char forend[30];
             char _forend[30];
             sprintf ( forstart, "forst%d", for_label );
-            sprintf ( _forstart, "_forst%d", for_label++ );
+            sprintf ( _forstart, "_forst%d", for_label );
+            sprintf ( forend, "forend%d", for_label );
+            sprintf ( _forend, "_forend%d", for_label++ );
             // Initialize ecx, i.e. the loop counter
             generate ( stream, root->children[0] );
             instruction_add ( PUSH, eax, NULL, 0, 0 );
