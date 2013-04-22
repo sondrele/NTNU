@@ -48,12 +48,12 @@ int32_t
 strings_add ( char *str )
 {
     strings_index += 1;
+    strings[strings_index] = str;
     if ( strings_index == strings_size )
     {
         strings_size *= 2;
         strings = realloc ( strings, strings_size * sizeof(char *) );
     }
-    strings[strings_index] = str;
     return strings_index;
 }
 

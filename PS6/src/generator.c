@@ -553,11 +553,6 @@ void generate ( FILE *stream, node_t *root )
             break;
         }
         case FOR_STATEMENT: {
-            // instruction_add ( MOVE, eax, ebx, 0, 0 );
-            // instruction_add ( POP, ebx, NULL, 0,0 );
-            // instruction_add ( SUB, ebx, eax, 0,0 );
-            // instruction_add ( PUSH, eax, NULL, 0,0 );
-            // instruction_add ( POP, ecx, NULL, 0, 0 );
             char forstart[30];
             char _forstart[30];
             char forend[30];
@@ -581,7 +576,6 @@ void generate ( FILE *stream, node_t *root )
             generate ( stream, root->children[2] );
             // Increment counter
             instruction_add ( ADD, STRDUP( "$1" ), edi, 0, 0 );
-            // Push value to stack
             instruction_add ( PUSH, edi, NULL, 0, 0 );
             depth_difference = depth - root->children[0]->children[0]->entry->depth;
             instruction_add(PUSH, ebp, NULL, 0,0);
@@ -600,8 +594,6 @@ void generate ( FILE *stream, node_t *root )
             instruction_add ( JUMP, STRDUP( _forstart ), NULL, 0, 0 );
             // End label
             instruction_add ( LABEL, STRDUP( forend ), NULL, 0, 0 );
-            //instruction_add ( LOOP, STRDUP( _forstart ), NULL, 0, 0 );
-            //instruction_add ( JUMPZERO, STRDUP( "TEST" ), NULL, 0, 0 );
             break;
         }
         case IF_STATEMENT: {
@@ -632,6 +624,7 @@ void generate ( FILE *stream, node_t *root )
                 generate ( stream, root->children[1] );
                 instruction_add ( LABEL, STRDUP( ifend ), NULL, 0, 0 );
             } else {
+                // The expression is just an integer
                 generate ( stream, root->children[0] );
                 instruction_add ( POP, eax, NULL, 0, 0 );
                 instruction_add ( CMPZERO, eax, NULL, 0, 0 );
