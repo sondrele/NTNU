@@ -553,6 +553,11 @@ void generate ( FILE *stream, node_t *root )
             break;
         }
         case FOR_STATEMENT: {
+            // instruction_add ( MOVE, eax, ebx, 0, 0 );
+            // instruction_add ( POP, ebx, NULL, 0,0 );
+            // instruction_add ( SUB, ebx, eax, 0,0 );
+            // instruction_add ( PUSH, eax, NULL, 0,0 );
+            // instruction_add ( POP, ecx, NULL, 0, 0 );
             char forstart[30];
             char _forstart[30];
             char forend[30];
@@ -561,17 +566,9 @@ void generate ( FILE *stream, node_t *root )
             sprintf ( _forstart, "_forst%d", for_label );
             sprintf ( forend, "forend%d", for_label );
             sprintf ( _forend, "_forend%d", for_label++ );
-            // Initialize ecx, i.e. the loop counter
+            // Set counter to start value
             generate ( stream, root->children[0] );
-
-            // instruction_add ( MOVE, eax, ebx, 0, 0 );
-            // instruction_add ( POP, ebx, NULL, 0,0 );
-            // instruction_add ( SUB, ebx, eax, 0,0 );
-            // instruction_add ( PUSH, eax, NULL, 0,0 );
-            // instruction_add ( POP, ecx, NULL, 0, 0 );
-            // Set counter to start val
-            instruction_add ( PUSH, ebx, NULL, 0, 0 );
-            instruction_add ( MOVE, ebx, edi, 0, 0 );
+            instruction_add ( MOVE, eax, edi, 0, 0 );
             // Start label
             instruction_add ( LABEL, STRDUP( forstart ), NULL, 0, 0 );
             // Compare counter to end value
