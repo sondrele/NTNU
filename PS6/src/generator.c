@@ -195,8 +195,8 @@ void generate ( FILE *stream, node_t *root )
              * Emit the list of print items, followed by newline (0x0A)
              */
 
-            instruction_add ( PUSH, ecx, NULL, 0, 0 );
-            instruction_add ( PUSH, edi, NULL, 0, 0 );
+            // instruction_add ( PUSH, ecx, NULL, 0, 0 );
+            // instruction_add ( PUSH, edi, NULL, 0, 0 );
             //Generate code for all the PRINT_ITEMs
             RECUR();
 
@@ -205,9 +205,9 @@ void generate ( FILE *stream, node_t *root )
             instruction_add(PUSH, STRDUP("$0x0A"), NULL, 0, 0);
             instruction_add(SYSCALL, STRDUP("putchar"), NULL, 0,0);
             instruction_add(POP, eax, NULL, 0,0);
-            
-            instruction_add ( POP, edi, NULL, 0, 0 );
-            instruction_add ( POP, ecx, NULL, 0, 0 );
+
+            // instruction_add ( POP, edi, NULL, 0, 0 );
+            // instruction_add ( POP, ecx, NULL, 0, 0 );
             break;
 
         case PRINT_ITEM:
@@ -563,6 +563,7 @@ void generate ( FILE *stream, node_t *root )
             sprintf ( _forend, "_forend%d", for_label++ );
             // Initialize ecx, i.e. the loop counter
             generate ( stream, root->children[0] );
+
             instruction_add ( PUSH, eax, NULL, 0, 0 );
             instruction_add ( MOVE, eax, edi, 0, 0 );
             generate ( stream, root->children[1] );
@@ -574,8 +575,10 @@ void generate ( FILE *stream, node_t *root )
             
             // Start loop
             instruction_add ( LABEL, STRDUP( forstart ), NULL, 0, 0 );
-            generate ( stream, root->children[2] );
 
+            instruction_add ( PUSH, ecx, NULL, 0, 0 );
+            generate ( stream, root->children[2] );
+            instruction_add ( POP, ecx, NULL, 0, 0 );
             // Increment counter
             instruction_add ( ADD, STRDUP( "$1" ), edi, 0, 0 );
             instruction_add ( PUSH, edi, NULL, 0, 0 );
