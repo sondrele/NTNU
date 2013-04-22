@@ -577,7 +577,7 @@ void generate ( FILE *stream, node_t *root )
             // Compare counter to end value
             generate ( stream, root->children[1] );
             instruction_add ( POP, eax, NULL, 0,0 ); 
-            instruction_add ( CMP, ebx, eax, 0, 0 );
+            instruction_add ( CMP, edi, eax, 0, 0 );
             // If equal jump to end label
             instruction_add ( JUMPEQ, STRDUP( _forend ), NULL, 0, 0 );
             // Loop body
