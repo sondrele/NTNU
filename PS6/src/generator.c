@@ -597,6 +597,7 @@ void generate ( FILE *stream, node_t *root )
             instruction_add(POP, eax, NULL, 0,0);
             instruction_add(MOVE, eax, ebp, 0, offset_2);
             instruction_add(MOVE, ebx, ebp, 0, 0);
+            instruction_add(MOVE, eax, ebx, 0, 0);
             // Jump to start label
             instruction_add ( JUMP, STRDUP( _forstart ), NULL, 0, 0 );
             // End label
