@@ -37,6 +37,11 @@ static instruction_t *start = NULL, *last = NULL;
 static int32_t depth = 1;
 //Used to find variables in other frames
 int32_t depth_difference;
+// Used to index every labels and end-labels for when jumping to conditional 
+// labels. They are incremented in the respective switch-labels
+int if_label = 0;
+int while_label = 0;
+int for_label = 0;
 
 /* Prototypes for auxiliaries (implemented at the end of this file) */
 static void instruction_add ( opcode_t op, char *arg1, char *arg2, int32_t off1, int32_t off2 );
@@ -52,6 +57,7 @@ static void instructions_finalize ( void );
     for ( int32_t i=0; i<root->n_children; i++ )\
     generate ( stream, root->children[i] );\
 } while(false)
+    
 
 /*
  * These macros set implement a function to start/stop the program, with
@@ -84,9 +90,6 @@ static void instructions_finalize ( void );
     instruction_add ( PUSH, eax, NULL, 0, 0 );              \
     instruction_add ( SYSCALL, STRDUP("exit"), NULL, 0, 0 );\
 } while ( false )
-
-
-
 
 void generate ( FILE *stream, node_t *root )
 {
@@ -533,10 +536,39 @@ void generate ( FILE *stream, node_t *root )
         		RECUR();
             break;
             
-        case IF_STATEMENT:
-        		RECUR();
-            break;
+        case IF_STATEMENT: {
 
+            char ifend[30];
+            char _ifend[30];
+            char ifelse[30];
+            char _ifelse[30];
+            // IF-THEN-FI
+            if ( root->n_children == 2 ) {
+                sprintf ( ifend, "ifend%d", if_label );
+                sprintf ( _ifend, "_ifend%d", if_label++ );
+                generate ( stream, root->children[0] );
+                instruction_add ( CMPZERO, eax, NULL, 0, 0 );
+                instruction_add ( JUMPZERO,  STRDUP( _ifend ), NULL, 0, 0 );
+                generate ( stream, root->children[1] );
+                instruction_add ( LABEL, STRDUP( ifend ), NULL, 0, 0 );
+            } // IF-THEN-ELSE-FI
+            else {
+                sprintf ( ifelse, "ifelse%d", if_label );
+                sprintf ( _ifelse, "_ifelse%d", if_label );
+                sprintf ( ifend, "ifend%d", if_label );
+                sprintf ( _ifend, "_ifend%d", if_label++ );
+                generate ( stream, root->children[0] );
+                instruction_add ( CMPZERO, eax, NULL, 0, 0 );
+                instruction_add ( JUMPZERO,  STRDUP( _ifelse ), NULL, 0, 0 );
+                generate ( stream, root->children[1] );
+                instruction_add ( JUMP, STRDUP( _ifend ), NULL, 0, 0 );
+                instruction_add ( LABEL, STRDUP( ifelse ), NULL, 0, 0 );
+                generate ( stream, root->children[2] );
+                instruction_add ( JUMP, STRDUP( _ifend ), NULL, 0, 0 );
+                instruction_add ( LABEL, STRDUP( ifend ), NULL, 0, 0 );
+            }
+            break;
+        }
         case NULL_STATEMENT:
         		RECUR();
             break;
