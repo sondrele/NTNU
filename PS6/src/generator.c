@@ -528,16 +528,30 @@ void generate ( FILE *stream, node_t *root )
 
             break;
             
-        case WHILE_STATEMENT:
-        		RECUR();
-            break;
+        case WHILE_STATEMENT: {
+            char whilestart[30];
+            char _whilestart[30];
+            char whileend[30];
+            char _whileend[30];
+            sprintf ( whilestart, "whilestart%d", while_label );
+            sprintf ( _whilestart, "_whilestart%d", while_label );
+            sprintf ( whileend, "whileend%d", while_label );
+            sprintf ( _whileend, "_whileend%d", while_label++ );
 
+            instruction_add ( LABEL, STRDUP ( whilestart ), NULL, 0, 0 );
+    		generate ( stream, root->children[0] );
+            instruction_add ( CMPZERO, eax, NULL, 0, 0 );
+            instruction_add ( JUMPZERO,  STRDUP( _whileend ), NULL, 0, 0 );
+            generate ( stream, root->children[1] );
+            instruction_add ( JUMP, STRDUP( _whilestart ), NULL, 0, 0 );
+            instruction_add ( LABEL, STRDUP( whileend ), NULL, 0, 0 );
+            break;
+        }
         case FOR_STATEMENT:  
         		RECUR();
             break;
             
         case IF_STATEMENT: {
-
             char ifend[30];
             char _ifend[30];
             char ifelse[30];
