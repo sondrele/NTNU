@@ -602,10 +602,12 @@ void generate ( FILE *stream, node_t *root )
             char _ifend[30];
             char ifelse[30];
             char _ifelse[30];
+            sprintf ( ifend, "ifend%d", if_label );
+            sprintf ( _ifend, "_ifend%d", if_label );
+            sprintf ( ifelse, "ifelse%d", if_label );
+            sprintf ( _ifelse, "_ifelse%d", if_label++ );
             // IF-THEN-FI
             if ( root->n_children == 2 ) {
-                sprintf ( ifend, "ifend%d", if_label );
-                sprintf ( _ifend, "_ifend%d", if_label++ );
                 generate ( stream, root->children[0] );
                 instruction_add ( CMPZERO, eax, NULL, 0, 0 );
                 instruction_add ( JUMPZERO,  STRDUP( _ifend ), NULL, 0, 0 );
@@ -613,10 +615,6 @@ void generate ( FILE *stream, node_t *root )
                 instruction_add ( LABEL, STRDUP( ifend ), NULL, 0, 0 );
             } // IF-THEN-ELSE-FI
             else {
-                sprintf ( ifelse, "ifelse%d", if_label );
-                sprintf ( _ifelse, "_ifelse%d", if_label );
-                sprintf ( ifend, "ifend%d", if_label );
-                sprintf ( _ifend, "_ifend%d", if_label++ );
                 generate ( stream, root->children[0] );
                 instruction_add ( CMPZERO, eax, NULL, 0, 0 );
                 instruction_add ( JUMPZERO,  STRDUP( _ifelse ), NULL, 0, 0 );
