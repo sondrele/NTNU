@@ -165,10 +165,12 @@ void generate ( FILE *stream, node_t *root )
 			 * Print lists:
 			 * Emit the list of print items, followed by newline (0x0A)
 			 */
+			instruction_add ( PUSH, ecx, NULL, 0, 0 );
 			RECUR ();
 			instruction_add ( PUSH, STRDUP( "$10" ), NULL, 0, 0 );
 			instruction_add ( SYSCALL, STRDUP( "putchar" ), NULL, 0, 0 );
 			instruction_add ( ADD, STRDUP( "$4" ), esp, 0, 0 );
+			instruction_add ( POP, ecx, NULL, 0, 0 );
 			break;
 		}
 		case PRINT_ITEM: {
@@ -335,6 +337,107 @@ void generate ( FILE *stream, node_t *root )
 			instruction_add ( POP, eax, NULL, 0, 0 );
 			break;
 		}
+		case WHILE_STATEMENT: {
+            char whilestart[30];
+            char _whilestart[30];
+            char whileend[30];
+            char _whileend[30];
+            sprintf ( whilestart, "whilestart%d", while_label );
+            sprintf ( _whilestart, "_whilestart%d", while_label );
+            sprintf ( whileend, "whileend%d", while_label );
+            sprintf ( _whileend, "_whileend%d", while_label++ );
+
+            instruction_add ( LABEL, STRDUP( whilestart ), NULL, 0, 0 );
+    		generate ( stream, root->children[0] );
+            instruction_add ( CMPZERO, eax, NULL, 0, 0 );
+            instruction_add ( JUMPZERO,  STRDUP( _whileend ), NULL, 0, 0 );
+            generate ( stream, root->children[1] );
+            instruction_add ( JUMP, STRDUP( _whilestart ), NULL, 0, 0 );
+            instruction_add ( LABEL, STRDUP( whileend ), NULL, 0, 0 );
+            break;
+        }
+        case FOR_STATEMENT: {
+            char forstart[30];
+            char _forstart[30];
+            char forend[30];
+            char _forend[30];
+            sprintf ( forstart, "forstart%d", for_label );
+            sprintf ( _forstart, "_forstart%d", for_label++ );
+
+            // Initialize ecx, i.e. the loop counter
+            generate ( stream, root->children[0] );
+            instruction_add ( PUSH, eax, NULL, 0, 0 );
+            instruction_add ( MOVE, eax, edi, 0, 0 );
+            generate ( stream, root->children[1] );
+            instruction_add ( POP, eax, NULL, 0,0 ); 
+            instruction_add ( POP, ebx, NULL, 0,0 );
+            instruction_add ( SUB, ebx, eax, 0,0 );
+            instruction_add ( PUSH, eax, NULL, 0,0 );
+            instruction_add ( POP, ecx, NULL, 0, 0 );
+            
+            // Start loop
+            instruction_add ( LABEL, STRDUP( forstart ), NULL, 0, 0 );
+            generate ( stream, root->children[2] );
+
+            // Increment counter
+            instruction_add ( ADD, STRDUP( "$1" ), edi, 0, 0 );
+            instruction_add ( PUSH, edi, NULL, 0, 0 );
+            depth_difference = depth - root->children[0]->children[0]->entry->depth;
+            instruction_add(PUSH, ebp, NULL, 0,0);
+            for(int c = 0; c < depth_difference; c++){
+                instruction_add(MOVE, STRDUP("$4"), eax, 0,0);
+                instruction_add(ADD, ebp, eax, 0,0);
+                instruction_add(MOVE, eax, ebp, -4,0);
+            }
+            int32_t offset_2 = root->children[0]->children[0]->entry->stack_offset;
+            //Putting the current ebp in ebx
+            instruction_add(POP, ebx, NULL, 0,0);
+            //Putting the result of the expression in eax
+            instruction_add(POP, eax, NULL, 0,0);
+            //Putting the result of the expression in the variable (ebp is the ebp of the variable)
+            instruction_add(MOVE, eax, ebp, 0, offset_2);
+            //Restoring the current ebp
+            instruction_add(MOVE, ebx, ebp, 0, 0);
+
+            // Loop
+            instruction_add ( LOOP, STRDUP( _forstart ), NULL, 0, 0 );
+            //instruction_add ( JUMPZERO, STRDUP( "TEST" ), NULL, 0, 0 );
+            break;
+        }
+        case IF_STATEMENT: {
+            char ifend[30];
+            char _ifend[30];
+            char ifelse[30];
+            char _ifelse[30];
+            sprintf ( ifend, "ifend%d", if_label );
+            sprintf ( _ifend, "_ifend%d", if_label );
+            sprintf ( ifelse, "ifelse%d", if_label );
+            sprintf ( _ifelse, "_ifelse%d", if_label++ );
+            // IF-THEN-FI
+            if ( root->n_children == 2 ) {
+                char str[30];
+                node_t *expr = root->children[0];
+                sprintf ( str, "expr: n:%d", expr->n_children );
+                instruction_add ( JUMPZERO, STRDUP(str), NULL, 0, 0 );
+                generate ( stream, root->children[0] );
+                instruction_add ( CMPZERO, eax, NULL, 0, 0 );
+                instruction_add ( JUMPZERO,  STRDUP( _ifend ), NULL, 0, 0 );
+                generate ( stream, root->children[1] );
+                instruction_add ( LABEL, STRDUP( ifend ), NULL, 0, 0 );
+            } // IF-THEN-ELSE-FI
+            else {
+                generate ( stream, root->children[0] );
+                instruction_add ( CMPZERO, eax, NULL, 0, 0 );
+                instruction_add ( JUMPZERO,  STRDUP( _ifelse ), NULL, 0, 0 );
+                generate ( stream, root->children[1] );
+                instruction_add ( JUMP, STRDUP( _ifend ), NULL, 0, 0 );
+                instruction_add ( LABEL, STRDUP( ifelse ), NULL, 0, 0 );
+                generate ( stream, root->children[2] );
+                instruction_add ( JUMP, STRDUP( _ifend ), NULL, 0, 0 );
+                instruction_add ( LABEL, STRDUP( ifend ), NULL, 0, 0 );
+            }
+            break;
+        }
 		default:
 			/* Everything else can just continue through the tree */
 			RECUR();

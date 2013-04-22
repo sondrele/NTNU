@@ -460,7 +460,7 @@ void generate ( FILE *stream, node_t *root )
 
             break;
 
-        case INTEGER:
+        case INTEGER: 
             /*
              * Integers: constants which can just be put on stack
              */
@@ -474,7 +474,7 @@ void generate ( FILE *stream, node_t *root )
             sprintf(temp1, "%d", t);
             char temp2[11] = "$";
             strcat(temp2, temp1);
-
+            // instruction_add ( JUMPZERO, STRDUP("TEST"), NULL, 0, 0 );
             //The value is pushed on the stack
             instruction_add(PUSH, STRDUP(temp2), NULL, 0,0);
             break;
@@ -608,6 +608,10 @@ void generate ( FILE *stream, node_t *root )
             sprintf ( _ifelse, "_ifelse%d", if_label++ );
             // IF-THEN-FI
             if ( root->n_children == 2 ) {
+                // char str[30];
+                // node_t *expr = root->children[0];
+                // sprintf ( str, "expr: n:%d t:%s", expr->n_children , expr->type.text);
+                // instruction_add ( JUMPZERO, STRDUP(str), NULL, 0, 0 );
                 generate ( stream, root->children[0] );
                 instruction_add ( CMPZERO, eax, NULL, 0, 0 );
                 instruction_add ( JUMPZERO,  STRDUP( _ifend ), NULL, 0, 0 );
