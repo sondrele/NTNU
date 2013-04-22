@@ -564,26 +564,27 @@ void generate ( FILE *stream, node_t *root )
             // Initialize ecx, i.e. the loop counter
             generate ( stream, root->children[0] );
 
-            instruction_add ( PUSH, eax, NULL, 0, 0 );
-            instruction_add ( MOVE, eax, edi, 0, 0 );
+            // instruction_add ( MOVE, eax, ebx, 0, 0 );
+            // instruction_add ( POP, ebx, NULL, 0,0 );
+            // instruction_add ( SUB, ebx, eax, 0,0 );
+            // instruction_add ( PUSH, eax, NULL, 0,0 );
+            // instruction_add ( POP, ecx, NULL, 0, 0 );
+            // Set counter to start val
+            instruction_add ( PUSH, ebx, NULL, 0, 0 );
+            instruction_add ( MOVE, ebx, edi, 0, 0 );
+            // Start label
+            instruction_add ( LABEL, STRDUP( forstart ), NULL, 0, 0 );
+            // Compare counter to end value
             generate ( stream, root->children[1] );
             instruction_add ( POP, eax, NULL, 0,0 ); 
-            instruction_add ( POP, ebx, NULL, 0,0 );
-            instruction_add ( SUB, ebx, eax, 0,0 );
-            instruction_add ( PUSH, eax, NULL, 0,0 );
-            instruction_add ( POP, ecx, NULL, 0, 0 );
-            
-            // Start loop
-            instruction_add ( LABEL, STRDUP( forstart ), NULL, 0, 0 );
-            instruction_add ( PUSH, edi, NULL, 0, 0 );
-            instruction_add ( PUSH, ecx, NULL, 0, 0 );
+            instruction_add ( CMP, ebx, eax, 0, 0 );
+            // If equal jump to end label
+            instruction_add ( JUMPEQ, STRDUP( _forend ), NULL, 0, 0 );
+            // Loop body
             generate ( stream, root->children[2] );
-            instruction_add ( POP, ecx, NULL, 0, 0 );
-            instruction_add ( POP, edi, NULL, 0, 0 );
-
             // Increment counter
-            instruction_add ( ADD, STRDUP( "$1" ), edi, 0, 0 );
-            instruction_add ( PUSH, edi, NULL, 0, 0 );
+            instruction_add ( ADD, STRDUP( "$1" ), ebx, 0, 0 );
+            instruction_add ( PUSH, ebx, NULL, 0, 0 );
             depth_difference = depth - root->children[0]->children[0]->entry->depth;
             instruction_add(PUSH, ebp, NULL, 0,0);
             for(int c = 0; c < depth_difference; c++){
@@ -592,17 +593,15 @@ void generate ( FILE *stream, node_t *root )
                 instruction_add(MOVE, eax, ebp, -4,0);
             }
             int32_t offset_2 = root->children[0]->children[0]->entry->stack_offset;
-            //Putting the current ebp in ebx
             instruction_add(POP, ebx, NULL, 0,0);
-            //Putting the result of the expression in eax
             instruction_add(POP, eax, NULL, 0,0);
-            //Putting the result of the expression in the variable (ebp is the ebp of the variable)
             instruction_add(MOVE, eax, ebp, 0, offset_2);
-            //Restoring the current ebp
             instruction_add(MOVE, ebx, ebp, 0, 0);
-
-            // Loop
-            instruction_add ( LOOP, STRDUP( _forstart ), NULL, 0, 0 );
+            // Jump to start label
+            instruction_add ( JUMP, STRDUP( _forstart ), NULL, 0, 0 );
+            // End label
+            instruction_add ( LABEL, STRDUP( forend ), NULL, 0, 0 );
+            //instruction_add ( LOOP, STRDUP( _forstart ), NULL, 0, 0 );
             //instruction_add ( JUMPZERO, STRDUP( "TEST" ), NULL, 0, 0 );
             break;
         }
