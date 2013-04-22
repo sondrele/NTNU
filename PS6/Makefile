@@ -15,7 +15,7 @@ INCLUDEPATH=\
     -Iinclude\
     -I/usr/local/include\
 
-CFLAGS+=  -D_POSIX_C_SOURCE -std=c99 ${INCLUDEPATH}
+CFLAGS+=  -D_POSIX_C_SOURCE -std=c99 ${INCLUDEPATH} -g
 LDFLAGS+= -L/usr/local/lib -Llib
 LDLIBS+=  -lghthash
 YFLAGS+=  --defines=work/parser.h -o y.tab.c
@@ -27,6 +27,25 @@ all: bin/vslc
 test: all
 	./test_runner.sh
 
+run:
+	bin/vslc < vsl_programs/${arg}.vsl | cat > testOutput/${arg}.s
+	gcc -g -o ${arg} testOutput/${arg}.s
+	./${arg}
+
+upload: all
+	cat Makefile > 64bitmk
+	git checkout Makefile
+	git commit -am "Uploading..."
+	git push
+	cat 64bitmk > Makefile
+
+download:
+	git checkout .
+	git pull
+	make test
+
+status:
+	ls -laS testOutput/*.diff
 #
 # The binary is built in 'obj' when all the object code is ready.
 # Make a copy of it in 'bin', to leave it around even after cleanup of
