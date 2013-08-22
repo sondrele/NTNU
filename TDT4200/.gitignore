@@ -10,8 +10,9 @@
 ############
 
 *.o
-linkedlist
-test_runner
+PS1/linkedlist
+PS1/test_runner
+PS1/ring
 
 ############
 ## Windows

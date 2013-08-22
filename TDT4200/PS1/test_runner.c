@@ -57,17 +57,17 @@ void print_summary(int result) {
 
 int linked_list_has_right_value() {
     linked_list *ll = new_linked_list(1, 0);
-    _assert(ll->value == 0);
-    _assert(ll->prev == 0);
-    _assert(ll->next == 0);
+    ASSERT_EQUAL_INT(ll->value, 0);
+    ASSERT_EQUAL_INT(ll->prev, 0);
+    ASSERT_EQUAL_INT(ll->next, 0);
     return 0;
 }
 
 int linked_list_has_next() {
     linked_list *ll = new_linked_list(2, 0);
-    _assert(ll->next);
-    _assert(ll->next->value == 0);
-    _assert(ll->next->prev == ll);
+    ASSERT_TRUE(ll->next);
+    ASSERT_EQUAL_INT(ll->next->value, 0);
+    ASSERT_EQUAL_INT(ll->next->prev, ll);
     return 0;
 }
 
@@ -75,10 +75,10 @@ int can_insert_to_start_of_linked_list() {
     linked_list *ll = new_linked_list(3, 0);
     insert_linked_list(ll, 0, 3);
 
-    _assert(ll->prev == NULL);
-    _assert(ll->next->value == 0);
-    _assert(ll->next->prev == ll);
-    _assert_equals(ll->value, 3, INT);
+    ASSERT_EQUAL_INT(ll->prev, NULL);
+    ASSERT_EQUAL_INT(ll->next->value, 0);
+    ASSERT_EQUAL_INT(ll->next->prev, ll);
+    ASSERT_EQUAL_INT(ll->value, 3);
     return 0;
 }
 
@@ -87,12 +87,12 @@ int can_insert_in_middle_of_linked_list() {
     insert_linked_list(ll, 2, 3);
 
     linked_list *inserted = ll->next->next;
-    _assert(ll->prev == NULL);
-    _assert(ll->value == 0);
-    _assert(ll->next->value == 0);
-    _assert(inserted->prev == ll->next);
-    _assert(inserted->next->prev == inserted);
-    _assert_equals(inserted->value, 3, INT);
+    ASSERT_EQUAL_INT(ll->prev, NULL);
+    ASSERT_EQUAL_INT(ll->value, 0);
+    ASSERT_EQUAL_INT(ll->next->value, 0);
+    ASSERT_EQUAL_INT(inserted->prev, ll->next);
+    ASSERT_EQUAL_INT(inserted->next->prev, inserted);
+    ASSERT_EQUAL_INT(inserted->value, 3);
     return 0;
 }
 
@@ -101,9 +101,9 @@ int can_insert_at_end_of_linked_list() {
     insert_linked_list(ll, 3, 3);
 
     linked_list *last = ll->next->next->next;
-    _assert(last != NULL);
-    _assert(last->next == NULL);
-    _assert_equals(last->value, 3, INT);
+    ASSERT_NOT_EQUAL_INT(last, NULL);
+    ASSERT_EQUAL_INT(last->next, NULL);
+    ASSERT_EQUAL_INT(last->value, 3);
     return 0;
 }
 
@@ -116,7 +116,7 @@ int linked_list_can_be_printed_horizontally() {
 
     char *actual = read_printf();
     char *expected = "0 3 3 3 \n";
-    _assert_equals(actual, expected, CHAR);
+    ASSERT_EQUAL_STRING(actual, expected);
     return 0;
 }
 
@@ -128,7 +128,7 @@ int linked_list_can_be_printed_vertically() {
 
     char *actual = read_printf();
     char *expected = "3\n3\n3\n";
-    _assert_equals(actual, expected, CHAR);
+    ASSERT_EQUAL_STRING(actual, expected);
     return 0;
 }
 
@@ -141,14 +141,14 @@ int linked_list_can_be_printed_backwards() {
 
     char *actual = read_printf();
     char *expected = "1 3 3 3 \n";
-    _assert_equals(actual, expected, CHAR);
+    ASSERT_EQUAL_STRING(actual, expected);
     return 0;
 }
 
 int sum_of_linked_list() {
     linked_list *ll = new_linked_list(3, 3);
     int sum = sum_linked_list(ll);
-    _assert(sum == 9);
+    ASSERT_EQUAL_INT(sum, 9);
     return 0;
 }
 
@@ -156,7 +156,7 @@ int sum_of_linked_list_after_insertion() {
     linked_list *ll = new_linked_list(3, 3);
     insert_linked_list(ll, 2, 9);
     int sum = sum_linked_list(ll);
-    _assert(sum == 18);
+    ASSERT_EQUAL_INT(sum, 18);
     return 0;
 }
 
@@ -165,13 +165,13 @@ int linked_lists_can_be_merged() {
     linked_list *l2 = new_linked_list(3, 0);
     merge_linked_list(l1, l2);
 
-    _assert(l1->value == 3);
-    _assert(l1->next->value == 0);
+    ASSERT_EQUAL_INT(l1->value, 3);
+    ASSERT_EQUAL_INT(l1->next->value, 0);
 
     linked_list *last = l1->next->next->next->next->next;
-    _assert(last != NULL);
-    _assert(last->value == 0);
-    _assert(last->prev->value == 3);
+    ASSERT_NOT_EQUAL_INT(last, NULL);
+    ASSERT_EQUAL_INT(last->value, 0);
+    ASSERT_EQUAL_INT(last->prev->value, 3);
     return 0;
 }
 
