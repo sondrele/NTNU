@@ -1,48 +1,51 @@
+
+INCLUDEPATH=\
+    -Iinclude\
+    -I/usr/local/include
 CC ?= cc
-MPICC ?= mpicc
-INCS =
-LIBS =
-CFLAGS += -g -std=c99 -pedantic -Wall ${INCS}
-LDFLAGS += -static ${LIBS}
-SRC = linkedlist.c
-SRC2 = ring.c
-OBJ = ${SRC:.c=.o}
-OBJ2 = ${SRC2:.c=.o}
+CFLAGS += -std=c99 ${INCLUDEPATH} -g
+LDFLAGS += -L/usr/local/lib
+SRCS = src/linkedlist.c
+OBJS = ${SRCS:.c=.o}
+TEST = lib/ctest.c test/test_linkedlist.c
+TOBJ = ${TEST:.c=.o} ${OBJS}
+DEPS = linkedlist.h
 
-all: options linkedlist test_runner ring test
+%.o: %.c ${DEPS}
+	${CC} ${CFLAGS} -c -o $@ $<
 
-options:
-	@echo linkedlist build options:
-	@echo "CFLAGS   = ${CFLAGS}"
-	@echo "LDFLAGS  = ${LDFLAGS}"
-	@echo "CC       = ${CC}"
-	@echo "MPICC    = ${MPICC}"
+# Default
+all: setup linkedlist
 
-.c.o:
-	@echo CC $<
-	@${CC} -c ${CFLAGS} $<
+setup: bin obj
+	@echo "SRCS = ${SRCS}"
+	@echo "TEST = ${TEST}"
+	@echo "OBJS = ${OBJS}"
 
-linkedlist: ${OBJ}
-	@echo CC -o $@
-	@${CC} -o $@ ${OBJ} ${LDFLAGS}
+linkedlist: ${OBJS}
+	${CC} -o bin/$@ $^ ${CFLAGS}
+	mv src/*.o obj/
+#mv test/*.o obj/
 
-test_runner: test_runner.o linkedlist.o
-	@echo CC -o $@
-	@echo Stubbing symbols: main
-	@strip -N main linkedlist.o -o _linkedlist.o
-	@${CC} -o $@ test_runner.o _linkedlist.o ${LDFLAGS}
+test: all ${TOBJ}
+	@strip -N main obj/linkedlist.o -o obj/_linkedlist.o
+	${CC} -o bin/$@ ${TEST:.c=.o} obj/_linkedlist.o ${CFLAGS}
+	bin/test
 
-ring: ${SRC2}
-	@echo ${MPICC} ${CFLAGS} -o $@ ${SRC2}
-	@${MPICC} ${CFLAGS} -o $@ ${SRC2}
+run: all
+	bin/linkedlist
 
-test: test_runner
-	@echo Running tests...
-	@./test_runner
-
-run: linkedlist.o
-	./linkedlist
+# Cleanup.
+.PHONY: clean
 
 clean:
-	@echo cleaning
-	@rm -f test_runner *.o *.core linkedlist
+	if [ -e obj ]; then rm -r obj; fi
+
+purge: clean
+	if [ -e bin ]; then rm -r bin; fi
+
+# Targets to create directories (when they don't exist already).
+bin:
+	mkdir bin
+obj:
+	mkdir obj
