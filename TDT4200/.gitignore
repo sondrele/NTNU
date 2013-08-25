@@ -6,13 +6,16 @@
 .temp_printf
 
 ############
-## Compiled files
+# Compiled files
 ############
-
 *.o
-PS1/linkedlist
-PS1/test_runner
-PS1/ring
+
+############
+# Directories
+############
+bin/
+obj/
+
 
 ############
 ## Windows
