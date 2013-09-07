@@ -27,7 +27,6 @@ test: $(CTEST)
 	$(CC) -o $@ $(CTEST) $(CFLAGS)
 	./$@
 
-
 clean:
 	rm -f $(BIN) *.o
 
