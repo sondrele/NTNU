@@ -1,7 +1,7 @@
 
 INCLUDE = -I../PS1/include/
-CC = cc
-MPICC = mpicc
+CC = mpicc
+REALCC = cc
 CFLAGS = -std=c99 -g $(INCLUDE)
 
 CTEST = ../PS1/lib/ctest.c jacobi.c test_jacobi.c
@@ -20,27 +20,16 @@ unzip:
 $(BIN) : $(SRC)
 
 upload:
-	zip $(ZIP) $(SRC)
+	zip -r $(ZIP) .
 	scp $(ZIP) sondrele@clustis3.idi.ntnu.no:~/TDT4200/PS2/
 
+download:
+	scp sondrele@clustis3.idi.ntnu.no:~/TDT4200/PS2/out.bmp .
+	eog ./out.bmp
+
 test: $(CTEST)
-	$(CC) -o $@ $(CTEST) $(CFLAGS)
+	$(REALCC) -o $@ $(CTEST) $(CFLAGS)
 	./$@
 
 clean:
 	rm -f $(BIN) *.o
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

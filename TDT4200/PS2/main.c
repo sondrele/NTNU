@@ -7,22 +7,24 @@
 #include "global.h"
 #include "bmp.h"
 
-struct Configuration config; // Stores arrays needed for the CFD computation, should not be modified
+struct Configuration config;    // Stores arrays needed for the CFD computation, should not be modified
 
-int iterations,              // Number of CFD iterations (not Jacobi iterations)
-    imageSize;               // Width/height of the simulation domain/output image.
-unsigned char* imageBuffer;  // Buffer to hold the image to be written to file
+int iterations,                 // Number of CFD iterations (not Jacobi iterations)
+    imageSize;                  // Width/height of the simulation domain/output image.
+unsigned char* imageBuffer;     // Buffer to hold the image to be written to file
 
-int rank,                      // Rank of this process
-    size,                      // Total number of processes
-    dims[2],                   // Process grid dimensions
-    coords[2],                 // Process grid coordinates of current process
-    periods[2] = {0,0},        // Periodicity of process grid
-    north, south, east, west,  // Ranks of neighbours in process grid
-    local_height, local_width, // Size of local subdomain
-    border = 1;                // Border thickness
+int rank,                       // Rank of this process
+    size,                       // Total number of processes
+    dims[2],                    // Process grid dimensions
+    coords[2],                  // Process grid coordinates of current process
+    periods[2] = {0,0},         // Periodicity of process grid
+    north, south, east, west,   // Ranks of neighbours in process grid
+    local_height, local_width,  // Size of local subdomain
+    border = 1;                 // Border thickness
 
-MPI_Comm cart_comm;  // Cartesian communicator
+MPI_Comm cart_comm;             // Cartesian communicator
+
+MPI_Status status;              // MPI status object 
 
 // MPI datatypes, you might need to add some
 // remember to also include them in global.h to
@@ -48,7 +50,7 @@ int main (int argc, char **argv) {
     // Reading command line arguments
     iterations = 100;
     imageSize = 512;
-    if(argc == 3){
+    if (argc == 3) {
         iterations = atoi(argv[1]);
         imageSize = atoi(argv[2]);
     }
@@ -60,12 +62,17 @@ int main (int argc, char **argv) {
 
     // Creating cartesian communicator
     MPI_Dims_create(size, 2, dims);
-    MPI_Cart_create( MPI_COMM_WORLD, 2, dims, periods, 0, &cart_comm );
-    MPI_Cart_coords( cart_comm, rank, 2, coords );
+    MPI_Cart_create(MPI_COMM_WORLD, 2, dims, periods, 0, &cart_comm);
+    MPI_Cart_coords(cart_comm, rank, 2, coords);
 
     // Finding neighbours processes
-    MPI_Cart_shift( cart_comm, 0, 1, &north, &south );
-    MPI_Cart_shift( cart_comm, 1, 1, &west, &east );
+    MPI_Cart_shift(cart_comm, 0, 1, &north, &south);
+    MPI_Cart_shift(cart_comm, 1, 1, &west, &east);
+    // printf("rank: %d\n", rank);
+    // printf("north: %d\n", north);
+    // printf("south: %d\n", south);
+    // printf("east: %d\n", east);
+    // printf("west: %d\n", west);
 
     // Determining size of local subdomain
     local_height = imageSize/dims[0];
@@ -80,8 +87,8 @@ int main (int argc, char **argv) {
     local_diverg = (float*)malloc(sizeof(float)*local_width*local_height);
 
     // Initializing the CFD computation, only one process should do this.
-    if(rank == 0){
-        initFluid( &config, imageSize, imageSize);
+    if (rank == 0) {
+        initFluid(&config, imageSize, imageSize);
         pres = config.pres;
         diverg = config.div;
 
@@ -92,12 +99,12 @@ int main (int argc, char **argv) {
     // These are not the same iterations used in the Jacobi solver.
     // The solveFluid function call the Jacobi solver, wich runs for 
     // 100 iterations for each of these iterations.
-    for(int i = 0; i < iterations; i++){
+    for (int i = 0; i < iterations; i++) {
         solveFluid(&config);
     }
 
     // Converting the density to an image and writing it to file.
-    if(rank == 0){
+    if (rank == 0) {
         densityToColor(imageBuffer, config.dens, config.N);
         write_bmp(imageBuffer, imageSize, imageSize);
 

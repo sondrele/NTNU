@@ -4,11 +4,14 @@
 
 .gdbinit
 .temp_printf
+PS2/ps2.zip
 
 ############
 # Compiled files
 ############
 *.o
+PS2/test
+PS2/fluid2d
 
 ############
 # Directories
