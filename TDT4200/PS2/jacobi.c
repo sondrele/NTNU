@@ -9,47 +9,73 @@
 
 // Distribute the diverg (bs) from rank 0 to all the processes
 void distribute_diverg() {
-    if (rank != 0) 
-        return;
+    if (rank != 0) {
+        MPI_Recv(local_diverg, (local_width * local_height), array_slice_t, 0, 1, cart_comm, &status);
+        printf("%d: receiving divergence\n", rank);
+        for (int i = 0; i < (local_width * local_height); i++) {
+            printf("%f\n", local_diverg[i]);
+        }
+    } else {
+        for (int node = 1; node < size; node++) {
+            float *loc_div = (float *) malloc(sizeof(float) * local_width * local_height);
+            for (int i = 0; i < (local_width * local_height); i++) {
 
+            }
+            MPI_Send(&diverg[node], 1, array_slice_t, node, 1, cart_comm);
+            printf("distributing divergence to: %d\n", node);
+        }
+    }
 }
 
 // Gather the results of the computation at rank 0
 void gather_pres() {
-    if (rank != 0) 
-        return;
+    printf("%d: gathering pressure\n", rank);
+    if (rank != 0) {
+        // MPI_Send()
+    } else {
+        for (int i = 0; i < size; i++) {
 
+        }
+    }
+}
+
+void print_array(float *array, int length) {
+    for (int i = 0; i < length; i++)
+        printf("%f", array[i]);
+    printf("\n");
 }
 
 // Exchange borders between processes during computation
 void exchange_borders() {
-    // if (north >= 0) {
-    //     float *row = get_row(0),
-    //         *in_row = (float *) malloc(sizeof(float) * local_width);
-    //     MPI_Send(row, local_width, MPI_FLOAT, north, 1, cart_comm);
-    //     MPI_Recv(&in_row, local_width, MPI_FLOAT, north, 1, cart_comm, &status);
-    // }
+    printf("%d: exchanging borders\n", rank);
+    if (north >= 0) {
+        float *row = get_row(0),
+            *in_row = (float *) malloc(sizeof(float) * local_width);
+        MPI_Send(row, local_width, MPI_FLOAT, north, 1, cart_comm);
+        MPI_Recv(&in_row, local_width, MPI_FLOAT, north, 1, cart_comm, &status);
+        print_array(in_row, local_width);
+    }
 
-    // if (south >= 0) {
-    //     float *row = get_row(local_height - 1),
-    //         *in_row = (float *) malloc(sizeof(float) * local_width);
-    //     MPI_Send(row, local_width, MPI_FLOAT, south, 1, cart_comm);
-    //     MPI_Recv(&in_row, local_width, MPI_FLOAT, south, 1, cart_comm, &status);
-    // }
+    if (south >= 0) {
+        float *row = get_row(local_height - 1),
+            *in_row = (float *) malloc(sizeof(float) * local_width);
+        MPI_Send(row, local_width, MPI_FLOAT, south, 1, cart_comm);
+        MPI_Recv(&in_row, local_width, MPI_FLOAT, south, 1, cart_comm, &status);
+    }
 
-    // if (west >= 0) {
-    //     float *col = get_col(0),
-    //         *in_col = (float *) malloc(sizeof(float) * local_height);
-    //     MPI_Send(col, local_height, MPI_FLOAT, west, 1, cart_comm);
-    //     MPI_Recv(&in_col, local_height, MPI_FLOAT, west, 1, cart_comm, &status);
-    // }
+    if (west >= 0) {
+        float *col = get_col(0),
+            *in_col = (float *) malloc(sizeof(float) * local_height);
+        MPI_Send(col, local_height, MPI_FLOAT, west, 1, cart_comm);
+        MPI_Recv(&in_col, local_height, MPI_FLOAT, west, 1, cart_comm, &status);
+    }
 
-    // if (east >= 0) {
-    //     float *col = get_col(local_width - 1),
-    //         *in_col = (float *) malloc(sizeof(float) * local_height);
-    //     MPI_Send(col, local_height, MPI_FLOAT, east, 1, cart_comm);
-    //     MPI_Recv(&in_col, local_height, MPI_FLOAT, east, 1, cart_comm, &status);
-    // }
+    if (east >= 0) {
+        float *col = get_col(local_width - 1),
+            *in_col = (float *) malloc(sizeof(float) * local_height);
+        MPI_Send(col, local_height, MPI_FLOAT, east, 1, cart_comm);
+        MPI_Recv(&in_col, local_height, MPI_FLOAT, east, 1, cart_comm, &status);
+    }
 }
 
 float *get_row(int x) {
@@ -78,22 +104,25 @@ void jacobi_iteration() {
 }
 
 float calculate_jacobi(int row, int col) {
-    // TODO: hvis (row,col) er på edge, så må noe gjøres, ikke hvis (row-1,col) er på edge..
-    int i1 = on_edge(row - 1, col) ? LP(row, col) : LP(row - 1, col),
-        i2 = on_edge(row + 1, col) ? LP(row, col) : LP(row + 1, col),
-        i3 = on_edge(row, col - 1) ? LP(row, col) : LP(row, col - 1),
-        i4 = on_edge(row, col + 1) ? LP(row, col) : LP(row, col + 1);
-    float x1 = local_pres[i1],
-        x2 = local_pres[i2],
-        x3 = local_pres[i3],
-        x4 = local_pres[i4];
+    int r2 = (row == -1) ? row : row - 1,
+        r4 = (row == local_height) ? row : row + 1,
+        c1 = (col == -1) ? col : col - 1,
+        c3 = (col == local_width) ? col : col + 1;
+
+    float x1 = local_pres[LP(row, c1)],
+        x2 = local_pres[LP(r2, col)],
+        x3 = local_pres[LP(row, c3)],
+        x4 = local_pres[LP(r4, col)];
     return 0.25 * (x1 + x2 + x3 + x4 - *local_diverg);
 }
 
-int on_edge(int row, int col) {
-    if (row == -1 || col == -1 || row == (local_height + 1) || col == (local_width + 1))
-        return 1;
-    return 0;
+void print_jacobi(float *jacobi) {
+    for(int i = -1; i < local_height + 1; i++) {
+        for (int j = -1; j < local_width + 1; j++) {
+            printf("%f ", jacobi[LP(i, j)]);
+        }
+        printf("\n");
+    }
 }
 
 // Solve linear system with jacobi method

@@ -30,20 +30,28 @@ MPI_Status status;              // MPI status object
 // remember to also include them in global.h to
 // make them visible in other files
 MPI_Datatype border_row_t,
-             border_col_t;
+             border_col_t,
+             MPI_array_slice_t;
 
-// Global, local part of the pres array (stores the xs)
+// Global and local part of the pres array (stores the xs)
+float* pres;
 float* local_pres;
 float* local_pres0;
-float* pres;
 
 // Global, local part of the diverg array (stores the bs)
 float* local_diverg;
 float* diverg;
 
 // Function to create and commit MPI datatypes
-void create_types(){
+void create_types() {
+    MPI_Type_vector(local_height, 1, local_width, MPI_FLOAT, &border_row_t);
+    MPI_Type_commit(&border_row_t);
 
+    MPI_Type_vector(local_width, 1, local_height, MPI_FLOAT, &border_col_t);
+    MPI_Type_commit(&border_col_t);
+
+    MPI_Type_vector(imageSize * imageSize, 1, 1, MPI_FLOAT, &MPI_array_slice_t);
+    MPI_Type_commit(&MPI_array_slice_t);
 }
 
 int main (int argc, char **argv) {
@@ -68,11 +76,6 @@ int main (int argc, char **argv) {
     // Finding neighbours processes
     MPI_Cart_shift(cart_comm, 0, 1, &north, &south);
     MPI_Cart_shift(cart_comm, 1, 1, &west, &east);
-    // printf("rank: %d\n", rank);
-    // printf("north: %d\n", north);
-    // printf("south: %d\n", south);
-    // printf("east: %d\n", east);
-    // printf("west: %d\n", west);
 
     // Determining size of local subdomain
     local_height = imageSize/dims[0];
@@ -94,6 +97,12 @@ int main (int argc, char **argv) {
 
         imageBuffer = (unsigned char*)malloc(sizeof(unsigned char)*imageSize*imageSize);
     }
+
+    // if (rank == 0) {
+    //     for (int i = 0; i < (config.size); i++) {
+    //         printf("%f ", diverg[i]);
+    //     }
+    // }
 
     // Solving the CFD equations, one iteration for each timestep.
     // These are not the same iterations used in the Jacobi solver.
