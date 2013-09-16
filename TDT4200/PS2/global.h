@@ -35,3 +35,4 @@ int on_edge(int row, int col);
 float calculate_jacobi(int row, int col);
 float *get_row(int row);
 float *get_col(int col);
+void print_jacobi();

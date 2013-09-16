@@ -31,7 +31,7 @@ MPI_Status status;              // MPI status object
 // make them visible in other files
 MPI_Datatype border_row_t,
              border_col_t,
-             MPI_array_slice_t;
+             array_slice_t;
 
 // Global and local part of the pres array (stores the xs)
 float* pres;
@@ -44,14 +44,22 @@ float* diverg;
 
 // Function to create and commit MPI datatypes
 void create_types() {
-    MPI_Type_vector(local_height, 1, local_width, MPI_FLOAT, &border_row_t);
+        MPI_Type_contiguous(local_width,        // count
+                        MPI_FLOAT,          // old_type
+                        &border_row_t);     // newtype_p
     MPI_Type_commit(&border_row_t);
 
-    MPI_Type_vector(local_width, 1, local_height, MPI_FLOAT, &border_col_t);
+    MPI_Type_vector(local_height,           // count
+                    1,                      // blocklength
+                    local_width + 2,        // stride
+                    MPI_FLOAT,              // old_type
+                    &border_col_t);         // newtype_p
     MPI_Type_commit(&border_col_t);
 
-    MPI_Type_vector(imageSize * imageSize, 1, 1, MPI_FLOAT, &MPI_array_slice_t);
-    MPI_Type_commit(&MPI_array_slice_t);
+    MPI_Type_contiguous(local_width,        // count
+                    MPI_FLOAT,              // old_type
+                    &array_slice_t);        // newtype_p
+    MPI_Type_commit(&array_slice_t);
 }
 
 int main (int argc, char **argv) {
@@ -97,12 +105,6 @@ int main (int argc, char **argv) {
 
         imageBuffer = (unsigned char*)malloc(sizeof(unsigned char)*imageSize*imageSize);
     }
-
-    // if (rank == 0) {
-    //     for (int i = 0; i < (config.size); i++) {
-    //         printf("%f ", diverg[i]);
-    //     }
-    // }
 
     // Solving the CFD equations, one iteration for each timestep.
     // These are not the same iterations used in the Jacobi solver.

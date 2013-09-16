@@ -7,6 +7,8 @@
 
 #define LP(row, col) ((row) + border) * (local_width + 2 * border) + ((col) + border)
 
+void print_arr(float*, int, int);
+
 int iterations,             // Number of CFD iterations (not Jacobi iterations)
     imageSize;              // Width/height of the simulation domain/output image.
 unsigned char* imageBuffer;     // Buffer to hold the image to be written to file
@@ -24,24 +26,16 @@ MPI_Comm cart_comm;             // Cartesian communicator
 
 MPI_Status status;              // MPI status object 
 
-// MPI datatypes, you might need to add some
-// remember to also include them in global.h to
-// make them visible in other files
-MPI_Datatype border_row_t,
-             border_col_t,
-             array_slice_t,
-             test_t;
-
 // Global and local part of the pres array (stores the xs)
-float test_pres[100] = {
-    1.0, 2.0, 3.0, 4.0, 1.0, 2.0, 3.0, 4.0,
-    5.0, 6.0, 7.0, 8.0, 5.0, 6.0, 7.0, 8.0,
-    1.0, 2.0, 3.0, 4.0, 1.0, 2.0, 3.0, 4.0,
-    5.0, 6.0, 7.0, 8.0, 5.0, 6.0, 7.0, 8.0,
-    1.0, 2.0, 3.0, 4.0, 1.0, 2.0, 3.0, 4.0,
-    5.0, 6.0, 7.0, 8.0, 5.0, 6.0, 7.0, 8.0,
-    1.0, 2.0, 3.0, 4.0, 1.0, 2.0, 3.0, 4.0,
-    5.0, 6.0, 7.0, 8.0, 5.0, 6.0, 7.0, 8.0
+float test_pres[64] = {
+    0.1, 0.2, 0.3, 0.4, 1.1, 1.2, 1.3, 1.4,
+    0.5, 0.6, 0.7, 0.8, 1.5, 1.6, 1.7, 1.8,
+    2.1, 2.2, 2.3, 2.4, 3.1, 3.2, 3.3, 3.4,
+    2.5, 2.6, 2.7, 2.8, 3.5, 3.6, 3.7, 3.8,
+    4.1, 4.2, 4.3, 4.4, 5.1, 5.2, 5.3, 5.4,
+    4.5, 4.6, 4.7, 4.8, 5.5, 5.6, 5.7, 5.8,
+    6.1, 6.2, 6.3, 6.4, 7.1, 7.2, 7.3, 7.4,
+    6.5, 6.6, 6.7, 6.8, 7.5, 7.6, 7.7, 7.8
 };
 float* pres;
 float* local_pres;
@@ -50,101 +44,191 @@ float* local_pres0;
 // Global, local part of the diverg array (stores the bs)
 float* local_diverg;
 float* diverg;
-float test_diverg[100] = {
-    0.7, 0.8, 0.9, 0.1, 5.5, 5.5, 5.5, 5.5,
-    7.0, 8.0, 9.0, 1.0, 4.5, 4.5, 4.5, 4.5,
-    0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
-    0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
-    0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
-    0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
-    0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
-    0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5
+float test_diverg[64] = {
+    0.1, 0.2, 0.3, 0.4, 1.1, 1.2, 1.3, 1.4,
+    0.5, 0.6, 0.7, 0.8, 1.5, 1.6, 1.7, 1.8,
+    2.1, 2.2, 2.3, 2.4, 3.1, 3.2, 3.3, 3.4,
+    2.5, 2.6, 2.7, 2.8, 3.5, 3.6, 3.7, 3.8,
+    4.1, 4.2, 4.3, 4.4, 5.1, 5.2, 5.3, 5.4,
+    4.5, 4.6, 4.7, 4.8, 5.5, 5.6, 5.7, 5.8,
+    6.1, 6.2, 6.3, 6.4, 7.1, 7.2, 7.3, 7.4,
+    6.5, 6.6, 6.7, 6.8, 7.5, 7.6, 7.7, 7.8
 };
+
+// MPI datatypes, you might need to add some
+// remember to also include them in global.h to
+// make them visible in other files
+MPI_Datatype border_row_t,
+             border_col_t,
+             array_slice_t,
+             array_slice_t2;
 
 // Function to create and commit MPI datatypes
 void create_types() {
-    MPI_Type_contiguous(local_width,                // count
-                        MPI_FLOAT,                  // old_type
-                        &border_row_t);             // newtype_p
+    MPI_Type_contiguous(local_width,        // count
+                        MPI_FLOAT,          // old_type
+                        &border_row_t);     // newtype_p
     MPI_Type_commit(&border_row_t);
 
-    MPI_Type_vector(local_height,                   // count
-                     1,                             // blocklength
-                     local_width + 2,               // stride
-                     MPI_FLOAT,                     // old_type
-                     &border_col_t);                // newtype_p
+    MPI_Type_vector(local_height,           // count
+                    1,                      // blocklength
+                    local_width + 2,        // stride
+                    MPI_FLOAT,              // old_type
+                    &border_col_t);         // newtype_p
     MPI_Type_commit(&border_col_t);
 
-    MPI_Type_contiguous(local_width,                // count
-                    MPI_FLOAT,                      // old_type
-                    &array_slice_t);                // newtype_p
+    MPI_Type_contiguous(local_width,        // count
+                    MPI_FLOAT,              // old_type
+                    &array_slice_t);        // newtype_p
     MPI_Type_commit(&array_slice_t);
+
+    // Used with MPI_Scatter, but does not work properly
+    // MPI_Type_vector(local_height,           // count
+    //                 local_width,            // blocklength
+    //                 imageSize,              // stride
+    //                 MPI_FLOAT,              // old_type
+    //                 &array_slice_t2));      // newtype_p
+    // MPI_Type_commit(&array_slice_t2);
 }
 
 void test_disiribute_diverg() {
-    if (rank == 1) {
-        printf("%d: receiving divergence\n", rank);
-        local_diverg = (float*) malloc(sizeof(float) * local_width * local_height * 2);
+    if (rank == 0) {
+        int displs[size];
+        for (int i = 0; i < size / local_height; i++) {
+            for (int j = 0; j < local_height; j++) {
+                displs[i * local_height + j] = i * imageSize * local_height + j * local_width;
+            }
+        }
+
+        for (int i = 1; i < size; i++) {
+            int offset = displs[i];
+            for (int j = 0; j < local_height; j++) {
+                offset += j * imageSize;
+                MPI_Send((diverg + offset), 1, array_slice_t, i, 123, cart_comm);
+            }
+        }
+
+        for (int i = 0; i < local_height; i++) {
+            for(int j = 0; j < local_width; j++) {
+                local_diverg[i * local_width + j] = diverg[i * imageSize + j];
+            }
+        }
+    } else {
         for (int i = 0; i < local_height; i++) {
             MPI_Recv((local_diverg + local_width * i), 1, array_slice_t, 0, 123, cart_comm, &status);
         }
-        for (int i = 0; i < local_height*local_width; i++) {
-            printf("%f ", local_diverg[i]);
-        }
-        printf("\n");
     }
+    // implementation using scatter
+    // MPI_Scatter(diverg,
+    //             1,
+    //             array_slice_t2,
+    //             local_diverg,
+    //             local_width*local_height,
+    //             MPI_FLOAT,
+    //             rank,
+    //             cart_comm);
 
-    if (rank == 0) {
-        printf("distributing divergence to: %d\n", 1);
-        // offset for diverg er riktig
-        for (int i = 0; i <local_height; i++) {
-            MPI_Send((diverg + local_width + imageSize*i), 1, array_slice_t, 1, 123, cart_comm);
-        }
-    }
+    // print local_diverg
+    // printf("%d:======\n", rank);
+    // for (int i = 0; i < local_height*local_width; i++) {
+    //         printf("%f ", local_diverg[i]);
+    //     }
+    // printf("\n======\n");
 }
 
 void test_exchange_border() {
-    if (rank == 1 && 0) {
-        printf("%d: exchanging border\n", rank);
-        for (int i = 0; i < ((local_width + 2) * (local_height + 2)); i++)
-            local_pres[i] = 1;
-        local_pres[LP(0,0)] = 1.111111;
-        local_pres[LP(1,0)] = 5.555555;
-        print_jacobi(local_pres);
-
-        printf("Sending: %f %f\n", (local_pres + LP(0, 0)), (local_pres + LP(0, 0) + 6));
-        MPI_Send((local_pres + LP(0, 0)), 1, border_col_t, 0, 123, cart_comm);
-        MPI_Recv((local_pres0 + LP(0, -1)), 1, border_col_t, 0, 123, cart_comm, &status);
-        // printf("%d receiving %f %f\n", rank, local_pres0[LP(0,0)], local_pres0[LP(1,0)]);
-        print_jacobi(local_pres0);
+    printf("%d: exchanging borders\n", rank);
+    for (int i = 0; i < local_height; i++) {
+        for (int j = 0; j < local_width; j++) {
+            local_pres[LP(i, j)] = - rank - 0.1 * (i * local_width + j);
+        }
     }
 
-    if (rank == 0) {
-        printf("%d: exchanging border\n", rank);
-        for (int i = 0; i < ((local_width + 2) * (local_height + 2)); i++)
-            local_pres[i] = i;
+    if (north >= 0) {
+        float *out = (local_pres + LP(0, 0)),
+            *in = (local_pres + LP(-1, 0));
 
-        print_jacobi(local_pres);
-        // printf("%d Sending: %f %f\n", rank, *(local_pres + LP(0, 3)), *(local_pres + LP(0, 3) + 6));
-        // MPI_Send((local_pres + LP(0, 3)), 1, border_col_t, 1, 123, cart_comm);
-        // MPI_Recv((local_pres0 + LP(0, 4)), 1, border_col_t, 1, 123, cart_comm, &status);
-
-
-        MPI_Send((local_pres + LP(1, 0)), 1, border_row_t, 2, 123, cart_comm);
-        MPI_Recv((local_pres0 + LP(2, 0)), 1, border_row_t, 2, 123, cart_comm, &status);
-        print_jacobi(local_pres0);
+        MPI_Send(out, 1, border_row_t, north, 1, cart_comm);
+        MPI_Recv(in, 1, border_row_t, north, 1, cart_comm, &status);
     }
 
-    if (rank == 2) {
-        printf("%d: exchanging border\n", rank);
-        for (int i = 0; i < ((local_width + 2) * (local_height + 2)); i++)
-            local_pres[i] = i;
-        print_jacobi(local_pres);
+    if (south >= 0) {
+        float *out = (local_pres + LP(local_height - 1, 0)),
+            *in = (local_pres + LP(local_height, 0));
+            
+        MPI_Send(out, 1, border_row_t, south, 1, cart_comm);
+        MPI_Recv(in, 1, border_row_t, south, 1, cart_comm, &status);
+    }
 
-        // printf("%d Sending: %f %f\n", rank, *(local_pres + LP(0, 3)), *(local_pres + LP(0, 3) + 6));
-        MPI_Send((local_pres + LP(0, 0)), 1, border_row_t, 0, 123, cart_comm);
-        MPI_Recv((local_pres0 + LP(-1, 0)), 1, border_row_t, 0, 123, cart_comm, &status);
-        print_jacobi(local_pres0);
+    if (west >= 0) {
+        float *out = (local_pres + LP(0, 0)),
+            *in = (local_pres + LP(0, -1));
+            
+        MPI_Send(out, 1, border_col_t, west, 1, cart_comm);
+        MPI_Recv(in, 1, border_col_t, west, 1, cart_comm, &status);
+    }
+
+    if (east >= 0) {
+        float *out = (local_pres + LP(0, local_width - 1)),
+            *in = (local_pres + LP(0, local_width));
+            
+        MPI_Send(out, 1, border_col_t, east, 1, cart_comm);
+        MPI_Recv(in, 1, border_col_t, east, 1, cart_comm, &status);
+    }
+    print_jacobi(local_pres);
+    printf("%d: done\n", rank);
+}
+
+void test_gather_pressure() {
+    for (int i = 0; i < local_height; i++) {
+        for (int j = 0; j < local_width; j++) {
+            local_pres[LP(i, j)] = - rank - 0.1 * (i * local_width + j);
+        }
+    }
+    printf("rank: %d, last: %f\n", rank, local_pres[LP(local_height-1, local_width-1)]);
+    if (rank != 0) {
+        for (int j = 0; j < local_height; j++) {
+            MPI_Send((local_pres + LP(j, 0)), 1, array_slice_t, 0, 123, cart_comm);
+        }
+    } else if (rank == 0) {
+        int displs[size];
+        for (int i = 0; i < size / local_height; i++) {
+            for (int j = 0; j < local_height; j++) {
+                displs[i * local_height + j] = i * imageSize * local_height + j * local_width;
+                printf("d: %d\n", displs[i*local_height+j]);
+            }
+        }
+
+        for (int i = 1; i < size; i++) {
+            int offset = displs[i];
+            for (int j = 0; j < local_height; j++) {
+                offset += j * imageSize;
+                float *buf = (float*) malloc(sizeof(float)*local_width);
+                MPI_Recv(buf, 1, array_slice_t, i, 123, cart_comm, &status);
+                printf("received from %d: ", i);
+                for(int i = 0; i < local_width; i++) {
+                    printf("%f ", buf[i]);
+                }
+                printf("\n");
+                // MPI_Recv((pres + offset), 1, array_slice_t, i, 123, cart_comm, &status);
+            }
+        }
+
+        for (int i = 0; i < local_height; i++) {
+            for(int j = 0; j < local_width; j++) {
+                pres[i * imageSize + j] = local_pres[LP(i, j)];
+            }
+        }
+        print_arr(pres, imageSize, imageSize);
+    }
+}
+
+void print_arr(float *a, int row, int col) {
+    for (int i = 0; i < row; i++) {
+        for (int j = 0; j < col; j++) {
+            printf("%f ", a[i * col + j]);
+        }
+        printf("\n");
     }
 }
 
@@ -197,8 +281,9 @@ int main(int argc, char** argv){
         printf("imageSize: %d\n", imageSize);
     }
 
-    test_disiribute_diverg();
-    // test_exchange_border();
+    // test_gather_pressure();
+    // test_disiribute_diverg();
+    test_exchange_border();
 
     // Finalize
     MPI_Finalize();

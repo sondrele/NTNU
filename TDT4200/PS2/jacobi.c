@@ -9,89 +9,86 @@
 
 // Distribute the diverg (bs) from rank 0 to all the processes
 void distribute_diverg() {
-    if (rank != 0) {
-        MPI_Recv(local_diverg, (local_width * local_height), array_slice_t, 0, 1, cart_comm, &status);
-        printf("%d: receiving divergence\n", rank);
-        for (int i = 0; i < (local_width * local_height); i++) {
-            printf("%f\n", local_diverg[i]);
+    if (rank == 0) {
+        int displs[size];
+        for (int i = 0; i < size / local_height; i++) {
+            for (int j = 0; j < local_height; j++) {
+                displs[i * local_height + j] = i * imageSize * local_height + j * local_width;
+            }
+        }
+        for (int i = 1; i < size; i++) {
+            int offset = displs[i];
+            for (int j = 0; j < local_height; j++) {
+                offset += j * imageSize;
+                MPI_Send((diverg + offset), 1, array_slice_t, i, 123, cart_comm);
+            }
+        }
+        for (int i = 0; i < local_height; i++) {
+            for(int j = 0; j < local_width; j++) {
+                local_diverg[i * local_width + j] = diverg[i * imageSize + j];
+            }
         }
     } else {
-        for (int node = 1; node < size; node++) {
-            float *loc_div = (float *) malloc(sizeof(float) * local_width * local_height);
-            for (int i = 0; i < (local_width * local_height); i++) {
-
-            }
-            MPI_Send(&diverg[node], 1, array_slice_t, node, 1, cart_comm);
-            printf("distributing divergence to: %d\n", node);
+        for (int i = 0; i < local_height; i++) {
+            MPI_Recv((local_diverg + local_width * i), 1, array_slice_t, 0, 123, cart_comm, &status);
         }
     }
 }
 
 // Gather the results of the computation at rank 0
 void gather_pres() {
-    printf("%d: gathering pressure\n", rank);
     if (rank != 0) {
-        // MPI_Send()
-    } else {
-        for (int i = 0; i < size; i++) {
-
+        for (int j = 0; j < local_height; j++) {
+            MPI_Send((local_pres + LP(j, 0)), 1, array_slice_t, 0, 123, cart_comm);
+        }
+    } else if (rank == 0) {
+        int displs[size];
+        for (int i = 0; i < size / local_height; i++) {
+            for (int j = 0; j < local_height; j++) {
+                displs[i * local_height + j] = i * imageSize * local_height + j * local_width;
+            }
+        }
+        for (int i = 1; i < size; i++) {
+            int offset = displs[i];
+            for (int j = 0; j < local_height; j++) {
+                offset += j * imageSize;
+                MPI_Recv((pres + offset), 1, array_slice_t, i, 123, cart_comm, &status);
+            }
+        }
+        for (int i = 0; i < local_height; i++) {
+            for(int j = 0; j < local_width; j++) {
+                pres[i * imageSize + j] = local_pres[LP(i, j)];
+            }
         }
     }
 }
 
-void print_array(float *array, int length) {
-    for (int i = 0; i < length; i++)
-        printf("%f", array[i]);
-    printf("\n");
-}
-
 // Exchange borders between processes during computation
 void exchange_borders() {
-    printf("%d: exchanging borders\n", rank);
     if (north >= 0) {
-        float *row = get_row(0),
-            *in_row = (float *) malloc(sizeof(float) * local_width);
-        MPI_Send(row, local_width, MPI_FLOAT, north, 1, cart_comm);
-        MPI_Recv(&in_row, local_width, MPI_FLOAT, north, 1, cart_comm, &status);
-        print_array(in_row, local_width);
+        float *out = (local_pres + LP(0, 0)),
+            *in = (local_pres + LP(-1, 0));
+        MPI_Send(out, 1, border_row_t, north, 1, cart_comm);
+        MPI_Recv(in, 1, border_row_t, north, 1, cart_comm, &status);
     }
-
     if (south >= 0) {
-        float *row = get_row(local_height - 1),
-            *in_row = (float *) malloc(sizeof(float) * local_width);
-        MPI_Send(row, local_width, MPI_FLOAT, south, 1, cart_comm);
-        MPI_Recv(&in_row, local_width, MPI_FLOAT, south, 1, cart_comm, &status);
+        float *out = (local_pres + LP(local_height - 1, 0)),
+            *in = (local_pres + LP(local_height, 0));
+        MPI_Send(out, 1, border_row_t, south, 1, cart_comm);
+        MPI_Recv(in, 1, border_row_t, south, 1, cart_comm, &status);
     }
-
     if (west >= 0) {
-        float *col = get_col(0),
-            *in_col = (float *) malloc(sizeof(float) * local_height);
-        MPI_Send(col, local_height, MPI_FLOAT, west, 1, cart_comm);
-        MPI_Recv(&in_col, local_height, MPI_FLOAT, west, 1, cart_comm, &status);
+        float *out = (local_pres + LP(0, 0)),
+            *in = (local_pres + LP(0, -1));
+        MPI_Send(out, 1, border_col_t, west, 1, cart_comm);
+        MPI_Recv(in, 1, border_col_t, west, 1, cart_comm, &status);
     }
-
     if (east >= 0) {
-        float *col = get_col(local_width - 1),
-            *in_col = (float *) malloc(sizeof(float) * local_height);
-        MPI_Send(col, local_height, MPI_FLOAT, east, 1, cart_comm);
-        MPI_Recv(&in_col, local_height, MPI_FLOAT, east, 1, cart_comm, &status);
+        float *out = (local_pres + LP(0, local_width - 1)),
+            *in = (local_pres + LP(0, local_width));
+        MPI_Send(out, 1, border_col_t, east, 1, cart_comm);
+        MPI_Recv(in, 1, border_col_t, east, 1, cart_comm, &status);
     }
-}
-
-float *get_row(int x) {
-    float *row = (float *) malloc(sizeof(float) * (local_width + 2));
-    for (int i = -1; i < local_width + 1; i++) {
-        row[i+1] = local_pres[LP(x, i)];
-    }
-    return row;
-}
-
-float *get_col(int x) {
-    float *col = (float *) malloc(sizeof(float) * (local_height + 2));
-    for (int i = -1; i < local_height + 1; i++) {
-        col[i+1] = local_pres[LP(i, x)];
-    }
-    return col;
 }
 
 // One jacobi iteration
