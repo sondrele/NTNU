@@ -10,27 +10,33 @@
 // Distribute the diverg (bs) from rank 0 to all the processes
 void distribute_diverg() {
     if (rank == 0) {
+        // each entry is the index for the 'grid' corresponding to each node
         int displs[size];
         for (int i = 0; i < size / local_height; i++) {
             for (int j = 0; j < local_height; j++) {
                 displs[i * local_height + j] = i * imageSize * local_height + j * local_width;
             }
         }
+        // distribute to every other process than itself (0)
         for (int i = 1; i < size; i++) {
             int offset = displs[i];
             for (int j = 0; j < local_height; j++) {
                 offset += j * imageSize;
                 MPI_Send((diverg + offset), 1, array_slice_t, i, 123, cart_comm);
+                MPI_Send((pres + offset), 1, array_slice_t, i, 123, cart_comm);
             }
         }
+        // fix local_diverg 'manually'
         for (int i = 0; i < local_height; i++) {
             for(int j = 0; j < local_width; j++) {
                 local_diverg[i * local_width + j] = diverg[i * imageSize + j];
             }
         }
     } else {
+        // receive local_diverg from process 0
         for (int i = 0; i < local_height; i++) {
             MPI_Recv((local_diverg + local_width * i), 1, array_slice_t, 0, 123, cart_comm, &status);
+            MPI_Recv((local_pres + 1 + (i + 1) * (local_width + 2)), 1, array_slice_t, 0, 123, cart_comm, &status);
         }
     }
 }
@@ -91,15 +97,6 @@ void exchange_borders() {
     }
 }
 
-// One jacobi iteration
-void jacobi_iteration() {
-    for (int row = 0; row < local_height; row++) {
-        for (int col = 0; col < local_width; col++) {
-            local_pres0[LP(row, col)] = calculate_jacobi(row, col);
-        }
-    }
-}
-
 float calculate_jacobi(int row, int col) {
     int r2 = (row == -1) ? row : row - 1,
         r4 = (row == local_height) ? row : row + 1,
@@ -110,9 +107,47 @@ float calculate_jacobi(int row, int col) {
         x2 = local_pres[LP(r2, col)],
         x3 = local_pres[LP(row, c3)],
         x4 = local_pres[LP(r4, col)];
-    return 0.25 * (x1 + x2 + x3 + x4 - *local_diverg);
+    return 0.25 * (x1 + x2 + x3 + x4 - local_diverg[LP(row, col)]);
 }
 
+// One jacobi iteration
+void jacobi_iteration() {
+    for (int row = 0; row < local_height; row++) {
+        for (int col = 0; col < local_width; col++) {
+            local_pres0[LP(row, col)] = calculate_jacobi(row, col);
+        }
+    }
+}
+
+void init_local_pres() {
+    for (int i = -1; i < local_height + 1; i++) {
+        for (int j = -1; j < local_width + 1; j++) {
+            int idx = LP(i, j);
+            local_pres0[idx] = 0;
+            local_pres[idx] = 0;
+        }
+    }
+}
+
+// Solve linear system with jacobi method
+void jacobi(int iter) {
+    init_local_pres();
+
+    printf("Disibuting divergence\n");
+    distribute_diverg();
+    printf("Divergence distributed\n");
+
+    // Jacobi iterations
+    for (int k = 0; k < iter; k++) {    
+        jacobi_iteration();
+    }
+
+    printf("Gathering pressure\n");
+    gather_pres();
+    printf("Pressure gathered\n");
+}
+
+// For debugging puposes
 void print_jacobi(float *jacobi) {
     for(int i = -1; i < local_height + 1; i++) {
         for (int j = -1; j < local_width + 1; j++) {
@@ -120,16 +155,4 @@ void print_jacobi(float *jacobi) {
         }
         printf("\n");
     }
-}
-
-// Solve linear system with jacobi method
-void jacobi(int iter) {
-    distribute_diverg();
-
-    // Jacobi iterations
-    for (int k = 0; k < iter; k++) {    
-        jacobi_iteration();
-    }
-
-    gather_pres();
 }

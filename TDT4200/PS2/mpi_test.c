@@ -92,32 +92,65 @@ void create_types() {
 }
 
 void test_disiribute_diverg() {
+    // if (rank == 0) {
+    //     int displs[size];
+    //     for (int i = 0; i < size / local_height; i++) {
+    //         for (int j = 0; j < local_height; j++) {
+    //             displs[i * local_height + j] = i * imageSize * local_height + j * local_width;
+    //         }
+    //     }
+
+    //     for (int i = 1; i < size; i++) {
+    //         int offset = displs[i];
+    //         for (int j = 0; j < local_height; j++) {
+    //             offset += j * imageSize;
+    //             MPI_Send((diverg + offset), 1, array_slice_t, i, 123, cart_comm);
+    //         }
+    //     }
+
+    //     for (int i = 0; i < local_height; i++) {
+    //         for(int j = 0; j < local_width; j++) {
+    //             local_diverg[i * local_width + j] = diverg[i * imageSize + j];
+    //         }
+    //     }
+    // } else {
+    //     for (int i = 0; i < local_height; i++) {
+    //         MPI_Recv((local_diverg + local_width * i), 1, array_slice_t, 0, 123, cart_comm, &status);
+    //     }
+    // }
     if (rank == 0) {
+        // each entry is the index for the 'grid' corresponding to each node
         int displs[size];
         for (int i = 0; i < size / local_height; i++) {
             for (int j = 0; j < local_height; j++) {
                 displs[i * local_height + j] = i * imageSize * local_height + j * local_width;
             }
         }
-
+        // distribute to every other process than itself (0)
         for (int i = 1; i < size; i++) {
             int offset = displs[i];
             for (int j = 0; j < local_height; j++) {
                 offset += j * imageSize;
                 MPI_Send((diverg + offset), 1, array_slice_t, i, 123, cart_comm);
+                MPI_Send((pres + offset), 1, array_slice_t, i, 123, cart_comm);
             }
         }
-
+        // fix local_diverg 'manually'
         for (int i = 0; i < local_height; i++) {
             for(int j = 0; j < local_width; j++) {
                 local_diverg[i * local_width + j] = diverg[i * imageSize + j];
             }
         }
     } else {
+        // receive local_diverg from process 0
         for (int i = 0; i < local_height; i++) {
             MPI_Recv((local_diverg + local_width * i), 1, array_slice_t, 0, 123, cart_comm, &status);
+            MPI_Recv((local_pres + 1 + (i + 1) * (local_width + 2)), 1, array_slice_t, 0, 123, cart_comm, &status);
         }
     }
+    printf("%d: start\n", rank);
+    print_arr(local_pres, local_height+2, local_width+2);
+    printf("%d: end\n", rank);
     // implementation using scatter
     // MPI_Scatter(diverg,
     //             1,
@@ -281,9 +314,9 @@ int main(int argc, char** argv){
         printf("imageSize: %d\n", imageSize);
     }
 
+    test_disiribute_diverg();
+    // test_exchange_border();
     // test_gather_pressure();
-    // test_disiribute_diverg();
-    test_exchange_border();
 
     // Finalize
     MPI_Finalize();

@@ -14,9 +14,11 @@ int north = 0,
     west = 0;
 int rank = 0;
 int border = 1;
-float *local_pres,
-    *local_pres0,
-    *local_diverg;
+float *diverg,
+    *local_diverg,
+    *pres,
+    *local_pres,
+    *local_pres0;
 
 void setup() {
     local_pres = (float *) malloc(sizeof(float) * ((local_width + 2) * (local_height + 2)));
@@ -38,25 +40,11 @@ void setup() {
     *local_diverg = 0.0f;
 }
 
-// void test_get_row() {
-//     float *row = get_row(1);
-    
-//     ASSERT_EQUAL_FLOAT(row[0], 1.0, 0.001);
-//     ASSERT_EQUAL_FLOAT(row[1], 2.4, 0.001);
-//     ASSERT_EQUAL_FLOAT(row[2], 3.0, 0.001);
-//     ASSERT_EQUAL_FLOAT(row[3], 2.5, 0.001);
-//     ASSERT_EQUAL_FLOAT(row[4], 1.0, 0.001);
-// }
-
-// void test_get_col() {
-//     float *col = get_col(1);
-
-//     ASSERT_EQUAL_FLOAT(col[0], 1.0, 0.001);
-//     ASSERT_EQUAL_FLOAT(col[1], 2.2, 0.001);
-//     ASSERT_EQUAL_FLOAT(col[2], 3.0, 0.001);
-//     ASSERT_EQUAL_FLOAT(col[3], 2.7, 0.001);
-//     ASSERT_EQUAL_FLOAT(col[4], 1.0, 0.001);
-// }
+void teardown() {
+    free(local_pres);
+    free(local_pres0);
+    free(local_diverg);
+}
 
 void test_indexing() {
     int i = LP(0, 0);
@@ -92,6 +80,7 @@ void test_jacobi() {
     TEST_CASE(test_indexing);
     TEST_CASE(test_calculate_jacobi);
     TEST_CASE(test_jacobi_iteration);
+    teardown();
 }
 
 int main() {
