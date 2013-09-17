@@ -62,6 +62,14 @@ void create_types() {
     MPI_Type_commit(&array_slice_t);
 }
 
+void print_stats() {
+    printf("dims[0] = %d\ndims[1] = %d\n", dims[0], dims[1]);
+    printf("imageSize = %d\n", imageSize);
+    printf("local_height = %d\n", local_height);
+    printf("local_width = %d\n", local_width);
+    printf("size = %d\n", size);
+}
+
 int main (int argc, char **argv) {
     // Reading command line arguments
     iterations = 100;
@@ -104,6 +112,7 @@ int main (int argc, char **argv) {
         diverg = config.div;
 
         imageBuffer = (unsigned char*)malloc(sizeof(unsigned char)*imageSize*imageSize);
+        print_stats();
     }
 
     // Solving the CFD equations, one iteration for each timestep.

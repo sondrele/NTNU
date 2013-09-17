@@ -121,10 +121,17 @@ void test_disiribute_diverg() {
     if (rank == 0) {
         // each entry is the index for the 'grid' corresponding to each node
         int displs[size];
-        for (int i = 0; i < size / local_height; i++) {
-            for (int j = 0; j < local_height; j++) {
-                displs[i * local_height + j] = i * imageSize * local_height + j * local_width;
+        for (int i = 0; i < 4; i++) {
+            int row_addr = i * local_height * local_width * 2;
+            for (int j = 0; j < 2; j++) {
+                int col_addr = j * local_width;
+                displs[i * 2 + j] = row_addr + col_addr;
             }
+        }
+
+        printf("%d\n", size/local_height+local_height);
+        for(int i = 0; i < size; i++) {
+            printf("displs[%d]=%d\n", i, displs[i]);
         }
         // distribute to every other process than itself (0)
         for (int i = 1; i < size; i++) {
