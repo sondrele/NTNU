@@ -19,11 +19,11 @@ extern MPI_Datatype border_row_t,
                     border_col_t,
                     array_slice_t;
 
-extern float* local_pres;
-extern float* local_pres0;
-extern float* pres;
-extern float* local_diverg;
-extern float* diverg;
+extern float *local_pres;
+extern float *local_pres0;
+extern float *pres;
+extern float *local_diverg;
+extern float *diverg;
 
 // Functions
 void distribute_diverg();
@@ -35,4 +35,4 @@ int on_edge(int row, int col);
 float calculate_jacobi(int row, int col);
 float *get_row(int row);
 float *get_col(int col);
-void print_jacobi();
+void print_local_pres();

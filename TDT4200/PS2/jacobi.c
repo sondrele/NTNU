@@ -5,12 +5,42 @@
 
 // Indexing macro for local pres arrays
 #define LP(row, col) ((row) + border) * (local_width + 2 * border) + ((col) + border)
+#define IX(i,j) ((i)+(imageSize+2)*(j))
 
 void print_statss() {
     printf("imageSize = %d\n", imageSize);
     printf("local_height = %d\n", local_height);
     printf("local_width = %d\n", local_width);
     printf("size = %d\n", size);
+
+    double sum = 0;
+    for (int j=1; j<=imageSize; j++) {
+        for (int i=1; i<=imageSize; i++) {
+            sum += pres[IX(i,j)];
+        }
+    }
+    printf("------sum pres: %f\n", sum);
+    sum = 0;
+    for (int j=1; j<=imageSize; j++) {
+        for (int i=1; i<=imageSize; i++) {
+            sum += diverg[IX(i,j)];
+        }
+    }
+    printf("------sum div: %f\n", sum);
+    double sum1 = 0,
+        sum2 = 0,
+        sum3 = 0;
+    for (int j=-1; j <= local_height; j++) {
+        for (int i=-1; i<= local_width ; i++) {
+            sum1 += local_pres[IX(i,j)];
+            sum2 += local_pres0[IX(i,j)];
+            if (j >= 0 && j < local_height && i >= 0 && i < local_width)
+                sum3 += local_diverg[IX(i,j)];
+        }
+    }
+    printf("------sum local_pres: %f\n", sum1);
+    printf("------sum local_pres0: %f\n", sum2);
+    printf("------sum local_diverg: %f\n", sum3);
 }
 
 void print_array(float *a, int s, int s2) {
@@ -25,6 +55,13 @@ void print_array(float *a, int s, int s2) {
 // Distribute the diverg (bs) from rank 0 to all the processes
 void distribute_diverg() {
     if (rank == 0) {
+        // double sum = 0;
+        // for (int i = 0; i < imageSize; i++) {
+        //     for (int j = 0; j < imageSize; j++) {
+        //         sum += diverg[i * imageSize + j];
+        //     }   
+        // }
+        // printf("sum: %f\n", sum);
         // each entry is the index for the 'grid' corresponding to each node
         int displs[size];
         // TODO: Fix right dimensions
@@ -74,9 +111,9 @@ void gather_pres() {
                 int offset = displs[i] + j * imageSize;
                 MPI_Recv((pres + offset), 1, array_slice_t, i, 123, cart_comm, &status);
                 if (i == 1) {
-                    for (int i = 0; i < 32; i++) {
-                        printf("%f ", *(pres + offset));
-                    }
+                    // for (int i = 0; i < 32; i++) {
+                    //     printf("%f ", *(pres + offset));
+                    // }
                 }
             }
         }
@@ -87,13 +124,13 @@ void gather_pres() {
         }
     } else {
         for (int i = 0; i < local_height; i++) {
-            MPI_Send((local_pres + LP(i, 0)), 1, array_slice_t, 0, 123, cart_comm);
+            MPI_Send((local_pres0 + LP(i, 0)), 1, array_slice_t, 0, 123, cart_comm);
             if (rank == 1 && i == 0) {
-                printf("sending: \n");
-                for (int i = 0; i < 32; i++) {
-                    printf("%f ", local_pres[LP(i, 0)]);
-                }
-                printf("sending finished: \n");
+                // printf("sending: \n");
+                // for (int i = 0; i < 32; i++) {
+                //     printf("%f ", local_pres[LP(i, 0)]);
+                // }
+                // printf("sending finished: \n");
             }
         }
     }
@@ -112,6 +149,17 @@ void exchange_borders() {
             *in = (local_pres + LP(local_height, 0));
         MPI_Send(out, 1, border_row_t, south, 1, cart_comm);
         MPI_Recv(in, 1, border_row_t, south, 1, cart_comm, &status);
+        // if (rank == 0) {
+        //     printf("sending\n");
+        //     for (int i = 0; i < local_width; i++) {
+        //         printf("%f ", local_pres[LP(local_height-1+i, 0)]);
+        //     }
+        //     printf("\nreceiving\n");
+        //     for (int i = 0; i < local_width; i++) {
+        //         printf("%f ", local_pres[LP(local_height+i, 0)]);
+        //     }
+        //     printf("\n");
+        // }
     }
     if (west >= 0) {
         float *out = (local_pres + LP(0, 0)),
@@ -162,7 +210,9 @@ void init_local_pres() {
 
 // Solve linear system with jacobi method
 void jacobi(int iter) {
-    // print_statss();
+    // if (rank == 0) {
+    //     print_statss();
+    // }
     init_local_pres();
 
     distribute_diverg();
@@ -180,7 +230,7 @@ void jacobi(int iter) {
 }
 
 // For debugging purposes
-void print_jacobi(float *jacobi) {
+void print_local_pres(float *jacobi) {
     for(int i = -1; i < local_height + 1; i++) {
         for (int j = -1; j < local_width + 1; j++) {
             printf("%f ", jacobi[LP(i, j)]);

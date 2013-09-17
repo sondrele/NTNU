@@ -188,6 +188,13 @@ void divergence (int N, float *velx, float *vely, float *div) {
 */
 void projection (int N, float *velx, float *vely, float *pres) {
 {		
+	// double sum = 0;
+	// for (int j=1; j<=N; j++) {
+	// 	for (int i=1; i<=N; i++) {
+	// 		sum += pres[IX(i,j)];
+	// 	}
+	// }
+	// printf("------sum for pres before: %f--------\n", sum);
 	for (int j=1; j<=N; j++) {
 		for (int i=1; i<=N; i++) {
 
@@ -204,6 +211,13 @@ void projection (int N, float *velx, float *vely, float *pres) {
 			vely[IX(i,j)] -= normy * 0.5f * N * (pres[IX(i,j+1)] - pres[IX(i,j-1)]);				
 		}
 	}
+	// sum = 0;
+	// for (int j=1; j<=N; j++) {
+	// 	for (int i=1; i<=N; i++) {
+	// 		sum += pres[IX(i,j)];
+	// 	}
+	// }
+	// printf("------sum for pres after: %f--------\n", sum);
 }
 }
 
