@@ -44,7 +44,7 @@ float* diverg;
 
 // Function to create and commit MPI datatypes
 void create_types() {
-        MPI_Type_contiguous(local_width,        // count
+    MPI_Type_contiguous(local_width,        // count
                         MPI_FLOAT,          // old_type
                         &border_row_t);     // newtype_p
     MPI_Type_commit(&border_row_t);

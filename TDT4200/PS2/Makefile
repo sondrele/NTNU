@@ -19,7 +19,7 @@ fluid: $(BIN)
 $(BIN) : $(SRC)
 
 run: unzip $(BIN)
-	qrsh -cwd mpirun -n 8 $(BIN) 150 256
+	qrsh -cwd mpirun -n 8 $(BIN) 50 256
 
 runfluid: upload
 	ssh $(SSH) 'cd /home/sondrele/TDT4200/PS2/;make run'

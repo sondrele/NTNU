@@ -55,19 +55,11 @@ void print_array(float *a, int s, int s2) {
 // Distribute the diverg (bs) from rank 0 to all the processes
 void distribute_diverg() {
     if (rank == 0) {
-        // double sum = 0;
-        // for (int i = 0; i < imageSize; i++) {
-        //     for (int j = 0; j < imageSize; j++) {
-        //         sum += diverg[i * imageSize + j];
-        //     }   
-        // }
-        // printf("sum: %f\n", sum);
         // each entry is the index for the 'grid' corresponding to each node
         int displs[size];
-        // TODO: Fix right dimensions
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < dims[0]; i++) {
             int row_addr = i * local_height * local_width * 2;
-            for (int j = 0; j < 2; j++) {
+            for (int j = 0; j < dims[1]; j++) {
                 int col_addr = j * local_width;
                 displs[i * 2 + j] = row_addr + col_addr;
             }
@@ -99,9 +91,9 @@ void distribute_diverg() {
 void gather_pres() {
     if (rank == 0) {
         int displs[size];
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < dims[0]; i++) {
             int row_addr = i * local_height * local_width * 2;
-            for (int j = 0; j < 2; j++) {
+            for (int j = 0; j < dims[1]; j++) {
                 int col_addr = j * local_width;
                 displs[i * 2 + j] = row_addr + col_addr;
             }
@@ -109,12 +101,7 @@ void gather_pres() {
         for (int i = 1; i < size; i++) {
             for (int j = 0; j < local_height; j++) {
                 int offset = displs[i] + j * imageSize;
-                MPI_Recv((pres + offset), 1, array_slice_t, i, 123, cart_comm, &status);
-                if (i == 1) {
-                    // for (int i = 0; i < 32; i++) {
-                    //     printf("%f ", *(pres + offset));
-                    // }
-                }
+                MPI_Recv((pres + offset), 1, array_slice_t, i, 1000, cart_comm, &status);
             }
         }
         for (int i = 0; i < local_height; i++) {
@@ -124,14 +111,8 @@ void gather_pres() {
         }
     } else {
         for (int i = 0; i < local_height; i++) {
-            MPI_Send((local_pres0 + LP(i, 0)), 1, array_slice_t, 0, 123, cart_comm);
-            if (rank == 1 && i == 0) {
-                // printf("sending: \n");
-                // for (int i = 0; i < 32; i++) {
-                //     printf("%f ", local_pres[LP(i, 0)]);
-                // }
-                // printf("sending finished: \n");
-            }
+            // Send from local_pres0, as this is pointing to the newest calculated pressure
+            MPI_Send((local_pres0 + LP(i, 0)), 1, array_slice_t, 0, 1000, cart_comm);
         }
     }
 }
@@ -141,51 +122,47 @@ void exchange_borders() {
     if (north >= 0) {
         float *out = (local_pres + LP(0, 0)),
             *in = (local_pres + LP(-1, 0));
-        MPI_Send(out, 1, border_row_t, north, 1, cart_comm);
-        MPI_Recv(in, 1, border_row_t, north, 1, cart_comm, &status);
+        MPI_Send(out, 1, border_row_t, north, 555, cart_comm);
+        MPI_Recv(in, 1, border_row_t, north, 555, cart_comm, &status);
     }
     if (south >= 0) {
         float *out = (local_pres + LP(local_height - 1, 0)),
             *in = (local_pres + LP(local_height, 0));
-        MPI_Send(out, 1, border_row_t, south, 1, cart_comm);
-        MPI_Recv(in, 1, border_row_t, south, 1, cart_comm, &status);
-        // if (rank == 0) {
-        //     printf("sending\n");
-        //     for (int i = 0; i < local_width; i++) {
-        //         printf("%f ", local_pres[LP(local_height-1+i, 0)]);
-        //     }
-        //     printf("\nreceiving\n");
-        //     for (int i = 0; i < local_width; i++) {
-        //         printf("%f ", local_pres[LP(local_height+i, 0)]);
-        //     }
-        //     printf("\n");
-        // }
+        MPI_Send(out, 1, border_row_t, south, 555, cart_comm);
+        MPI_Recv(in, 1, border_row_t, south, 555, cart_comm, &status);
     }
     if (west >= 0) {
         float *out = (local_pres + LP(0, 0)),
             *in = (local_pres + LP(0, -1));
-        MPI_Send(out, 1, border_col_t, west, 1, cart_comm);
-        MPI_Recv(in, 1, border_col_t, west, 1, cart_comm, &status);
+        MPI_Send(out, 1, border_col_t, west, 555, cart_comm);
+        MPI_Recv(in, 1, border_col_t, west, 555, cart_comm, &status);
     }
     if (east >= 0) {
         float *out = (local_pres + LP(0, local_width - 1)),
             *in = (local_pres + LP(0, local_width));
-        MPI_Send(out, 1, border_col_t, east, 1, cart_comm);
-        MPI_Recv(in, 1, border_col_t, east, 1, cart_comm, &status);
+        MPI_Send(out, 1, border_col_t, east, 555, cart_comm);
+        MPI_Recv(in, 1, border_col_t, east, 555, cart_comm, &status);
     }
 }
 
 // Calculate the value for one element in the grid
 float calculate_jacobi(int row, int col) {
-    int r2 = (row == -1) ? row : row - 1,
-        r4 = (row == local_height) ? row : row + 1,
-        c1 = (col == -1) ? col : col - 1,
-        c3 = (col == local_width) ? col : col + 1;
-
-    float x1 = local_pres0[LP(row, c1)],
-        x2 = local_pres0[LP(r2, col)],
-        x3 = local_pres0[LP(row, c3)],
-        x4 = local_pres0[LP(r4, col)];
+    float x1 = local_pres0[LP(row, col - 1)],
+        x2 = local_pres0[LP(row - 1, col)],
+        x3 = local_pres0[LP(row, col + 1)],
+        x4 = local_pres0[LP(row + 1, col)];
+    if (north < 0 && row == 0) {
+        x2 = local_pres0[LP(row, col)];
+    }
+    if (south < 0 && row == local_height) {
+        x4 = local_pres0[LP(row, col)];
+    }
+    if (west < 0 && col == 0) {
+        x1 = local_pres0[LP(row, col)];
+    }
+    if (east < 0 && col == local_width) {
+        x3 = local_pres0[LP(row, col)];
+    }    
     return 0.25 * (x1 + x2 + x3 + x4 - local_diverg[LP(row, col)]);
 }
 
@@ -208,16 +185,46 @@ void init_local_pres() {
     }
 }
 
+void distribute_diverg2() {
+    if (rank == 0) {
+        for (int i = 0; i < local_height; i++) {
+            for (int j = 0; j < local_width; j++) {
+                local_diverg[i * local_width + j] = diverg[i * local_width + j];
+            }
+        }
+    }
+}
+
+void gather_pres2() {
+    if (rank == 0) {
+        for (int i = 0; i < local_height; i++) {
+            for (int j = 0; j < local_width; j++) {
+                pres[i * local_width + j] = local_pres0[i * local_width + j];
+            }
+        }
+    }
+}
+
+// void jacobi(int iter) {
+//     // print_statss();
+//     init_local_pres();
+//     distribute_diverg2();
+//     for (int k = 0; k < iter; k++) {
+//         jacobi_iteration();
+//         float *temp_ptr = local_pres0;
+//         local_pres0 = local_pres;
+//         local_pres = temp_ptr;
+//     }
+//     // print_local_pres(local_pres);
+//     gather_pres2();
+// }
+
 // Solve linear system with jacobi method
 void jacobi(int iter) {
-    // if (rank == 0) {
-    //     print_statss();
-    // }
     init_local_pres();
-
     distribute_diverg();
 
-    // Jacobi iterations
+    // // Jacobi iterations
     for (int k = 0; k < iter; k++) {    
         jacobi_iteration();
         exchange_borders();
