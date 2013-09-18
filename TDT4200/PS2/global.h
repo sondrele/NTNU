@@ -16,8 +16,17 @@ extern MPI_Comm cart_comm;
 extern MPI_Status status;
 
 extern MPI_Datatype border_row_t,
+                    border_row_t0,
                     border_col_t,
-                    array_slice_t;
+                    border_col_t0,
+                    array_slice_t,
+                    array_slice_t0,
+                    matrix_t0,
+                    matrix_t,
+                    local_diverg_t0,
+                    local_diverg_t,
+                    local_pres_t0,
+                    local_pres_t;
 
 extern float *local_pres;
 extern float *local_pres0;

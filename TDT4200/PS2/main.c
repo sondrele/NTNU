@@ -30,8 +30,17 @@ MPI_Status status;              // MPI status object
 // remember to also include them in global.h to
 // make them visible in other files
 MPI_Datatype border_row_t,
-             border_col_t,
-             array_slice_t;
+            border_row_t0,
+            border_col_t,
+            border_col_t0,
+            array_slice_t,
+            array_slice_t0,
+            matrix_t0,
+            matrix_t,
+            local_diverg_t0,
+            local_diverg_t,
+            local_pres_t0,
+            local_pres_t;
 
 // Global and local part of the pres array (stores the xs)
 float* pres;
@@ -46,20 +55,51 @@ float* diverg;
 void create_types() {
     MPI_Type_contiguous(local_width,        // count
                         MPI_FLOAT,          // old_type
-                        &border_row_t);     // newtype_p
+                        &border_row_t0);     // newtype_p
+    MPI_Type_create_resized(border_row_t0, 0, sizeof(float), &border_row_t);
     MPI_Type_commit(&border_row_t);
 
     MPI_Type_vector(local_height,           // count
                     1,                      // blocklength
                     local_width + 2,        // stride
                     MPI_FLOAT,              // old_type
-                    &border_col_t);         // newtype_p
+                    &border_col_t0);         // newtype_p
+    MPI_Type_create_resized(border_col_t0, 0, sizeof(float), &border_col_t);
     MPI_Type_commit(&border_col_t);
 
     MPI_Type_contiguous(local_width,        // count
                     MPI_FLOAT,              // old_type
-                    &array_slice_t);        // newtype_p
+                    &array_slice_t0);        // newtype_p
+    MPI_Type_create_resized(array_slice_t0, 0, sizeof(float), &array_slice_t);
     MPI_Type_commit(&array_slice_t);
+
+    // Used with MPI_Scatter, but does not work properly
+    MPI_Type_vector(local_height,           // count
+                    local_width,            // blocklength
+                    local_width,              // stride
+                    MPI_FLOAT,              // old_type
+                    &local_diverg_t0);      // newtype_p
+    MPI_Type_create_resized(local_diverg_t0, 0, sizeof(float), &local_diverg_t);
+    MPI_Type_commit(&local_diverg_t);
+
+    MPI_Type_vector(local_height,           // count
+                    local_width,            // blocklength
+                    imageSize + 2,              // stride
+                    MPI_FLOAT,              // old_type
+                    &matrix_t0);      // newtype_p
+    MPI_Type_create_resized(matrix_t0, 0, sizeof(float), &matrix_t);
+    MPI_Type_commit(&matrix_t);
+
+
+
+        // Used with MPI_Scatter, but does not work properly
+    MPI_Type_vector(local_height,           // count
+                    local_width,            // blocklength
+                    local_width + 2,              // stride
+                    MPI_FLOAT,              // old_type
+                    &local_pres_t0);      // newtype_p
+    MPI_Type_create_resized(local_pres_t0, 0, sizeof(float), &local_pres_t);
+    MPI_Type_commit(&local_pres_t);
 }
 
 void print_stats() {
@@ -125,6 +165,7 @@ int main (int argc, char **argv) {
 
     // Converting the density to an image and writing it to file.
     if (rank == 0) {
+        // dens->pres
         densityToColor(imageBuffer, config.dens, config.N);
         write_bmp(imageBuffer, imageSize, imageSize);
 
