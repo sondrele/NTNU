@@ -133,36 +133,6 @@ void create_types() {
 }
 
 void test_disiribute_diverg() {
-    // if (rank == 0) {
-    //     int displs[size];
-    //     int counts[size];
-    //     for (int i = 0; i < dims[0]; i++) {
-    //         int row_addr = i * local_height * local_width * 2;
-    //         for (int j = 0; j < dims[1]; j++) {
-    //             int col_addr = j * local_width;
-    //             displs[i * dims[1] + j] = row_addr + col_addr;
-    //             counts[i] = 1;
-    //             printf("%d\n", displs[i * dims[1] + j]);
-    //         }
-    //     }
-    //     for (int i = 1; i < size; i++) {
-    //         int offset = displs[i];
-    //         for (int j = 0; j < local_height; j++) {
-    //             offset += j * imageSize;// !!!!!!!!!!!!!!!!!!!!!!!!! feil
-    //             MPI_Send((diverg + offset), 1, array_slice_t, i, 123, cart_comm);
-    //         }
-    //     }
-
-    //     for (int i = 0; i < local_height; i++) {
-    //         for(int j = 0; j < local_width; j++) {
-    //             local_diverg[i * local_width + j] = diverg[i * imageSize + j];
-    //         }
-    //     }
-    // } else {
-    //     for (int i = 0; i < local_height; i++) {
-    //         MPI_Recv((local_diverg + local_width * i), 1, array_slice_t, 0, 123, cart_comm, &status);
-    //     }
-    // }
 
     // if (rank == 0) {
         int displs[size];
@@ -187,17 +157,6 @@ void test_disiribute_diverg() {
                     local_diverg_t,
                     0,
                     cart_comm);
-    // }
-        // printf("%d???\n", rank);
-        // print_arr(local_diverg, local_height, local_width);
-        // printf("%d!!!\n", rank);
-
-    // print local_diverg
-    // printf("%d:======\n", rank);
-    // for (int i = 0; i < local_height*local_width; i++) {
-    //         printf("%f ", local_diverg[i]);
-    //     }
-    // printf("\n======\n");
 }
 
 void print_jacobi(float *jacobi) {
@@ -259,33 +218,6 @@ void test_gather_pressure() {
                 matrix_t,
                 0,
                 cart_comm);
-    // if (rank == 0) {
-    //     int displs[size];
-    //     for (int i = 0; i < dims[0]; i++) {
-    //         int row_addr = i * local_height * local_width * 2;
-    //         for (int j = 0; j < dims[1]; j++) {
-    //             int col_addr = j * local_width;
-    //             displs[i * dims[1] + j] = row_addr + col_addr;
-    //             printf("%d\n", displs[i * dims[1] + j]);
-    //         }
-    //     }
-    //     for (int i = 1; i < size; i++) {
-    //         for (int j = 0; j < local_height; j++) {
-    //             int offset = displs[i] + j * imageSize;
-    //             MPI_Recv((pres + offset), 1, array_slice_t, i, 1000, cart_comm, &status);
-    //         }
-    //     }
-    //     for (int i = 0; i < local_height; i++) {
-    //         for(int j = 0; j < local_width; j++) {
-    //             pres[i * imageSize + j] = local_pres[LP(i, j)];
-    //         }
-    //     }
-    //     // print_arr(pres, imageSize, imageSize);
-    // } else {
-    //     for (int i = 0; i < local_height; i++) {
-    //         MPI_Send((local_pres + LP(i, 0)), 1, array_slice_t, 0, 1000, cart_comm);
-    //     }
-    // }
 }
 
 void print_arr(float *a, int row, int col) {
