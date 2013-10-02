@@ -24,8 +24,10 @@ void reverse(char * string)
 	}
 	
 	// Print starting with the last char.
-	for(i = lastChar; i >= 0; i--)
+	for(i = lastChar; i >= 0; i--) {
 		printf("%c", mem[i]);
+		// printf("*");
+	}
 	printf("\n");
 	
 	free(mem);

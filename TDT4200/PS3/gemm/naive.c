@@ -17,4 +17,5 @@ void gemm(complex float* A,
             }
         }
     }
+
 }

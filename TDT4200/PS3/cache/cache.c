@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define SIZE 1000000
+#define SIZE 10000000
 
 typedef struct{
     double a;
@@ -138,7 +138,7 @@ int main(int argc, char** argv){
 
     // Test one function by commenting out the other
     //double result = array_of_structs();
-    double result = struct_of_arrays();
+    double result = array_of_structs();
 
     printf("Result: %f\n", result);
 
