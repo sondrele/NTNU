@@ -29,7 +29,7 @@ extern float *diverg;
 // Functions
 void distribute_diverg();
 void gather_pres();
-void exchange_border(float *out, float *in, int dst);
+void exchange_border(float *out, float *in, int dst, MPI_Datatype type);
 void exchange_borders();
 void jacobi_iteration();
 void init_local_pres();

@@ -40,26 +40,26 @@ void gather_pres() {
 }
 
 // Called from 'exchange_borders', handles the MPI procedure calls
-void exchange_border(float *out, float *in, int dst) {
+void exchange_border(float *out, float *in, int dst, MPI_Datatype type) {
     int tag = dst + rank;
-    MPI_Send(out, 1, border_row_t, dst, tag, cart_comm);
-    MPI_Recv(in, 1, border_row_t, dst, tag, cart_comm, &status);
+    MPI_Send(out, 1, type, dst, tag, cart_comm);
+    MPI_Recv(in, 1, type, dst, tag, cart_comm, &status);
 }
 
 // Exchange borders between processes during computation
 void exchange_borders() {
     float *lp = local_pres;
     if (north >= 0) {
-        exchange_border(lp + LP(0, 0), lp + LP(-1, 0), north);
+        exchange_border(lp + LP(0, 0), lp + LP(-1, 0), north, border_row_t);
     }
     if (south >= 0) {
-        exchange_border(lp + LP(local_height - 1, 0), lp + LP(local_height, 0), south);
+        exchange_border(lp + LP(local_height - 1, 0), lp + LP(local_height, 0), south, border_row_t);
     }
     if (west >= 0) {
-        exchange_border(lp + LP(0, 0), lp + LP(0, -1), west);
+        exchange_border(lp + LP(0, 0), lp + LP(0, -1), west, border_col_t);
     }
     if (east >= 0) {
-        exchange_border(lp + LP(0, local_width - 1), lp + LP(0, local_width), east);
+        exchange_border(lp + LP(0, local_width - 1), lp + LP(0, local_width), east, border_col_t);
     }
 }
 
