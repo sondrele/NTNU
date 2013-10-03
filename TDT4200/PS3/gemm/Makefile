@@ -1,4 +1,4 @@
-CFLAGS = -I. -I/share/apps/atlas/include -std=c99 -O3 -ffast-math -fno-math-errno
+CFLAGS = -I. -I/share/apps/atlas/include -std=c99 -O3 -ffast-math
 LDFLAGS = -L/share/apps/atlas/lib
 LDLIBS = -latlas -lcblas -lm
 
@@ -17,8 +17,8 @@ gemm_fast : gemm.c fast.o
 	gcc $(CFLAGS) -msse3 -c $<
 
 run: all
-	./gemm_naive 512 512 512
-	./gemm_fast 512 512 512
+	./gemm_naive 256 256 256
+	./gemm_fast 256 256 256
 
 update:
 	scp Makefile sondrele@clustis3.idi.ntnu.no:~/TDT4200/PS3/
