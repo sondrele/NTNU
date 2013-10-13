@@ -1,3 +1,6 @@
-gemm
+gemm/gemm
 gemm_openmp
 gemm_pthread
+g_res
+t_res
+mp_res

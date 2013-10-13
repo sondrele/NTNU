@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <pthread.h>
 
 float random(){
     return ((float)rand())/((float)RAND_MAX);
@@ -36,6 +37,64 @@ void print_matrix( float* A, int m, int n){
     printf("\n");
 }
 
+typedef struct {
+    float *A;
+    float *B;
+    float *C;
+    float alpha;
+    float beta;
+    int x_min;
+    int x_max;
+    int y_min;
+    int y_max;
+    int n;
+    int k;
+} sub_matrix_args;
+
+sub_matrix_args* create_args(float *A, float *B, float *C, float alpha, float beta,
+        int x_min, int x_max, int y_min, int y_max, int n, int k) {
+    sub_matrix_args *args = malloc(sizeof(sub_matrix_args));
+    args->A = A;
+    args->B = B;
+    args->C = C;
+    args->alpha = alpha;
+    args->beta = beta;
+    args->x_min = x_min;
+    args->x_max = x_max;
+    args->y_min = y_min;
+    args->y_max = y_max;
+    args->n = n;
+    args->k = k;
+
+    return args;
+}
+
+void* calculate_sub_matrix(void *args) {
+    // int counter = 0;
+    // pthread_mutex_t mutex;
+    // pthread_cond_t cond_var;
+
+    sub_matrix_args *a = (sub_matrix_args *) args;
+
+    for(int x = a->x_min; x < a->x_max; x++){
+        for(int y = a->y_min; y < a->y_max; y++){
+            a->C[y * a->n + x] *= a->beta;
+            for(int z = 0; z < a->k; z++){
+                a->C[y * a->n + x] += a->alpha * a->A[y * a->k + z] * a-> B[z * a->n + x];
+            }
+        }
+    }
+
+    // pthread_mutex_lock(&mutex);
+    // counter++;
+    // if(counter == 4){
+    //     counter = 0;
+    //     pthread_cond_broadcast(&cond_var);
+    // } else {
+    //     while(pthread_cond_wait(&cond_var, &mutex) != 0);
+    // }
+    // pthread_mutex_unlock(&mutex);
+}
 
 int main(int argc, char** argv){
 
@@ -59,6 +118,8 @@ int main(int argc, char** argv){
         k = atoi(argv[4]);
     }
 
+    pthread_t threads[nThreads];
+
     // Initializing matrices
     float alpha = -2;
     float beta = 1;
@@ -67,15 +128,16 @@ int main(int argc, char** argv){
     float* B = create_random_matrix(k,n);
     float* C = create_random_matrix(m,n);
 
-    // Performing computation
-    for(int x = 0; x < n; x++){
-        for(int y = 0; y < m; y++){
-            C[y*n + x] *= beta;
-            for(int z = 0; z < k; z++){
-                C[y*n + x] += alpha*A[y*k+z]*B[z*n + x];
-            }
-        }
+
+
+    for (int t = 0; t < nThreads; t++) {
+        int x_min = t * n / nThreads;
+        int x_max = x_min + n / nThreads;
+        sub_matrix_args *args = create_args(A, B, C, alpha, beta, x_min, x_max, 0, m, n, k);
+        pthread_create(&threads[t], NULL, calculate_sub_matrix, (void *) args);
     }
+
+    
 
     // Printing result
     print_matrix(A, m,k);

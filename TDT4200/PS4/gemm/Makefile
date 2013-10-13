@@ -10,13 +10,23 @@ gemm_pthread: gemm_pthread.c
 	gcc -std=c99 -O3 -o gemm_pthread gemm_pthread.c -lm -lpthread
 	
 run: all
-	time ./gemm 2 2048 2048 512
+	time ./gemm 4 8 8 1
 
 runmp: all
-	time ./gemm_openmp 1024 2048 2048 512
+	time ./gemm_openmp 4 8 8 1
 
 runt: all
-	./gemm_pthread 1 8 8 8
+	time ./gemm_pthread 4 8 8 1
+
+testmp: all
+	time ./gemm 512 1024 1024 512 > g_res
+	time ./gemm_openmp 512 1024 1024 512 > mp_res
+	diff g_res mp_res
+
+testt: all
+	./gemm 4 4 4 1 > g_res
+	./gemm_pthread 4 4 4 1 > t_res
+	diff g_res t_res
 
 clean:
 	-rm -f gemm gemm_pthread gemm_openmp

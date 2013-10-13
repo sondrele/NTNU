@@ -72,12 +72,11 @@ int main(int argc, char** argv) {
     // Performing computation
     #pragma omp parallel for
     for (int x = 0; x < n; x++) {
-        int s = omp_get_thread_num() * m / nThreads;
-        for (int y = s; y < s + m / nThreads; y++) {
+        #pragma omp parallel for
+        for (int y = 0; y < m; y++) {
             C[y*n + x] *= beta;
             for (int z = 0; z < k; z++) {
                 C[y*n + x] += alpha * A[y*k+z] * B[z*n + x];
-                // printf("x: %d, r: %0.4f, thread: %d\n", x, C[y*n + x], omp_get_thread_num());
             }
         }
     }
