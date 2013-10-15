@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <float.h>
 #include <math.h>
+#include <pthread.h>
+
 
 // Type for points
 typedef struct{
@@ -25,6 +27,22 @@ int nThreads;  // Number of threads to use
 Point* points;       // Array containig all points
 Centroid* centroids; // Array containing all centroids
 
+// Creates a barrier
+static int thread_counter = 0;
+static pthread_mutex_t barrier_mutex;
+static pthread_cond_t barrier_cond;
+
+void thread_barrier () {
+    pthread_mutex_lock(&barrier_mutex);
+    thread_counter += 1;
+    if (thread_counter == nThreads) {
+        thread_counter = 0;
+        pthread_cond_broadcast(&barrier_cond);
+    } else {
+        while (pthread_cond_wait(&barrier_cond, &barrier_mutex) != 0);
+    }
+    pthread_mutex_unlock(&barrier_mutex);
+}
 
 // Reading command line arguments
 void parse_args(int argc, char** argv){
@@ -123,6 +141,7 @@ void print_data(){
 void print_data_to_file(int i){
     char filename[15];
     sprintf(filename, "%04d.dat", i);
+
     FILE* f = fopen(filename, "w+");
 
     for(int i = 0; i < nPoints; i++){
@@ -145,68 +164,174 @@ double distance(Point a, Centroid b){
     return sqrt(dx*dx + dy*dy);
 }
 
+typedef struct {
+    int i;
+    int length;
+} index_t;
+
+index_t *ci, *pi;
+
+void init_indexes() {
+    ci = malloc(sizeof(index_t) * nThreads);
+
+    if (nThreads > nClusters) {
+        // TODO: fix 
+    } else {
+        int length = nClusters / nThreads;
+        for (int i = 0; i < nThreads; i++) {
+            ci[i].i = i * length;
+            ci[i].length = i * length + length;
+        }
+    }
+
+    pi = malloc(sizeof(index_t) * nThreads);
+    if (nThreads > nPoints) {
+
+    } else {
+        int length = nPoints / nThreads;
+        for (int i = 0; i < nThreads; i++) {
+            pi[i].i = i * length;
+            pi[i].length = i * length + length;
+        }
+    }
+}
+
+void* reset_centroids(void *id) {
+    int iid = *(int*) id;
+    // printf("%d: i=%d, l=%d\n", iid, ci[iid].i, ci[iid].length);
+    for (int i = ci[iid].i; i < ci[iid].length; i++) {
+        centroids[i].x = 0.0;
+        centroids[i].y = 0.0;
+        centroids[i].nPoints= 0;
+    }
+    return NULL;
+}
+
+void* compute_centroids(void *id) {
+    int iid = *(int*)id;
+
+}
+
+void* mediate_centroids(void *id) {
+    int iid = *(int*) id;
+
+    for (int i = ci[iid].i; i < ci[iid].length; i++) {
+        if(centroids[i].nPoints == 0){
+            centroids[i] = create_random_centroid();
+        } else {
+            centroids[i].x /= centroids[i].nPoints;
+            centroids[i].y /= centroids[i].nPoints;
+        }
+    }
+    // pthread_exit(NULL);
+}
+
+typedef struct {
+    // private
+    int id;
+    int j;
+    int bestCluster;
+    double bestDistance;
+    double d;
+
+    // shared
+    int *updated;
+} rp_args;
+
+void* reassign_points(void *args) {
+    rp_args *a = (rp_args *) args;
+    for (int i = pi[a->id].i; i < pi[a->id].length; i++) {   
+        a->bestDistance= DBL_MAX;
+        a->bestCluster = -1;
+
+        for (a->j = 0; a->j < nClusters; a->j++) {
+            a->d = distance(points[i], centroids[a->j]);
+            if(a->d < a->bestDistance){
+                a->bestDistance = a->d;
+                a->bestCluster = a->j;
+            }
+        }
+
+        // If one point got reassigned to a new cluster, we have to do another iteration
+        if (a->bestCluster != points[i].cluster) {
+            *a->updated = 1;
+        }
+        points[i].cluster = a->bestCluster;
+    }
+}
 
 int main(int argc, char** argv){
+    srand(0);
     parse_args(argc, argv);
 
     // Create random data, either function can be used.
     //init_clustered_data();
     init_data();
 
+    init_indexes();
+
+    // Threads
+    pthread_t threads[nThreads];
+
+    void *exit_status;
 
     // Iterate until no points are updated
     int updated = 1;
-    while(updated){
+    while (updated) {
         updated = 0;
 
         // Reset centroid positions
-        for(int i = 0; i < nClusters; i++){
-            centroids[i].x = 0.0;
-            centroids[i].y = 0.0;
-            centroids[i].nPoints= 0;
+        for (int i = 0; i < nThreads; i++) {
+            pthread_create(&threads[i], NULL, reset_centroids, (void*)&i);
+            pthread_join(threads[i], &exit_status) ;
         }
 
 
         // Compute new centroids positions
-        for(int i = 0; i < nPoints; i++){
+        for (int i = 0; i < nPoints; i++) {
+            // mutex
             int c = points[i].cluster;
             centroids[c].x += points[i].x;
             centroids[c].y += points[i].y;
             centroids[c].nPoints++;
         }
 
-        for(int i = 0; i < nClusters; i++){
-            // If a centroid lost all its points, we give it a random position
-            // (to avoid dividing by 0)
-            if(centroids[i].nPoints == 0){
-                centroids[i] = create_random_centroid();
-            }
-            else{
-                centroids[i].x /= centroids[i].nPoints;
-                centroids[i].y /= centroids[i].nPoints;
-            }
+        for (int i = 0; i < nThreads; i++) {
+            pthread_create(&threads[i], NULL, mediate_centroids, (void*)&i);
+            pthread_join(threads[i], &exit_status) ;
         }
 
+        for (int i = 0; i < nThreads; i++) {
+            rp_args *args = malloc(sizeof(rp_args));
+            args->id = i;
+            args->j = 0;
+            args->bestCluster = -1;
+            args->bestDistance = DBL_MAX;
+            args->updated = &updated;
+
+            pthread_create(&threads[i], NULL, reassign_points, (void*)args);
+            pthread_join(threads[i], &exit_status) ;
+        }
 
         //Reassign points to closest centroid
-        for(int i = 0; i < nPoints; i++){
-            double bestDistance = DBL_MAX;
-            int bestCluster = -1;
+        // for (int i = 0; i < nPoints; i++) {
+        //     double bestDistance = DBL_MAX;
+        //     int bestCluster = -1;
 
-            for(int j = 0; j < nClusters; j++){
-                double d = distance(points[i], centroids[j]);
-                if(d < bestDistance){
-                    bestDistance = d;
-                    bestCluster = j;
-                }
-            }
+        //     for (int j = 0; j < nClusters; j++) {
+        //         double d = distance(points[i], centroids[j]);
+        //         if(d < bestDistance){
+        //             bestDistance = d;
+        //             bestCluster = j;
+        //         }
+        //     }
 
-            // If one point got reassigned to a new cluster, we have to do another iteration
-            if(bestCluster != points[i].cluster){
-                updated = 1;
-            }
-            points[i].cluster = bestCluster;
-        }
+        //     // If one point got reassigned to a new cluster, we have to do another iteration
+        //     if (bestCluster != points[i].cluster) {
+        //         updated = 1;
+        //     }
+        //     points[i].cluster = bestCluster;
+        // }
     }
 
     print_data();

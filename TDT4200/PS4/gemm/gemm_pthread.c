@@ -76,10 +76,10 @@ void* calculate_sub_matrix(void *args) {
 
     sub_matrix_args *a = (sub_matrix_args *) args;
 
-    for(int x = a->x_min; x < a->x_max; x++){
-        for(int y = a->y_min; y < a->y_max; y++){
+    for (int x = a->x_min; x < a->x_max; x++) {
+        for (int y = a->y_min; y < a->y_max; y++) {
             a->C[y * a->n + x] *= a->beta;
-            for(int z = 0; z < a->k; z++){
+            for (int z = 0; z < a->k; z++) {
                 a->C[y * a->n + x] += a->alpha * a->A[y * a->k + z] * a-> B[z * a->n + x];
             }
         }
