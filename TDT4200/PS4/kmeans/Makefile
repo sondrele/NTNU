@@ -2,7 +2,7 @@
 
 T=2
 C=2
-P=8
+P=16
 
 all: kmeans kmeans_openmp kmeans_pthread
 
@@ -19,8 +19,16 @@ plot: plot.txt
 	gnuplot gpbatch.txt
 	
 plot.txt: kmeans
-	./kmeans 1 10 300 > plot.txt
-	
+	./kmeans $(T) $(C) $(P) > plot.txt
+	./kmeans_pthread $(T) $(C) $(P) > plott.txt
+
+plott: 
+	gnuplot gpbatcht.txt
+
+compare: plot plott
+	eog output.jpg &
+	eog outputt.jpg &
+
 jpgs: ${JPGS}
 
 %.jpg: %.dat
@@ -56,4 +64,5 @@ runt: upload
 	ssh sondrele@clustis3.idi.ntnu.no 'cd TDT4200/PS4/; make testt'
 
 clean:
-	-rm -f kmeans plot.txt plot.jpg
+	-rm -f kmeans plot.txt output.jpg
+	-rm -f kmeans_thread plott.txt outputt.jpg

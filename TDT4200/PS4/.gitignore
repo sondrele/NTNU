@@ -4,3 +4,8 @@ gemm_pthread
 g_res
 t_res
 mp_res
+kmeans_openmp
+kmeans_pthread
+mp_2-2-8.txt
+ps4.zip
+x.zip
