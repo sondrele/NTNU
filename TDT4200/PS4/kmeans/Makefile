@@ -47,13 +47,13 @@ upload: zip
 run: all
 	./kmeans_pthread $(T) $(C) $(P)
 
-testmp: unzip all
+testomp: unzip all
 	time ./kmeans $(T) $(C) $(P) > k_res
 	time ./kmeans_openmp $(T) $(C) $(P) > mp_res
 	diff k_res mp_res
 
 runomp: upload
-	ssh sondrele@clustis3.idi.ntnu.no 'cd TDT4200/PS4/; make testmp'
+	ssh sondrele@clustis3.idi.ntnu.no 'cd TDT4200/PS4/; make testomp'
 
 testt: unzip all
 	time ./kmeans $(T) $(C) $(P) > k_res
@@ -66,3 +66,4 @@ runt: upload
 clean:
 	-rm -f kmeans plot.txt output.jpg
 	-rm -f kmeans_thread plott.txt outputt.jpg
+	-rm -f kmeans_openmp

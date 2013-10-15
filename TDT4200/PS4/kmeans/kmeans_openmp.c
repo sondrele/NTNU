@@ -155,52 +155,44 @@ int main(int argc, char** argv){
 
     omp_set_num_threads(nThreads);
 
+    omp_lock_t writelock;
+    omp_init_lock(&writelock);
+
     // Iterate until no points are updated
     int updated = 1;
     while (updated) {
         updated = 0;
 
-        // #pragma omp parallel \
-        // shared(centroids, points, nClusters, nPoints)
-        {
-            #pragma omp parallel for
-            for (int i = 0; i < nClusters; i++) {
-                centroids[i].x = 0.0;
-                centroids[i].y = 0.0;
-                centroids[i].nPoints= 0;
-            }
+        #pragma omp parallel for
+        for (int i = 0; i < nClusters; i++) {
+            centroids[i].x = 0.0;
+            centroids[i].y = 0.0;
+            centroids[i].nPoints= 0;
+        }
 
-            // Compute new centroids positions
-            // #pragma omp parallel for
-            for (int i = 0; i < nPoints; i++) {
-                int c = points[i].cluster;
-                centroids[c].x += points[i].x;
-                centroids[c].y += points[i].y;
-                centroids[c].nPoints++;
-            }
+        // Compute new centroids positions
+        for (int i = 0; i < nPoints; i++) {
+            int c = points[i].cluster;
+            centroids[c].x += points[i].x;
+            centroids[c].y += points[i].y;
+            centroids[c].nPoints++;
+        }
 
-            #pragma omp parallel for
-            for (int i = 0; i < nClusters; i++) {
-                // If a centroid lost all its points, we give it a random position
-                // (to avoid dividing by 0)
-                if (centroids[i].nPoints == 0) {
-                    centroids[i] = create_random_centroid();
-                } else {
-                    centroids[i].x /= centroids[i].nPoints;
-                    centroids[i].y /= centroids[i].nPoints;
-                }
+        for (int i = 0; i < nClusters; i++) {
+            // If a centroid lost all its points, we give it a random position
+            // (to avoid dividing by 0)
+            if (centroids[i].nPoints == 0) {
+                centroids[i] = create_random_centroid();
+            } else {
+                centroids[i].x /= centroids[i].nPoints;
+                centroids[i].y /= centroids[i].nPoints;
             }
         }
-        
-        #pragma omp barrier
 
-        // #pragma omp parallel \
-        // shared(updated, centroids, points, nClusters, nPoints)
-        
+
         double bestDistance = DBL_MAX;
         int bestCluster = -1;
         double d;
-
         //Reassign points to closest centroid
         #pragma omp parallel for \
         private(bestDistance, bestCluster, d)
