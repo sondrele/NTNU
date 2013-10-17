@@ -155,9 +155,6 @@ int main(int argc, char** argv){
 
     omp_set_num_threads(nThreads);
 
-    omp_lock_t writelock;
-    omp_init_lock(&writelock);
-
     // Iterate until no points are updated
     int updated = 1;
     while (updated) {

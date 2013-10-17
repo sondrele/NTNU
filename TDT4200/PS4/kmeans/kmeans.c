@@ -147,7 +147,6 @@ double distance(Point a, Centroid b){
 
 
 int main(int argc, char** argv){
-    srand(0);
     parse_args(argc, argv);
 
     // Create random data, either function can be used.
