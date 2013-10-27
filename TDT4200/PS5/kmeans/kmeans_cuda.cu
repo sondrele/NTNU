@@ -144,8 +144,80 @@ float distance(Point a, Centroid b){
     return sqrt(dx*dx + dy*dy);
 }
 
+Point *input_points;
+Centroid *input_centroids;
+int *cuda_updated;
+int *cuda_nClusters;
+int *cuda_nPoints;
 
-int main(int argc, char** argv){
+__global__ void device_reassign_points(Point *input_points, Centroid *input_centroids, int *cuda_updated, int *cuda_nClusters) {
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+
+    //Reassign points to closest centroid
+    float bestDistance = DBL_MAX;
+    int bestCluster = -1;
+
+    for(int j = 0; j < *cuda_nClusters; j++) {
+        Point a = input_points[i];
+        Centroid b = input_centroids[j];
+        float dx = a.x - b.x;
+        float dy = a.y - b.y;
+        float d = sqrt(dx*dx + dy*dy);
+
+        if(d < bestDistance) {
+            bestDistance = d;
+            bestCluster = j;
+        }
+    }
+
+    // If one point got reassigned to a new cluster, we have to do another iteration
+    if(bestCluster != input_points[i].cluster) {
+        *cuda_updated = 1;
+    }
+
+    input_points[i].cluster = bestCluster;
+}
+
+__global__ void device_reset_centroid_position(Centroid *input_centroids, Point *input_points, int *cuda_nPoints) {
+    extern __shared__ Point sdata[];
+
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    int tid = threadIdx.x;
+    sdata[tid] = input_points[i];
+    __syncthreads();
+
+    input_centroids[i].x = 0.0;
+    input_centroids[i].y = 0.0;
+    input_centroids[i].nPoints = 0;
+
+    // for (int s = 1; s < blockDim.x; s *= 2) {
+    //     if (tid % (2 * s) == 0) {
+    //         sdata[tid].x += sdata[tid + s].x;
+    //         sdata[tid].y += sdata[tid + s].y;
+    //         sdata[tid].nPoints += sdata[tid + s].nPoints;
+    //     }
+    //     __syncthreads();
+    // }
+
+    for(int j = 0; j < *cuda_nPoints; j++) {
+        if (i == input_points[j].cluster) {
+            input_centroids[i].x += input_points[j].x;
+            input_centroids[i].y += input_points[j].y;
+            input_centroids[i].nPoints += 1;
+        }
+    }
+}
+
+__global__ void device_reset_centroid_pos(Centroid *input_centroids) {
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+
+    input_centroids[i].x = 0.0;
+    input_centroids[i].y = 0.0;
+    input_centroids[i].nPoints = 0;
+}
+
+int main(int argc, char** argv) {
+    srand(0);
     parse_args(argc, argv);
 
     // Create random data, either function can be used.
@@ -153,59 +225,80 @@ int main(int argc, char** argv){
     init_data();
 
 
+    dim3 numBlocks, threadsPerBlock;
+    numBlocks.x = nClusters;
+    threadsPerBlock.x = nPoints / nClusters;
+
+    // 1. Allocate buffers for the points and clusters
+    cudaMalloc((void**) &input_points, sizeof(Point) * nPoints);
+    cudaMalloc((void**) &input_centroids, sizeof(Centroid) * nClusters);
+    cudaMalloc((void**) &cuda_updated, sizeof(int));
+    cudaMalloc((void**) &cuda_nClusters, sizeof(int));
+    cudaMalloc((void**) &cuda_nPoints, sizeof(int));
+
+    cudaMemcpy(cuda_nClusters, &nClusters, sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(cuda_nPoints, &nPoints, sizeof(int), cudaMemcpyHostToDevice);
+
     // Iterate until no points are updated
     int updated = 1;
-    while(updated){
+
+    while(updated) {
         updated = 0;
 
+        // Transfer the points and clusters to device
+        cudaMemcpy(input_centroids, centroids, sizeof(Centroid) * nClusters, cudaMemcpyHostToDevice);
+        cudaMemcpy(input_points, points, sizeof(Point) * nPoints, cudaMemcpyHostToDevice);
         // Reset centroid positions
-        for(int i = 0; i < nClusters; i++){
-            centroids[i].x = 0.0;
-            centroids[i].y = 0.0;
-            centroids[i].nPoints= 0;
-        }
+        device_reset_centroid_position<<<numBlocks, 1, sizeof(Point) * nPoints>>>(input_centroids, input_points, cuda_nPoints);
+        // Transfer data to host
+        cudaMemcpy(centroids, input_centroids, sizeof(Centroid) * nClusters, cudaMemcpyDeviceToHost);
+        cudaMemcpy(points, input_points, sizeof(Point) * nPoints, cudaMemcpyDeviceToHost);
 
 
-        // Compute new centroids positions
-        for(int i = 0; i < nPoints; i++){
-            int c = points[i].cluster;
-            centroids[c].x += points[i].x;
-            centroids[c].y += points[i].y;
-            centroids[c].nPoints++;
-        }
+        // // Reset centroid positions
+        // for(int i = 0; i < nClusters; i++){
+        //     centroids[i].x = 0.0;
+        //     centroids[i].y = 0.0;
+        //     centroids[i].nPoints= 0;
+        // }
 
-        for(int i = 0; i < nClusters; i++){
+        // // Compute new centroids positions
+        // for(int i = 0; i < nPoints; i++){
+        //     int c = points[i].cluster;
+        //     centroids[c].x += points[i].x;
+        //     centroids[c].y += points[i].y;
+        //     centroids[c].nPoints++;
+        // }
+
+        // cudaMemcpy(input_centroids, centroids, sizeof(Centroid) * nClusters, cudaMemcpyHostToDevice);
+        // device_reset_centroid_pos<<<numBlocks, 1>>>(input_centroids);
+        // cudaMemcpy(centroids, input_centroids, sizeof(Centroid) * nClusters, cudaMemcpyDeviceToHost);
+
+        for(int i = 0; i < nClusters; i++) {
             // If a centroid lost all its points, we give it a random position
             // (to avoid dividing by 0)
-            if(centroids[i].nPoints == 0){
+            if(centroids[i].nPoints == 0) {
                 centroids[i] = create_random_centroid();
             }
-            else{
+            else {
                 centroids[i].x /= centroids[i].nPoints;
                 centroids[i].y /= centroids[i].nPoints;
             }
         }
 
+        // Transfer the points and clusters to device
+        cudaMemcpy(input_points, points, sizeof(Point) * nPoints, cudaMemcpyHostToDevice);
+        cudaMemcpy(input_centroids, centroids, sizeof(Centroid) * nClusters, cudaMemcpyHostToDevice);
+        cudaMemcpy(cuda_updated, &updated, sizeof(int), cudaMemcpyHostToDevice);
+        
+        // Reassign points
+        device_reassign_points<<<numBlocks, threadsPerBlock>>>(input_points, input_centroids, cuda_updated, cuda_nClusters);
+        
+        // Transfer data to host
+        cudaMemcpy(points, input_points, sizeof(Point) * nPoints, cudaMemcpyDeviceToHost);
+        cudaMemcpy(centroids, input_centroids, sizeof(Centroid) * nClusters, cudaMemcpyDeviceToHost);
+        cudaMemcpy(&updated, cuda_updated, sizeof(int), cudaMemcpyDeviceToHost);
 
-        //Reassign points to closest centroid
-        for(int i = 0; i < nPoints; i++){
-            float bestDistance = DBL_MAX;
-            int bestCluster = -1;
-
-            for(int j = 0; j < nClusters; j++){
-                float d = distance(points[i], centroids[j]);
-                if(d < bestDistance){
-                    bestDistance = d;
-                    bestCluster = j;
-                }
-            }
-
-            // If one point got reassigned to a new cluster, we have to do another iteration
-            if(bestCluster != points[i].cluster){
-                updated = 1;
-            }
-            points[i].cluster = bestCluster;
-        }
     }
 
     print_data();
