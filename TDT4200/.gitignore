@@ -1,17 +1,18 @@
-############
-## Project specific files
-############
-
 .gdbinit
+
+# PS2
 .temp_printf
 PS2/ps2.zip
+PS2/test
+PS2/fluid2d
+
+# PS5
+PS5/Bluring/ps5.zip
 
 ############
 # Compiled files
 ############
 *.o
-PS2/test
-PS2/fluid2d
 
 ############
 # Directories
@@ -19,13 +20,3 @@ PS2/fluid2d
 bin/
 obj/
 
-
-############
-## Windows
-############
-
-# Windows image file caches
-Thumbs.db
-
-# Folder config file
-Desktop.ini
