@@ -2,12 +2,8 @@
 #include <stdlib.h>
 #include <cuda.h>
 
-//#include "bmp.h"
 extern "C" void write_bmp(unsigned char* data, int width, int height);
 extern "C" unsigned char* read_bmp(char* filename);
-
-//#include "host_blur.h"
-extern "C" void host_blur(unsigned char* inputImage, unsigned char* outputImage, int size);
 
 void print_properties() {
     int deviceCount = 0;
@@ -27,7 +23,7 @@ void print_properties() {
 __global__ void device_blur(unsigned char *input_img, unsigned char *output_img) {
     int x = (blockIdx.x * blockDim.x) + threadIdx.x;
     int y = (blockIdx.y * blockDim.y) + threadIdx.y;
-    int index = x + y * 512; 
+    int index = x + y * 512;
 
     output_img[index] = 0;
     for(int k = -1; k < 2; k++) {
