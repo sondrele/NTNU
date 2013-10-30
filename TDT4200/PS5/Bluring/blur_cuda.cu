@@ -28,7 +28,6 @@ __global__ void device_blur(unsigned char *input_img, unsigned char *output_img)
     output_img[index] = 0;
     for(int k = -1; k < 2; k++) {
         for(int l = -1; l < 2; l++) {
-            // TOOD: Add 1px border to input_img and fix index
             output_img[index] += (input_img[index + k + l] / 9.0);
         }
     }
