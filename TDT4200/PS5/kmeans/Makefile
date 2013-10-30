@@ -23,7 +23,7 @@ jpgs: ${JPGS}
 	-rm -f $*.dat
 
 runcuda: run
-	ssh sondrele@gpu01.idi.ntnu.no 'cd ~/TDT4200/PS5/kmeans; ./kmeans_cuda 4 32'
+	ssh sondrele@gpu01.idi.ntnu.no 'cd ~/TDT4200/PS5/kmeans; ./kmeans_cuda 4 64'
 
 runserial: run
 	ssh sondrele@gpu01.idi.ntnu.no 'cd ~/TDT4200/PS5/kmeans; ./kmeans 8 1024 > kres'
