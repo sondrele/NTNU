@@ -239,7 +239,7 @@ int main(int argc, char** argv) {
             // Transfer the points and clusters to device
             cudaMemcpy(input_points, points, sizeof(Point) * nPoints, cudaMemcpyHostToDevice);
             
-            size_t size = sizeof(Centroid) * 64 + sizeof(Point) * nPoints;
+            size_t size = sizeof(Centroid) * 64 + sizeof(Point) * (64 + nPoints);
 
             // Reset centroid positions
             device_compute_centroids<<<nClusters, 64, size>>>(input_points, input_centroids, cuda_nClusters, cuda_nPoints);
@@ -306,7 +306,8 @@ __global__ void device_compute_centroids(Point *d_points, Centroid *d_centroids,
 {
     extern __shared__ Centroid s_compute_centroids[];
     Centroid *s_centroid = s_compute_centroids;
-    Point *s_points = (Point *) &s_centroid[64];
+    Point *s_centoid_points = (Point *) &s_centroid[64];
+    Point *s_points = (Point *) &s_centroid[128];
 
     int bid = blockIdx.x;
     int gid = blockIdx.x * blockDim.x + threadIdx.x;
@@ -322,17 +323,25 @@ __global__ void device_compute_centroids(Point *d_points, Centroid *d_centroids,
     }    
     __syncthreads();
 
+    int length = 
+
+    int cluster_id = d_points[tid].cluster;
+    if (bid == cluster_id) {
+        s_points[tid].x += s_points[tid].x;
+        s_points[tid].y += s_points[tid].y;
+        // s_centroid[tid].nPoints++;
+    }
+
     // Compute new centroids positions
     for (int i = 0; i < *d_nPoints; i++) {
-        if (bid == d_points[i].cluster) {
-            s_centroid[tid].x += s_points[i].x;
-            s_centroid[tid].y += s_points[i].y;
-            s_centroid[tid].nPoints++;
-        }
+        int cluster_id = d_points[i].cluster;
+        __syncthreads();
     }
 
     // Transfer computed centroid back to global memory
-    d_centroids[bid] = s_centroid[tid];
+    if (tid == 0) {
+        d_centroids[bid] = s_points[bid];
+    }
 }
 
 __global__ void device_reassign_points(Point *d_points, Centroid *d_centroids, 
