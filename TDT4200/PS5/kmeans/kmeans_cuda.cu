@@ -292,6 +292,17 @@ int main(int argc, char** argv) {
     print_data();
 }
 
+__device__ Centroid* device_compute_single(Centoid *d_centroids, Point *d_points, int d_nPoints) {
+    __shared__ Centroid s[];
+    Centroid *s_centroids = s;
+    Point *s_points = (Point *) s_centroids[d_nPoints];
+
+    int gid = blockIdx.x * blockDim.x + threadIdx.x;
+    if (gid == 0) {
+        printf("looooooool\n");
+    }
+}
+
 __global__ void device_compute_centroids(Point *d_points, Centroid *d_centroids, 
     int *d_nClusters, int *d_nPoints) 
 {
@@ -349,7 +360,6 @@ __global__ void device_reassign_points(Point *d_points, Centroid *d_centroids,
         }
     }
     __syncthreads();
-
 
     //Reassign points to closest centroid
     float bestDistance = DBL_MAX;
