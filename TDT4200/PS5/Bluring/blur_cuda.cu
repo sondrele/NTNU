@@ -26,10 +26,14 @@ __global__ void device_blur(unsigned char *input_img, unsigned char *output_img)
     int index = x + y * 512;
 
     output_img[index] = 0;
-    for(int k = -1; k < 2; k++) {
-        for(int l = -1; l < 2; l++) {
-            output_img[index] += (input_img[index + k + l] / 9.0);
+    if (x > 0 && x < 511 && y > 0 && y < 511) {
+        for(int k = -1; k < 2; k++) {
+            for(int l = -1; l < 2; l++) {
+                output_img[index] += (input_img[index + k + l] / 9.0);
+            }
         }
+    } else {
+        output_img[index] = input_img[index];
     }
 }
 
@@ -64,6 +68,9 @@ int main(int argc,char **argv) {
 
     write_bmp(B, 512, 512);
 
+    cudaFree(input_img);
+    cudaFree(output_img);
+    
     free(A);
     free(B);
 

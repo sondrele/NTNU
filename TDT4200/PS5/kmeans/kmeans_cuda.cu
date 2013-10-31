@@ -238,7 +238,7 @@ int main(int argc, char** argv) {
     while(updated) {
         updated = 0;
 
-        if (nClusters > 0) {
+        if (nClusters < 0) {
             for (int i = 0; i < nClusters; i++) {
                 centroids[i].x = 0.0;
                 centroids[i].y = 0.0;
@@ -295,6 +295,12 @@ int main(int argc, char** argv) {
         cudaMemcpy(&updated, cuda_updated, sizeof(int), cudaMemcpyDeviceToHost);
 
     }
+
+    cudaFree(input_points);
+    cudaFree(input_centroids);
+    cudaFree(cuda_updated);
+    cudaFree(cuda_nClusters);
+    cudaFree(cuda_nPoints);
 
     print_data();
 }
