@@ -22,24 +22,40 @@ float sim_time = 0.0;
 
 
 // CUDA buffers
-float* volume;
-float4* vertices;
+float *volume;
+float4 *vertices;
 
-uint* edge_table;
-uint* tri_table;
-uint* num_verts_table;
+uint *edge_table;
+uint *tri_table;
+uint *num_verts_table;
 
 // Fill_volume kernel
-__global__ void fill_volume(float* volume, float t){
+__global__ void fill_volume(float *volume, float t) {
+    int id = blockIdx.x * blockDim.x + threadIdx.x;
+
+    float dx = x - 0.5;
+    float dy = y - 0.5;
+    float dz = z - 0.5;
+    float v1 = sqrt((5+3.5*sin(0.1*t))*dx*dx +
+    (5+2*sin(t+3.14))*dy*dy +
+    (5+2*sin(t*0.5))*dz*dz);
+    float v2 = sqrt(dx*dx) + sqrt(dy*dy) +
+    sqrt(dz*dz);
+    float f = abs(cos(0.01*t));
+    volume[id] = f*v2 + (1-f)*v1;
 }
 
 // Get triangles kernel
-__global__ void get_triangles(float4 *out, float *volume, uint* edge_table, uint* tri_table, uint* num_verts_table){ //Some of the tables might be unnecessary
+__global__ void get_triangles(float4 *out, float *volume,
+    uint *edge_table,
+    uint *tri_table,
+    uint *num_verts_table) //Some of the tables might be unnecessary
+{
+
 }
 
-
 // Set up and call get_triangles kernel
-void call_get_triangles(){
+void call_get_triangles() {
 
     // CUDA taking over vertices buffer from OGL
     size_t num_bytes; 
@@ -53,12 +69,12 @@ void call_get_triangles(){
 }
 
 // Set up and call fill_volume kernel
-void call_fill_volume(){
+void call_fill_volume() {
 }
 
 
 // Creating vertex buffer in OpenGL
-void init_vertex_buffer(){
+void init_vertex_buffer() {
   glGenBuffers(1, &vbo);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBufferData(GL_ARRAY_BUFFER, dim_x*dim_y*dim_z*15*4*sizeof(float), 0, GL_DYNAMIC_DRAW);
@@ -68,7 +84,7 @@ void init_vertex_buffer(){
 
 // The display function is called at each iteration of the
 // OGL main loop. It calls the kernels, and draws the result
-void display(){
+void display() {
     sim_time+= 0.1;
 
     // Call kernels
@@ -103,7 +119,7 @@ void display(){
     glutPostRedisplay();
 }
 
-void init_GL(int *argc, char **argv){
+void init_GL(int *argc, char **argv) {
 
     glutInit(argc, argv);
     glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
@@ -126,8 +142,8 @@ void init_GL(int *argc, char **argv){
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
     glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
 
-    glColorMaterial ( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE ) ;
-    glEnable ( GL_COLOR_MATERIAL ) ;
+    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+    glEnable(GL_COLOR_MATERIAL);
 
     glClearColor(1.0, 1.0, 1.0, 1.0);
     glDisable(GL_DEPTH_TEST);
@@ -153,6 +169,8 @@ int main(int argc, char **argv) {
     init_vertex_buffer();
 
     // Allocate memory for volume
+    cudaMalloc((void**) &volume, sizeof(float) * nPoints);
+    cudaMalloc((void**) &vertices, sizeof(float4) * nPoints);
 
     // Allocate memory and transfer tables
 
