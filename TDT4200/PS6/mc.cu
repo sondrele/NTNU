@@ -173,7 +173,14 @@ int main(int argc, char **argv) {
     cudaMalloc((void**) &vertices, sizeof(float4) * nPoints);
 
     // Allocate memory and transfer tables
+    cudaMalloc((void**) &edge_table, sizeof(uint) * 256);
+    cudaMemcpy(edge_table, &edgeTable, sizeof(int), cudaMemcpyHostToDevice);
 
+    cudaMalloc((void**) &tri_table, sizeof(uint) * 256*16);
+    cudaMemcpy(tri_table, &triTable, sizeof(int), cudaMemcpyHostToDevice);
+
+    cudaMalloc((void**) &num_verts_table, sizeof(uint) * 256);
+    cudaMemcpy(num_verts_table, &numVertsTable, sizeof(int), cudaMemcpyHostToDevice);
 
     glutMainLoop();
 }
