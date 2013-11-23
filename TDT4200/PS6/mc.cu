@@ -3,11 +3,14 @@
 #include <math.h>
 #include <GL/glew.h>
 #include <GL/glut.h>
-
 #include <cuda_runtime.h>
 #include <cuda_gl_interop.h>
 
 #include "tables.h"
+
+#define NUM_BLOCKS                  64 * 64
+#define THREADS_PER_BLOCK           64
+#define NUM_CUBES                   (NUM_BLOCKS * THREADS_PER_BLOCK)
 
 // OGL vertex buffer object
 GLuint vbo;
@@ -24,24 +27,11 @@ float sim_time = 0.0;
 // CUDA buffers
 float *volume;
 float4 *vertices;
+// float4 *output_vertices;
 
 uint *edge_table;
 uint *tri_table;
 uint *num_verts_table;
-
-// Fill_volume kernel
-__global__ void fill_volume(float *volume, float t) {
-    int id = blockIdx.x * blockDim.x + threadIdx.x;
-
-    float dx = x - 0.5;
-    float dy = y - 0.5;
-    float dz = z - 0.5;
-    float v1 = sqrt((5+3.5*sin(0.1*t))*dx*dx + (5+2*sin(t+3.14))*dy*dy 
-        + (5+2*sin(t*0.5))*dz*dz);
-    float v2 = sqrt(dx*dx) + sqrt(dy*dy) + sqrt(dz*dz);
-    float f = abs(cos(0.01*t));
-    volume[id] = f*v2 + (1-f)*v1;
-}
 
 // Get triangles kernel
 __global__ void get_triangles(float4 *out, float *volume,
@@ -49,21 +39,58 @@ __global__ void get_triangles(float4 *out, float *volume,
     uint *tri_table,
     uint *num_verts_table) //Some of the tables might be unnecessary
 {
-    int x, y, z;
-    float iso = 0.0;
-    int id = blockIdx.x * blockDim.x + threadIdx.x;
+    float iso = 0.5;
 
+    int gid = blockIdx.x * blockDim.x + threadIdx.x;
+    int x = threadIdx.x;
+    int y = blockIdx.x % 64;
+    int z = blockIdx.x / 64;
     uint index = 0;
-    index =  (uint) (volume[x  ][y  ][z  ] < iso); 
-    index += (uint) (volume[x+1][y  ][z  ] < iso) * 2;
-    index += (uint) (volume[x+1][y+1][z  ] < iso) * 4;
-    index += (uint) (volume[x  ][y+1][z  ] < iso) * 8;
-    index += (uint) (volume[x  ][y  ][z+1] < iso) * 16;
-    index += (uint) (volume[x+1][y  ][z+1] < iso) * 32;
-    index += (uint) (volume[x+1][y+1][z+1] < iso) * 64;
-    index += (uint) (volume[x  ][y+1][z+1] < iso) * 128;
+    index =  (uint) (volume[(x  ) + (y  )*64 + (z  )*64*64] < iso);
+    index += (uint) (volume[(x+1) + (y  )*64 + (z  )*64*64] < iso) * 2;
+    index += (uint) (volume[(x+1) + (y+1)*64 + (z  )*64*64] < iso) * 4;
+    index += (uint) (volume[(x  ) + (y+1)*64 + (z  )*64*64] < iso) * 8;
+    index += (uint) (volume[(x  ) + (y  )*64 + (z+1)*64*64] < iso) * 16;
+    index += (uint) (volume[(x+1) + (y  )*64 + (z+1)*64*64] < iso) * 32;
+    index += (uint) (volume[(x+1) + (y+1)*64 + (z+1)*64*64] < iso) * 64;
+    index += (uint) (volume[(x  ) + (y+1)*64 + (z+1)*64*64] < iso) * 128;
 
+    // index >= 0 && index < 256
+    uint *cube_verts = (tri_table + index * 16);
+    int num_verts    = num_verts_table[index];
+    int verts_index  = gid * 15;
 
+    for (int i = 0; i < num_verts; i++) {
+        uint cur_vert = cube_verts[i];
+
+        float x_len = x / 64.0;
+        float y_len = y / 64.0;
+        float z_len = z / 64.0;
+        float full_len = 1.0 / 64.0;
+        float half_len = full_len / 2.0;
+
+        float4 cur_vox;
+        switch (cur_vert) {
+            case  0: cur_vox = (float4) {x_len+half_len, y_len,          z_len,          1.0}; break;
+            case  1: cur_vox = (float4) {x_len+full_len, y_len+half_len, z_len,          1.0}; break;
+            case  2: cur_vox = (float4) {x_len+half_len, y_len+full_len, z_len,          1.0}; break;
+            case  3: cur_vox = (float4) {x_len,          y_len+half_len, z_len,          1.0}; break;
+            case  4: cur_vox = (float4) {x_len+half_len, y_len,          z_len+full_len, 1.0}; break;
+            case  5: cur_vox = (float4) {x_len+full_len, y_len+half_len, z_len+full_len, 1.0}; break;
+            case  6: cur_vox = (float4) {x_len+half_len, y_len+full_len, z_len+full_len, 1.0}; break;
+            case  7: cur_vox = (float4) {x_len,          y_len+half_len, z_len+full_len, 1.0}; break;
+            case  8: cur_vox = (float4) {x_len,          y_len,          z_len+half_len, 1.0}; break;
+            case  9: cur_vox = (float4) {x_len+full_len, y_len,          z_len+half_len, 1.0}; break;
+            case 10: cur_vox = (float4) {x_len+full_len, y_len+full_len, z_len+half_len, 1.0}; break;
+            case 11: cur_vox = (float4) {x_len,          y_len+full_len, z_len+half_len, 1.0}; break;
+        }
+
+        out[verts_index + i] = cur_vox;
+    }
+
+    for (int i = num_verts; i < 15; i++) {
+        out[verts_index + i] = (float4) {0.0, 0.0, 0.0, 0.0};
+    } 
 }
 
 // Set up and call get_triangles kernel
@@ -72,39 +99,63 @@ void call_get_triangles() {
     // CUDA taking over vertices buffer from OGL
     size_t num_bytes; 
     cudaGraphicsMapResources(1, &vbo_resource, 0);
-    cudaGraphicsResourceGetMappedPointer((void **)&vertices, &num_bytes, vbo_resource);
+    cudaGraphicsResourceGetMappedPointer(
+        (void **)&vertices, &num_bytes, vbo_resource);
 
     // Insert call to get_triangles kernel here
-    // TODO
-    get_triangles(volume, edge_table, tri_table, num_verts_table);
+    get_triangles<<<NUM_BLOCKS, THREADS_PER_BLOCK>>>
+        (vertices, volume, edge_table, tri_table, num_verts_table);
 
     // CUDA giving back vertices buffer to OGL
     cudaGraphicsUnmapResources(1, &vbo_resource, 0);
 }
 
+// Fill_volume kernel
+__global__ void fill_volume(float *volume, float t) {
+    int gid = blockIdx.x * blockDim.x + threadIdx.x;
+    float x = ((float) threadIdx.x)     / 64; 
+    float y = (float) (blockIdx.x % 64) / 64;
+    float z = (float) (blockIdx.x / 64) / 64;
+
+    float dx = x - 0.5;
+    float dy = y - 0.5;
+    float dz = z - 0.5;
+    float v1 = sqrt((5 + 3.5 * sin(0.1 * t)) * dx * dx +
+        (5 + 2 * sin(t + 3.14)) * dy * dy +
+        (5 + 2 * sin(t * 0.5)) * dz * dz);
+    float v2 = sqrt(dx * dx) + sqrt(dy * dy) + sqrt(dz * dz);
+    float f = abs(cos(0.01 * t));
+
+    volume[gid] = f * v2 + (1 - f) * v1;
+}
+
 // Set up and call fill_volume kernel
 void call_fill_volume() {
-
-
+    fill_volume<<<NUM_BLOCKS, THREADS_PER_BLOCK>>>
+        (volume, sim_time);
 }
 
 
 // Creating vertex buffer in OpenGL
 void init_vertex_buffer() {
+    // vbo == vertexBuffer
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, dim_x*dim_y*dim_z*15*4*sizeof(float), 0, GL_DYNAMIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);	
-    cudaGraphicsGLRegisterBuffer(&vbo_resource, vbo, cudaGraphicsMapFlagsWriteDiscard);
+    glBufferData(GL_ARRAY_BUFFER, dim_x*dim_y*dim_z*15*4*
+        sizeof(float), 0, GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    cudaGraphicsGLRegisterBuffer(&vbo_resource, vbo,
+        cudaGraphicsMapFlagsWriteDiscard);
 }
 
 // The display function is called at each iteration of the
 // OGL main loop. It calls the kernels, and draws the result
 void display() {
-    sim_time+= 0.1;
+    sim_time += 0.1;
 
     // Call kernels
     call_fill_volume();
+    // printf("%s\n", cudaGetErrorString(cudaGetLastError()));
     call_get_triangles();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -185,18 +236,20 @@ int main(int argc, char **argv) {
     init_vertex_buffer();
 
     // Allocate memory for volume
-    cudaMalloc((void**) &volume, sizeof(float) * nPoints);
-    cudaMalloc((void**) &vertices, sizeof(float4) * nPoints);
+    cudaMalloc((void**) &volume, sizeof(float) *  NUM_CUBES);
 
     // Allocate memory and transfer tables
     cudaMalloc((void**) &edge_table, sizeof(uint) * 256);
-    cudaMemcpy(edge_table, &edgeTable, sizeof(uint), cudaMemcpyHostToDevice);
+    cudaMemcpy(edge_table, &edgeTable, 
+        sizeof(uint) * 256, cudaMemcpyHostToDevice);
 
-    cudaMalloc((void**) &tri_table, sizeof(uint) * 256*16);
-    cudaMemcpy(tri_table, &triTable, sizeof(uint), cudaMemcpyHostToDevice);
+    cudaMalloc((void**) &tri_table, sizeof(uint) * 256 * 16);
+    cudaMemcpy(tri_table, &triTable, 
+        sizeof(uint) * 256 * 16, cudaMemcpyHostToDevice);
 
     cudaMalloc((void**) &num_verts_table, sizeof(uint) * 256);
-    cudaMemcpy(num_verts_table, &numVertsTable, sizeof(uint), cudaMemcpyHostToDevice);
+    cudaMemcpy(num_verts_table, &numVertsTable, 
+        sizeof(uint) * 256, cudaMemcpyHostToDevice);
 
     glutMainLoop();
 }
