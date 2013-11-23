@@ -14,6 +14,9 @@
 typedef unsigned int uint;
 #include "tables.h"
 
+#define NUM_BLOCKS                  64 * 64
+#define THREADS_PER_BLOCK           64
+#define NUM_CUBES                   (NUM_BLOCKS * THREADS_PER_BLOCK)
 
 // OGL vertex buffer object
 GLuint vbo;
@@ -37,6 +40,7 @@ cl_mem vertices;
 cl_mem edge_table;
 cl_mem tri_table;
 cl_mem num_verts_table;
+cl_mem sim_time_kernel;
 
 // Size of voxel grid
 const int dim_x = 64;
@@ -47,8 +51,20 @@ float sim_time = 0.0;
 
 
 // Set up and call fill_volume kernel
-void fill_volume(){
+void fill_volume() {
+    // Update sim_time for kernel
+    err = clEnqueueWriteBuffer(queue, sim_time_kernel, CL_FALSE, 0, 
+        sizeof(cl_float), &sim_time, 0, NULL, NULL);
 
+    err = clSetKernelArg(fill_volume_kernel, 0, sizeof(volume), (void*)&volume);
+    err = clSetKernelArg(fill_volume_kernel, 1, sizeof(cl_float), (void*)&sim_time_kernel);
+    clError("Error setting arguments", err);
+
+    size_t gws = {64, 64, 1};
+    size_t lws = 64;
+    clEnqueueNDRangeKernel(queue, fill_volume_kernel, 1, NULL, 
+        &gws, &lws, 0, NULL, NULL);
+    clError("Error starting kernel", err);
 }
 
 // Set up and call get_triangles kernel
@@ -59,6 +75,17 @@ void get_triangles(){
     err = clEnqueueAcquireGLObjects(queue, 1, &vertices, 0,0,0);
 
 	//Set up an call kernel here
+    err = clSetKernelArg(get_triangles_kernel, 0, sizeof(volume), (void*)&volume);
+    err = clSetKernelArg(get_triangles_kernel, 1, sizeof(vertices), (void*)&vertices);
+    err = clSetKernelArg(get_triangles_kernel, 2, sizeof(tri_table), (void*)&tri_table);
+    err = clSetKernelArg(get_triangles_kernel, 3, sizeof(num_verts_table), (void*)&num_verts_table);
+    clError("Error setting arguments", err);
+    
+    size_t gws = NUM_CUBES;
+    size_t lws = THREADS_PER_BLOCK;
+    err = clEnqueueNDRangeKernel(queue, get_triangles_kernel, 1, NULL, 
+        &gws, &lws, 0, NULL, NULL);
+    clError("Error starting kernel", err);
     
     // OCL giving vertices buffer back to OGL
     err = clEnqueueReleaseGLObjects(queue, 1, &vertices, 0,0,0);
@@ -188,11 +215,34 @@ int main(int argc, char** argv) {
     init_vertex_buffer();
     
     // Build kernels
+    fill_volume_kernel = buildKernel("mc.cl", "fill_volume", context, device);
+    get_triangles_kernel = buildKernel("mc.cl", "get_triangles", context, device);
 
     // Allocate memory for volume
+    volume = clCreateBuffer(context, CL_MEM_READ_WRITE, 
+        sizeof(cl_float) * NUM_CUBES, NULL, &err);
 
     // Allocate memory and transfer tables
+    tri_table = clCreateBuffer(context, CL_MEM_READ_WRITE, 
+        sizeof(cl_uint) * 256 * 16, NULL, &err);
+    err = clEnqueueWriteBuffer(queue, tri_table, CL_TRUE, 0, 
+        sizeof(cl_uint) * 256 * 16, triTable, 0, NULL, NULL);
 
+    num_verts_table = clCreateBuffer(context, CL_MEM_READ_WRITE, 
+        sizeof(cl_uint) * 256, NULL, &err);
+    err = clEnqueueWriteBuffer(queue, num_verts_table, CL_TRUE, 0, 
+        sizeof(cl_uint) * 256, numVertsTable, 0, NULL, NULL);
+
+    sim_time_kernel = clCreateBuffer(context, CL_MEM_READ_WRITE, 
+        sizeof(cl_float), NULL, &err);
 
     glutMainLoop();
+
+    clReleaseMemObject(volume);
+    clReleaseMemObject(tri_table);
+    clReleaseMemObject(num_verts_table);
+    clReleaseKernel(fill_volume_kernel);
+    clReleaseKernel(get_triangles_kernel);
+    clReleaseCommandQueue(queue);
+    clReleaseContext(context);
 }
