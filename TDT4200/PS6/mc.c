@@ -50,6 +50,7 @@ const int dim_z = 64;
 float sim_time = 0.0;
 
 #define WG_SIZE 1
+
 size_t gws[WG_SIZE] = {64 * 64};
 
 // Set up and call fill_volume kernel
