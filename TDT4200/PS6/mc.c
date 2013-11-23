@@ -49,6 +49,8 @@ const int dim_z = 64;
 
 float sim_time = 0.0;
 
+#define WG_SIZE 1
+size_t gws[WG_SIZE] = {64 * 64};
 
 // Set up and call fill_volume kernel
 void fill_volume() {
@@ -60,10 +62,10 @@ void fill_volume() {
     err = clSetKernelArg(fill_volume_kernel, 1, sizeof(cl_float), (void*)&sim_time_kernel);
     clError("Error setting arguments", err);
 
-    size_t gws = {64, 64, 1};
+    // size_t gws = {64, 64, 1};
     size_t lws = 64;
-    clEnqueueNDRangeKernel(queue, fill_volume_kernel, 1, NULL, 
-        &gws, &lws, 0, NULL, NULL);
+    clEnqueueNDRangeKernel(queue, fill_volume_kernel, WG_SIZE, NULL, 
+        gws, &lws, 0, NULL, NULL);
     clError("Error starting kernel", err);
 }
 
@@ -81,10 +83,10 @@ void get_triangles(){
     err = clSetKernelArg(get_triangles_kernel, 3, sizeof(num_verts_table), (void*)&num_verts_table);
     clError("Error setting arguments", err);
     
-    size_t gws = NUM_CUBES;
-    size_t lws = THREADS_PER_BLOCK;
-    err = clEnqueueNDRangeKernel(queue, get_triangles_kernel, 1, NULL, 
-        &gws, &lws, 0, NULL, NULL);
+    // size_t gws = {64, 64, 1};
+    size_t lws = 64;
+    err = clEnqueueNDRangeKernel(queue, get_triangles_kernel, WG_SIZE, NULL, 
+        gws, &lws, 0, NULL, NULL);
     clError("Error starting kernel", err);
     
     // OCL giving vertices buffer back to OGL

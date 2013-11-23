@@ -1,9 +1,9 @@
 
 __kernel void fill_volume(__global float* volume, __global float *t) {
     int gid = get_global_id(0);
-    float x = ((float) get_local_id(0)) / 64; 
-    float y = (float) (get_group_id(1) % 64) / 64;
-    float z = (float) (get_group_id(2) / 64) / 64;
+    float x = ((float) get_local_id(0))      / 64; 
+    float y = ((float) get_group_id(1)) / 64;
+    float z = ((float) get_group_id(2)) / 64;
 
     float dx = x - 0.5;
     float dy = y - 0.5;
