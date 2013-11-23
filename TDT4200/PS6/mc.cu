@@ -35,7 +35,6 @@ uint *num_verts_table;
 
 // Get triangles kernel
 __global__ void get_triangles(float4 *out, float *volume,
-    uint *edge_table,
     uint *tri_table,
     uint *num_verts_table) //Some of the tables might be unnecessary
 {
@@ -104,7 +103,9 @@ void call_get_triangles() {
 
     // Insert call to get_triangles kernel here
     get_triangles<<<NUM_BLOCKS, THREADS_PER_BLOCK>>>
-        (vertices, volume, edge_table, tri_table, num_verts_table);
+        (vertices, volume, tri_table, num_verts_table);
+    // cudaMemcpy(output_vertices, vertices, 
+    //     sizeof(float4) * NUM_BLOCKS, cudaMemcpyDeviceToHost);
 
     // CUDA giving back vertices buffer to OGL
     cudaGraphicsUnmapResources(1, &vbo_resource, 0);
@@ -155,7 +156,6 @@ void display() {
 
     // Call kernels
     call_fill_volume();
-    // printf("%s\n", cudaGetErrorString(cudaGetLastError()));
     call_get_triangles();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -239,9 +239,9 @@ int main(int argc, char **argv) {
     cudaMalloc((void**) &volume, sizeof(float) *  NUM_CUBES);
 
     // Allocate memory and transfer tables
-    cudaMalloc((void**) &edge_table, sizeof(uint) * 256);
-    cudaMemcpy(edge_table, &edgeTable, 
-        sizeof(uint) * 256, cudaMemcpyHostToDevice);
+    // cudaMalloc((void**) &edge_table, sizeof(uint) * 256);
+    // cudaMemcpy(edge_table, &edgeTable, 
+    //     sizeof(uint) * 256, cudaMemcpyHostToDevice);
 
     cudaMalloc((void**) &tri_table, sizeof(uint) * 256 * 16);
     cudaMemcpy(tri_table, &triTable, 
