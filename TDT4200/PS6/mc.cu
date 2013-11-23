@@ -36,11 +36,9 @@ __global__ void fill_volume(float *volume, float t) {
     float dx = x - 0.5;
     float dy = y - 0.5;
     float dz = z - 0.5;
-    float v1 = sqrt((5+3.5*sin(0.1*t))*dx*dx +
-    (5+2*sin(t+3.14))*dy*dy +
-    (5+2*sin(t*0.5))*dz*dz);
-    float v2 = sqrt(dx*dx) + sqrt(dy*dy) +
-    sqrt(dz*dz);
+    float v1 = sqrt((5+3.5*sin(0.1*t))*dx*dx + (5+2*sin(t+3.14))*dy*dy 
+        + (5+2*sin(t*0.5))*dz*dz);
+    float v2 = sqrt(dx*dx) + sqrt(dy*dy) + sqrt(dz*dz);
     float f = abs(cos(0.01*t));
     volume[id] = f*v2 + (1-f)*v1;
 }
@@ -51,6 +49,20 @@ __global__ void get_triangles(float4 *out, float *volume,
     uint *tri_table,
     uint *num_verts_table) //Some of the tables might be unnecessary
 {
+    int x, y, z;
+    float iso = 0.0;
+    int id = blockIdx.x * blockDim.x + threadIdx.x;
+
+    uint index = 0;
+    index =  (uint) (volume[x  ][y  ][z  ] < iso); 
+    index += (uint) (volume[x+1][y  ][z  ] < iso) * 2;
+    index += (uint) (volume[x+1][y+1][z  ] < iso) * 4;
+    index += (uint) (volume[x  ][y+1][z  ] < iso) * 8;
+    index += (uint) (volume[x  ][y  ][z+1] < iso) * 16;
+    index += (uint) (volume[x+1][y  ][z+1] < iso) * 32;
+    index += (uint) (volume[x+1][y+1][z+1] < iso) * 64;
+    index += (uint) (volume[x  ][y+1][z+1] < iso) * 128;
+
 
 }
 
@@ -63,6 +75,8 @@ void call_get_triangles() {
     cudaGraphicsResourceGetMappedPointer((void **)&vertices, &num_bytes, vbo_resource);
 
     // Insert call to get_triangles kernel here
+    // TODO
+    get_triangles(volume, edge_table, tri_table, num_verts_table);
 
     // CUDA giving back vertices buffer to OGL
     cudaGraphicsUnmapResources(1, &vbo_resource, 0);
@@ -70,16 +84,18 @@ void call_get_triangles() {
 
 // Set up and call fill_volume kernel
 void call_fill_volume() {
+
+
 }
 
 
 // Creating vertex buffer in OpenGL
 void init_vertex_buffer() {
-  glGenBuffers(1, &vbo);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, dim_x*dim_y*dim_z*15*4*sizeof(float), 0, GL_DYNAMIC_DRAW);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);	
-  cudaGraphicsGLRegisterBuffer(&vbo_resource, vbo, cudaGraphicsMapFlagsWriteDiscard);
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, dim_x*dim_y*dim_z*15*4*sizeof(float), 0, GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);	
+    cudaGraphicsGLRegisterBuffer(&vbo_resource, vbo, cudaGraphicsMapFlagsWriteDiscard);
 }
 
 // The display function is called at each iteration of the
@@ -174,13 +190,13 @@ int main(int argc, char **argv) {
 
     // Allocate memory and transfer tables
     cudaMalloc((void**) &edge_table, sizeof(uint) * 256);
-    cudaMemcpy(edge_table, &edgeTable, sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(edge_table, &edgeTable, sizeof(uint), cudaMemcpyHostToDevice);
 
     cudaMalloc((void**) &tri_table, sizeof(uint) * 256*16);
-    cudaMemcpy(tri_table, &triTable, sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(tri_table, &triTable, sizeof(uint), cudaMemcpyHostToDevice);
 
     cudaMalloc((void**) &num_verts_table, sizeof(uint) * 256);
-    cudaMemcpy(num_verts_table, &numVertsTable, sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(num_verts_table, &numVertsTable, sizeof(uint), cudaMemcpyHostToDevice);
 
     glutMainLoop();
 }
