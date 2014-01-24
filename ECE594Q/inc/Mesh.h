@@ -14,7 +14,6 @@ class MeshPoint {
 public:
     MeshPoint() : MeshPoint(0, 0, 0) {;};
     MeshPoint(float, float, float);
-    ~MeshPoint();
     
     Vect point;
     Vect surfaceNormal;
@@ -40,9 +39,6 @@ public:
     MeshPoint b;
     MeshPoint c;
     MeshPoint d;
-
-    MicroPolygon();
-    ~MicroPolygon();
 
     void setColor(unsigned char *);
     void setColor(unsigned char, unsigned char, unsigned char);

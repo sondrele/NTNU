@@ -75,20 +75,17 @@ void FrameBuffer::projectAndScalePoint(Vect &vect) {
     Vect::Scale(vect, WIDTH / 2.0, HEIGHT / 2.0, 1);
 }
 
-MeshPoint *FrameBuffer::projectMeshPoint(MeshPoint &mp) {
+void FrameBuffer::projectMeshPoint(MeshPoint &mp) {
     projectAndScalePoint(mp.point);
-    MeshPoint *projected = new MeshPoint(mp.point.getX(), mp.point.getY(), mp.point.getZ());
-    return projected;
+    // MeshPoint *projected = new MeshPoint(mp.point.getX(), mp.point.getY(), mp.point.getZ());
+    // return projected;
 }
 
-MicroPolygon *FrameBuffer::projectMicroPolygon(MicroPolygon &mp) {
-    MicroPolygon *p = new MicroPolygon();
-    p->a = projectMeshPoint(*mp.a);
-    p->b = projectMeshPoint(*mp.b);
-    p->c = projectMeshPoint(*mp.c);
-    p->d = projectMeshPoint(*mp.d);
-    p->setColor(mp.getColor());
-    return p;
+void FrameBuffer::projectMicroPolygon(MicroPolygon &mp) {
+    projectMeshPoint(mp.a);
+    projectMeshPoint(mp.b);
+    projectMeshPoint(mp.c);
+    projectMeshPoint(mp.d);
 }
 
 void FrameBuffer::plotPoints(const char *name) {
@@ -110,35 +107,40 @@ void FrameBuffer::drawMicroPolygons(const char *name) {
 
     // const unsigned char white[] = {255, 255, 255};
     // Project each of the micropolygons to screen space
-    std::vector<MicroPolygon *> projectedMicroPolygons;
+    std::vector<MicroPolygon> projectedMicroPolygons;
     for (uint i = 0; i < objects.size(); ++i) {
-        std::vector<MicroPolygon> mps = (objects.at(i))->getMicroPolygons();
-        for (uint j = 0; j < mps.size(); j++) {
-            MicroPolygon *screenSpace = projectMicroPolygon(mps.at(j));
-            projectedMicroPolygons.push_back(screenSpace);
+        Mesh *object = objects.at(i);
+        std::vector<MicroPolygon> polygons = object->getMicroPolygons();
+
+        for (uint j = 0; j < polygons.size(); j++) {
+            MicroPolygon poly = polygons.at(j);
+            projectMicroPolygon(poly);
+            projectedMicroPolygons.push_back(poly);
         }
     }
     // For each micropolygon, check what samples it intersects
-    static int count = 0;
     for (uint i = 0; i < projectedMicroPolygons.size(); i++) {
-        MicroPolygon *mp = projectedMicroPolygons.at(i);
-        cout << "<a" << endl;
-        float *f = mp->getBoundingBox();
+        MicroPolygon poly = projectedMicroPolygons.at(i);
+        
+        float *f = poly.getBoundingBox();
         int px0_x = (int) (floor(f[0]));
         int px0_y = (int) (floor(f[1]));
         int px1_x = (int) (ceil(f[2]));
         int px1_y = (int) (ceil(f[3]));
+
         Vect point(0, 0, 0);
         for (int x = px0_x; x < px1_x; x++) {
             for (int y = px0_y; y < px1_y; y++) {
+                image.draw_point(x, y, poly.getColor());
+
+                // unsigned char *mpColor = poly.getColor();
                 // Loop over samples to get the right color
-                unsigned char *mpColor = mp->getColor();
                 // int sampledColor[3] = {0, 0, 0};
                 // for (uint m = 0; m < this->m; m++) {
                 //     for (uint n = 0; n < this->n * 2; n += 2) {
                 //         point.setX(x + samples[2 * n + m]);
                 //         point.setY(y + samples[2 * n + m + 1]);
-                //         if (mp->intersects(point)) {
+                //         if (poly.intersects(point)) {
                 //             sampledColor[0] += mpColor[0];
                 //             sampledColor[1] += mpColor[1];
                 //             sampledColor[2] += mpColor[2];
@@ -148,19 +150,8 @@ void FrameBuffer::drawMicroPolygons(const char *name) {
                 // sampledColor[0] /= m*n;
                 // sampledColor[1] /= m*n;
                 // sampledColor[2] /= m*n;
-                image.draw_point(x, y, mpColor);
             }
         }
-        cout << projectedMicroPolygons.size() << ": " << count++ << endl;
-    }
-
-    for (uint i = 0; i < projectedMicroPolygons.size(); i++) {
-        MicroPolygon *poly = projectedMicroPolygons.at(i);
-        delete poly->a;
-        delete poly->b;
-        delete poly->c;
-        delete poly->d;
-        delete poly;
     }
 
     image.save_jpeg(name, 100);

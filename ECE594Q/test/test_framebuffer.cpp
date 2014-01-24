@@ -46,12 +46,10 @@ void can_project_and_scale_points() {
 void can_project_mesh_point() {
     MeshPoint mp(0, 0, 100);
     FrameBuffer fb(500, 500);
-    MeshPoint *p = fb.projectMeshPoint(mp);
+    fb.projectMeshPoint(mp);
 
     ASSERT_EQUAL_FLOAT(mp.point.getX(), 250, 0.1);
     ASSERT_EQUAL_FLOAT(mp.point.getY(), 250, 0.1);
-
-    delete p;
 }
 
 void can_project_micropolygon() {
@@ -60,30 +58,25 @@ void can_project_micropolygon() {
     MeshPoint mp3(-10, 10, 100);
     MeshPoint mp4(10, 10, 100);
     MicroPolygon poly;
-    poly.a = &mp1;
-    poly.b = &mp2;
-    poly.c = &mp3;
-    poly.d = &mp4;
+    poly.a = mp1;
+    poly.b = mp2;
+    poly.c = mp3;
+    poly.d = mp4;
 
     FrameBuffer fb(500, 500);
-    MicroPolygon *mp = fb.projectMicroPolygon(poly);
+    fb.projectMicroPolygon(poly);
 
-    ASSERT_EQUAL_FLOAT(mp->a->getX(), 206.699, 0.1);
-    ASSERT_EQUAL_FLOAT(mp->a->getY(), 206.699, 0.1);
+    ASSERT_EQUAL_FLOAT(poly.a.getX(), 206.699, 0.1);
+    ASSERT_EQUAL_FLOAT(poly.a.getY(), 206.699, 0.1);
 
-    ASSERT_EQUAL_FLOAT(mp->b->getX(), 293.301, 0.1);
-    ASSERT_EQUAL_FLOAT(mp->b->getY(), 206.699, 0.1);
+    ASSERT_EQUAL_FLOAT(poly.b.getX(), 293.301, 0.1);
+    ASSERT_EQUAL_FLOAT(poly.b.getY(), 206.699, 0.1);
 
-    ASSERT_EQUAL_FLOAT(mp->c->getX(), 206.699, 0.1);
-    ASSERT_EQUAL_FLOAT(mp->c->getY(), 293.301, 0.1);
+    ASSERT_EQUAL_FLOAT(poly.c.getX(), 206.699, 0.1);
+    ASSERT_EQUAL_FLOAT(poly.c.getY(), 293.301, 0.1);
 
-    ASSERT_EQUAL_FLOAT(mp->d->getX(), 293.301, 0.1);
-    ASSERT_EQUAL_FLOAT(mp->d->getY(), 293.301, 0.1);
-    delete mp->a;
-    delete mp->b;
-    delete mp->c;
-    delete mp->d;
-    delete mp;
+    ASSERT_EQUAL_FLOAT(poly.d.getX(), 293.301, 0.1);
+    ASSERT_EQUAL_FLOAT(poly.d.getY(), 293.301, 0.1);
 }
 
 void bounding_box_for_microPolygon_has_right_coords() {
@@ -92,24 +85,19 @@ void bounding_box_for_microPolygon_has_right_coords() {
     MeshPoint mp3(-10, 10, 100);
     MeshPoint mp4(10, 10, 100);
     MicroPolygon poly;
-    poly.a = &mp1;
-    poly.b = &mp2;
-    poly.c = &mp3;
-    poly.d = &mp4;
+    poly.a = mp1;
+    poly.b = mp2;
+    poly.c = mp3;
+    poly.d = mp4;
 
     FrameBuffer fb(500, 500);
-    MicroPolygon *mp = fb.projectMicroPolygon(poly);
+    fb.projectMicroPolygon(poly);
 
-    float *f = mp->getBoundingBox();
+    float *f = poly.getBoundingBox();
     ASSERT_EQUAL_FLOAT(f[0], 206.699, 0.1);
     ASSERT_EQUAL_FLOAT(f[1], 206.699, 0.1);
     ASSERT_EQUAL_FLOAT(f[2], 293.301, 0.1);
     ASSERT_EQUAL_FLOAT(f[3], 293.301, 0.1);
-    delete mp->a;
-    delete mp->b;
-    delete mp->c;
-    delete mp->d;
-    delete mp;
     delete [] f;
 }
 
@@ -126,7 +114,7 @@ void plot_image() {
 void draw_microPolygons() {
     FrameBuffer fb(500, 500);
 
-    RiSphere s(20, 20);
+    RiSphere s(20, 256);
     fb.addMesh(s);
 
     fb.drawMicroPolygons("fb_test_poly.jpg");

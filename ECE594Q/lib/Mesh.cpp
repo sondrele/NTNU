@@ -10,20 +10,6 @@ MeshPoint::MeshPoint(float x, float y, float z) {
     color[2] = 0;
 }
 
-MeshPoint::~MeshPoint() {
-}
-
-MicroPolygon::MicroPolygon() {
-    a = b = c = d = NULL;
-}
-
-MicroPolygon::~MicroPolygon() {
-    // delete a;
-    // delete b;
-    // delete c;
-    // delete d;
-}
-
 void MicroPolygon::setColor(unsigned char *RGB) {
     color[0] = RGB[0];
     color[1] = RGB[1];
@@ -54,10 +40,10 @@ bool MicroPolygon::intersects(Vect point) {
 
 float* MicroPolygon::getBoundingBox() {
     float *bound = new float[4];
-    float x_min = min(a->getX(), min(b->getX(), min(c->getX(), d->getX())));
-    float y_min = min(a->getY(), min(b->getY(), min(c->getY(), d->getY())));
-    float x_max = max(a->getX(), max(b->getX(), max(c->getX(), d->getX())));
-    float y_max = max(a->getY(), max(b->getY(), max(c->getY(), d->getY())));
+    float x_min = min(a.getX(), min(b.getX(), min(c.getX(), d.getX())));
+    float y_min = min(a.getY(), min(b.getY(), min(c.getY(), d.getY())));
+    float x_max = max(a.getX(), max(b.getX(), max(c.getX(), d.getX())));
+    float y_max = max(a.getY(), max(b.getY(), max(c.getY(), d.getY())));
 
     bound[0] = x_min;
     bound[1] = y_min;

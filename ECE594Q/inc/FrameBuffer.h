@@ -39,8 +39,8 @@ public:
     void plotPoints(const char *);
     void drawMicroPolygons(const char *);
     void projectAndScalePoint(Vect &);
-    MeshPoint *projectMeshPoint(MeshPoint &);
-    MicroPolygon *projectMicroPolygon(MicroPolygon &);
+    void projectMeshPoint(MeshPoint &);
+    void projectMicroPolygon(MicroPolygon &);
 };
 
 #endif // _FRAMEBUFFER_H_
