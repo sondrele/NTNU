@@ -2,7 +2,7 @@ INCLUDEPATH=\
     -Iinc
 CC=clang++
 CC=g++
-CFLAGS = $(INCLUDEPATH) -Wall -g -std=c++11
+CFLAGS = $(INCLUDEPATH) -Wall -g -std=c++11 -O3
 CIMGFLAGS = $(CFLAGS) -O2 -L/usr/X11R6/lib -lm -lpthread -lX11
 LDFLAGS=
 SRCS = lib/Utils.cpp lib/Matrix.cpp lib/Mesh.cpp lib/FrameBuffer.cpp

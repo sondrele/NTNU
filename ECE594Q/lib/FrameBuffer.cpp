@@ -8,7 +8,12 @@ FrameBuffer::FrameBuffer(uint width, uint height) {
     fov = M_PI / 3.0;
     aspectRatio = 1;
     m = n = 1;
-    initSamples();
+
+    for (uint i = 0; i < height; i++) {
+        for (uint j = 0; j < width; j++) {
+            pixels.push_back(FramePixel(j, i));
+        }
+    }
 }
 
 FrameBuffer::FrameBuffer(uint width, uint height, float hither, float yon,
@@ -21,7 +26,12 @@ FrameBuffer::FrameBuffer(uint width, uint height, float hither, float yon,
     this->fov = fov;
     this->aspectRatio = aspectRatio;
     m = n = 1;
-    initSamples();
+
+    for (uint i = 0; i < height; i++) {
+        for (uint j = 0; j < width; j++) {
+            pixels.push_back(FramePixel(j, i));
+        }
+    }
 }
 
 FrameBuffer::FrameBuffer(uint width, uint height, uint m, uint n) {
@@ -29,25 +39,12 @@ FrameBuffer::FrameBuffer(uint width, uint height, uint m, uint n) {
     HEIGHT = height;
     this->m = m;
     this->n = n;
-    initSamples();
-}
 
-void FrameBuffer::initSamples() {
-    samples = new float[m * n * 2];
-    float dx = 1 / (float) (m + 1);
-    float dy = 1 / (float) (n + 1);
-
-    for (uint i = 0; i < m; i++) {
-        for (uint j = 0, k = 0; j < n * 2; j += 2, k++) {
-            samples[2 * n * i + j] = dx * (1 + i);
-            samples[2 * n * i + j + 1] = dy * (1 + k);
+    for (uint i = 0; i < height; i++) {
+        for (uint j = 0; j < width; j++) {
+            pixels.push_back(FramePixel(j, i));
         }
     }
-
-}
-
-FrameBuffer::~FrameBuffer() {
-    delete [] samples;
 }
 
 void FrameBuffer::addPoint(Vect m) {
@@ -77,8 +74,6 @@ void FrameBuffer::projectAndScalePoint(Vect &vect) {
 
 void FrameBuffer::projectMeshPoint(MeshPoint &mp) {
     projectAndScalePoint(mp.point);
-    // MeshPoint *projected = new MeshPoint(mp.point.getX(), mp.point.getY(), mp.point.getZ());
-    // return projected;
 }
 
 void FrameBuffer::projectMicroPolygon(MicroPolygon &mp) {
@@ -129,30 +124,62 @@ void FrameBuffer::drawMicroPolygons(const char *name) {
         int px1_y = (int) (ceil(f[3]));
 
         Vect point(0, 0, 0);
-        for (int x = px0_x; x < px1_x; x++) {
-            for (int y = px0_y; y < px1_y; y++) {
-                image.draw_point(x, y, poly.getColor());
-
-                // unsigned char *mpColor = poly.getColor();
-                // Loop over samples to get the right color
+        for (int y = px0_y; y < px1_y; y++) {
+            for (int x = px0_x; x < px1_x; x++) {
+                unsigned char *mpColor = poly.getColor();
                 // int sampledColor[3] = {0, 0, 0};
-                // for (uint m = 0; m < this->m; m++) {
-                //     for (uint n = 0; n < this->n * 2; n += 2) {
-                //         point.setX(x + samples[2 * n + m]);
-                //         point.setY(y + samples[2 * n + m + 1]);
-                //         if (poly.intersects(point)) {
-                //             sampledColor[0] += mpColor[0];
-                //             sampledColor[1] += mpColor[1];
-                //             sampledColor[2] += mpColor[2];
-                //         }
-                //     }
-                // }
-                // sampledColor[0] /= m*n;
-                // sampledColor[1] /= m*n;
-                // sampledColor[2] /= m*n;
+                // Loop over samples to get the right color
+                for (uint m = 0; m < this->m; m++) {
+                    for (uint n = 0; n < this->n; n++) {
+                        float dx = m / (float)this->m;
+                        float dy = n / (float)this->n;
+                        point.setX(x + dx);
+                        point.setY(y + dy);
+                        if (poly.intersects(point)) {
+                            pixels[y * WIDTH + x].addSample(mpColor);
+                        }
+                    }
+                }
             }
         }
     }
 
+    for (uint i = 0; i < pixels.size(); i++) {
+        FramePixel px = pixels[i];
+        F_Color c0 = px.getColor();
+        unsigned char c[] = {c0.R, c0.G, c0.B};
+        image.draw_point(px.getX(), px.getY(), c);
+    }
+
     image.save_jpeg(name, 100);
+}
+
+FramePixel::FramePixel(uint X, uint Y) {
+    this->X = X;
+    this->Y = Y;
+}
+
+void FramePixel::addSample(F_Color color) {
+    samples.push_back(color);
+}
+
+void FramePixel::addSample(unsigned char *color) {
+    samples.push_back({color[0], color[1], color[2]});
+}
+
+F_Color FramePixel::getColor() {
+    if (samples.size() > 0) {
+        F_Color c = {0, 0, 0};
+        for (uint i = 0; i < samples.size(); i++) {
+            c.R += samples.at(i).R;
+            c.G += samples.at(i).G;
+            c.B += samples.at(i).B;
+        }
+        c.R /= samples.size();
+        c.G /= samples.size();
+        c.B /= samples.size();
+        return c;
+    } else {
+        return {0, 0, 0};
+    }
 }

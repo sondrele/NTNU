@@ -11,6 +11,27 @@
 #include "Matrix.h"
 #include "Mesh.h"
 
+typedef struct {
+    unsigned char R;
+    unsigned char G;
+    unsigned char B;
+} F_Color;
+
+class FramePixel {
+private:
+    uint X;
+    uint Y;
+    std::vector<F_Color> samples;
+
+public:
+    FramePixel(uint X, uint Y);
+    void addSample(F_Color);
+    void addSample(unsigned char*);
+    F_Color getColor();
+    uint getX() { return X; };
+    uint getY() { return Y; };
+};
+
 class FrameBuffer {
 private:
     uint WIDTH;
@@ -21,18 +42,15 @@ private:
     float aspectRatio;
     uint m;
     uint n;
-    float *samples;
     std::vector<Vect> points;
     std::vector<Mesh *> objects;
-    void initSamples();
+    std::vector<FramePixel> pixels;
 
 public:
     FrameBuffer(uint, uint);
     FrameBuffer(uint, uint, float, float, float, float);
     FrameBuffer(uint, uint, uint, uint);
-    ~FrameBuffer();
-    
-    float *getSamples() { return samples; };
+
     void addPoint(Vect);
     Matrix getPoint(unsigned int);
     void addMesh(Mesh &);
