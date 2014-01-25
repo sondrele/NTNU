@@ -1,10 +1,15 @@
 #include "Mesh.h"
 
-MeshPoint::MeshPoint(float x, float y, float z) {
-    point.setX(x);
-    point.setY(y);
-    point.setZ(z);
-    point.setW(1);
+#define PT(i, j) (i * width + j)
+
+MeshPoint::MeshPoint(Vect &v) : Vect(v) {;}
+
+MeshPoint::MeshPoint(float x, float y, float z) : Vect(x, y, z) {
+    // point.setX(x);
+    // point.setY(y);
+    // point.setZ(z);
+    // point.setW(1);
+    setW(1);
     color[0] = 0;
     color[1] = 0;
     color[2] = 0;
@@ -24,31 +29,23 @@ void MicroPolygon::setColor(unsigned char R, unsigned char G,
     color[2] = B;
 }
 
-// bool MicroPolygon::isNeighbour(MicroPolygon other) {
-//     bool r = this->b == other.a and this->d == other.c;
-//     bool l = this->a == other.b and this->c == other.d;
-//     bool u = this->a == other.c and this->b == other.d;
-//     bool d = this->c == other.a and this->d == other.b;
-//     return r or l or u or d;
-// }
-
 bool MicroPolygon::intersects(Vect point) {
-    bool intersectsT1 = Utils::PointInTriangle(point, a.point, b.point, c.point);
-    bool intersectsT2 = Utils::PointInTriangle(point, b.point, d.point, c.point);
+    bool intersectsT1 = Utils::PointInTriangle(point, a, b, c);
+    bool intersectsT2 = Utils::PointInTriangle(point, b, d, c);
     return intersectsT1 or intersectsT2;
 }
 
-float* MicroPolygon::getBoundingBox() {
-    float *bound = new float[4];
+BoundingBox MicroPolygon::getBoundingBox() {
+    BoundingBox bound;
     float x_min = min(a.getX(), min(b.getX(), min(c.getX(), d.getX())));
     float y_min = min(a.getY(), min(b.getY(), min(c.getY(), d.getY())));
     float x_max = max(a.getX(), max(b.getX(), max(c.getX(), d.getX())));
     float y_max = max(a.getY(), max(b.getY(), max(c.getY(), d.getY())));
 
-    bound[0] = x_min;
-    bound[1] = y_min;
-    bound[2] = x_max;
-    bound[3] = y_max;
+    bound.X_start = (uint) floor(x_min);
+    bound.Y_start = (uint) floor(y_min);
+    bound.X_stop = (uint) ceil(x_max);
+    bound.Y_stop = (uint) ceil(y_max);
     return bound;
 }
 
@@ -75,16 +72,9 @@ void Mesh::addPoint(MeshPoint point) {
 
 MeshPoint Mesh::getPoint(uint index) {
     if (index < points.size()) {
-        return points.at(index);
+        return points[index];
     }
     throw "MeshPointException: Cannot get point";
-}
-
-void Mesh::movePoint(uint index, float x, float y, float z) {
-    points[index].setX(x);
-    points[index].setY(y);
-    points[index].setZ(z);
-    points[index].setW(1);
 }
 
 std::string Mesh::toString() {
@@ -114,6 +104,19 @@ std::vector<MicroPolygon> Mesh::getMicroPolygons() {
     return mPolygons;
 }
 
+void Mesh::rotate(const char axis, const float degrees) {
+    double radians = degrees * M_PI / 180.0;
+    for (uint i = 0; i < points.size(); i++) {
+        Vect::Rotate(points[i], axis, radians);
+    }
+}
+
+void Mesh::translate(const float dx, const float dy, const float dz) {
+    for (uint i = 0; i < points.size(); i++) {
+        Vect::Translate(points[i], dx, dy, dz);
+    }   
+}
+
 RiSphere::RiSphere(float radius, uint resolution):
 Mesh(resolution, resolution) 
 {
@@ -129,24 +132,24 @@ Mesh(resolution, resolution)
             float y = radius * cos(lat);
             float z = radius * sin(lon) * sin(lat);
             // TODO: Fiks z!
-            MeshPoint p(x, y, z+50);
+            MeshPoint p(x, y, z);
             addPoint(p);
         }
     }
 }
 
 RiRectangle::RiRectangle(float width, float height,
-    float deapth) : Mesh(4, 2) {
+    float depth) : Mesh(4, 2) {
     this->width = width;
     this->height = height;
-    this->deapth = deapth;
+    this->depth = depth;
 
-    addPoint(MeshPoint(-width/2.0, -height/2.0, deapth));
-    addPoint(MeshPoint(-width/2.0, -height/2.0, deapth+deapth));
-    addPoint(MeshPoint(-width/2.0,  height/2.0, deapth));
-    addPoint(MeshPoint(-width/2.0,  height/2.0, deapth+deapth));
-    addPoint(MeshPoint(width/2.0,  -height/2.0, deapth));
-    addPoint(MeshPoint(width/2.0,  -height/2.0, deapth+deapth));
-    addPoint(MeshPoint(width/2.0,   height/2.0, deapth));
-    addPoint(MeshPoint(width/2.0,   height/2.0, deapth+deapth));
+    addPoint(MeshPoint(-width/2.0, -height/2.0, depth));
+    addPoint(MeshPoint(-width/2.0, -height/2.0, depth+depth));
+    addPoint(MeshPoint(-width/2.0,  height/2.0, depth));
+    addPoint(MeshPoint(-width/2.0,  height/2.0, depth+depth));
+    addPoint(MeshPoint(width/2.0,  -height/2.0, depth));
+    addPoint(MeshPoint(width/2.0,  -height/2.0, depth+depth));
+    addPoint(MeshPoint(width/2.0,   height/2.0, depth));
+    addPoint(MeshPoint(width/2.0,   height/2.0, depth+depth));
 }

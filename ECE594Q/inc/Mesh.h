@@ -10,29 +10,27 @@
 #include "Matrix.h"
 #include "Utils.h"
 
-class MeshPoint {
+class MeshPoint : public Vect {
 public:
-    MeshPoint() : MeshPoint(0, 0, 0) {;};
-    MeshPoint(float, float, float);
-    
-    Vect point;
-    Vect surfaceNormal;
     float textureCoordinate[2];
     unsigned char color[3];
 
-    float getX() { return point.getX(); };
-    void setX(float x) { point.setX(x); };
-    float getY() { return point.getY(); };
-    void setY(float y) { point.setY(y); };
-    float getZ() { return point.getZ(); };
-    void setZ(float z) { point.setZ(z); };
-    float getW() { return point.getW(); };
-    void setW(float w) { point.setW(w); };
+    MeshPoint(Vect &v);
+    MeshPoint(float, float, float);
+    MeshPoint() : MeshPoint(0, 0, 0) {;};
 };
+
+typedef struct {
+    int X_start;
+    int Y_start;
+    int X_stop;
+    int Y_stop;
+} BoundingBox;
 
 class MicroPolygon {
 private:
     unsigned char color[3];
+    // Vect surfaceNormal;
     
 public:
     MeshPoint a;
@@ -45,7 +43,8 @@ public:
     unsigned char *getColor() { return color; };
     bool isNeighbour(MicroPolygon other);
     bool intersects(Vect point);
-    float* getBoundingBox();
+    BoundingBox getBoundingBox();
+    float *getBound();
 };
 
 class Mesh {
@@ -57,14 +56,18 @@ protected:
 public:
     Mesh(uint, uint);
     ~Mesh();
+    
     uint getSize();
+    uint getWidth() const { return width; };
+    uint getHeight() const { return height; };
+
     void addPoint(MeshPoint);
     MeshPoint getPoint(uint);
-    void movePoint(uint, float, float, float);
     std::string toString();
     std::vector<MicroPolygon> getMicroPolygons();
-    int getWidth() const { return width; };
-    int getHeight() const { return height; };
+    
+    void rotate(const char, const float);
+    void translate(const float, const float, const float);
 };
 
 class RiSphere : public Mesh {
@@ -77,15 +80,13 @@ public:
     float getRadius() const { return radius; };
     void setRadius(float radius);
     std::string toString();
-    void rotate(float, char);
-    void translate(float, float, float);
 };
 
 class RiRectangle : public Mesh {
 private:
     float width;
     float height;
-    float deapth;
+    float depth;
 
 public:
     RiRectangle(float, float, float);

@@ -18,10 +18,10 @@ void point_intersects_triangle() {
 void meshpoint_inits_correctly() {
     MeshPoint p(1.0, 2.0, 3.0);
 
-    ASSERT_EQUAL_FLOAT(p.point.getCell(0, 0), 1.0, 0.001);
-    ASSERT_EQUAL_FLOAT(p.point.getCell(1, 0), 2.0, 0.001);
-    ASSERT_EQUAL_FLOAT(p.point.getCell(2, 0), 3.0, 0.001);
-    ASSERT_EQUAL_FLOAT(p.point.getCell(3, 0), 1.0, 0.001);
+    ASSERT_EQUAL_FLOAT(p.getCell(0, 0), 1.0, 0.001);
+    ASSERT_EQUAL_FLOAT(p.getCell(1, 0), 2.0, 0.001);
+    ASSERT_EQUAL_FLOAT(p.getCell(2, 0), 3.0, 0.001);
+    ASSERT_EQUAL_FLOAT(p.getCell(3, 0), 1.0, 0.001);
 
     MeshPoint p1;
     ASSERT_EQUAL_FLOAT(p1.getX(), 0, 0.001);
@@ -30,6 +30,55 @@ void meshpoint_inits_correctly() {
     ASSERT_EQUAL_FLOAT(p1.getW(), 1, 0.001);
 }
 
+void meshpoint_can_rotate() {
+    MeshPoint p(10, 10, 0);
+    Vect::Rotate(p, 'x', M_PI / 2.0);
+
+    ASSERT_EQUAL_FLOAT(p.getX(), 10, 0.0001);
+    ASSERT_EQUAL_FLOAT(p.getY(), 0, 0.0001);
+    ASSERT_EQUAL_FLOAT(p.getZ(), 10, 0.0001);
+}
+
+void mesh_can_be_rotated() {
+    // ASSERT_EQUAL_FLOAT(v3.getX(), -2.0, 0.001);
+    // ASSERT_EQUAL_FLOAT(v3.getY(), 1.0, 0.001);
+    // ASSERT_EQUAL_FLOAT(v3.getZ(), 3.0, 0.001);
+
+    Mesh m(2, 2);
+    m.addPoint(MeshPoint(0, 0, 0));
+    m.addPoint(MeshPoint(1, 2, 3));
+    m.rotate('z', 90.0);
+
+    MeshPoint m0 = m.getPoint(0);
+    ASSERT_EQUAL_FLOAT(m0.getX(), 0, 0.0001);
+    ASSERT_EQUAL_FLOAT(m0.getY(), 0, 0.0001);
+    ASSERT_EQUAL_FLOAT(m0.getZ(), 0, 0.0001);
+
+    MeshPoint m1 = m.getPoint(1);
+    ASSERT_EQUAL_FLOAT(m1.getX(), -2, 0.0001);
+    ASSERT_EQUAL_FLOAT(m1.getY(), 1, 0.0001);
+    ASSERT_EQUAL_FLOAT(m1.getZ(), 3, 0.0001);
+}
+
+void mesh_can_be_translate() {
+    Mesh m(2, 2);
+    m.addPoint(MeshPoint(0, 0, 0));
+    m.addPoint(MeshPoint(1, 2, 3));
+
+    m.translate(-2, 2, 3);
+
+    MeshPoint m0 = m.getPoint(0);
+    ASSERT_EQUAL_FLOAT(m0.getX(), -2, 0.001);
+    ASSERT_EQUAL_FLOAT(m0.getY(), 2, 0.001);
+    ASSERT_EQUAL_FLOAT(m0.getZ(), 3, 0.001);
+    ASSERT_EQUAL_FLOAT(m0.getW(), 1, 0.001);
+
+    MeshPoint m1 = m.getPoint(1);
+    ASSERT_EQUAL_FLOAT(m1.getX(), -1, 0.001);
+    ASSERT_EQUAL_FLOAT(m1.getY(), 4, 0.001);
+    ASSERT_EQUAL_FLOAT(m1.getZ(), 6, 0.001);
+    ASSERT_EQUAL_FLOAT(m1.getW(), 1, 0.001);
+}
 
 void MicroPolygon_has_boundingbox() {
     MeshPoint a(-1, -2, 3);
@@ -42,12 +91,11 @@ void MicroPolygon_has_boundingbox() {
     mp.c = c;
     mp.d = d;
 
-    float *f = mp.getBoundingBox();
-    ASSERT_EQUAL_FLOAT(f[0], -2, 0.00001);
-    ASSERT_EQUAL_FLOAT(f[1], -2, 0.00001);
-    ASSERT_EQUAL_FLOAT(f[2], 3, 0.00001);
-    ASSERT_EQUAL_FLOAT(f[3], 2, 0.00001);
-    delete [] f;
+    BoundingBox box = mp.getBoundingBox();
+    ASSERT_EQUAL_INT(box.X_start, -2);
+    ASSERT_EQUAL_INT(box.Y_start, -2);
+    ASSERT_EQUAL_INT(box.X_stop, 3);
+    ASSERT_EQUAL_INT(box.Y_stop, 2);
 }
 
 void point_intersects_with_micropolygon() {
@@ -104,7 +152,7 @@ void sphere_has_points_with_right_length() {
     MeshPoint p = s.getPoint(0);
     ASSERT_EQUAL_FLOAT(p.getX(), 0, 0.0001);
     ASSERT_EQUAL_FLOAT(p.getY(), 100, 0.0001);
-    ASSERT_EQUAL_FLOAT(p.getZ(), 50, 0.0001);
+    ASSERT_EQUAL_FLOAT(p.getZ(), 0, 0.0001);
 }
 
 // void sphere_has_micropolygons() {
@@ -134,14 +182,77 @@ void sphere_has_points_with_right_length() {
 //     ASSERT_SAME(p4.d, p8.b);
 // }
 
+void sphere_can_rotate() {
+    RiSphere s(100, 32);
+
+    MeshPoint p0 = s.getPoint(0);
+    ASSERT_EQUAL_FLOAT(p0.getX(), 0, 0.0001);
+    ASSERT_EQUAL_FLOAT(p0.getY(), 100, 0.0001);
+    ASSERT_EQUAL_FLOAT(p0.getZ(), 0, 0.0001);
+
+    s.rotate('z', 90);
+    MeshPoint p1 = s.getPoint(0);
+    ASSERT_EQUAL_FLOAT(p1.getX(), -100, 0.0001);
+    ASSERT_EQUAL_FLOAT(p1.getY(), 0, 0.0001);
+    ASSERT_EQUAL_FLOAT(p1.getZ(), 0, 0.0001);
+}
+
+void sphere_can_translate() {
+    RiSphere s(100, 32);
+
+    MeshPoint p0 = s.getPoint(0);
+    ASSERT_EQUAL_FLOAT(p0.getX(), 0, 0.0001);
+    ASSERT_EQUAL_FLOAT(p0.getY(), 100, 0.0001);
+    ASSERT_EQUAL_FLOAT(p0.getZ(), 0, 0.0001);
+
+    s.translate(100, 0, 0);
+    MeshPoint p1 = s.getPoint(0);
+    ASSERT_EQUAL_FLOAT(p1.getX(), 100, 0.0001);
+    ASSERT_EQUAL_FLOAT(p1.getY(), 100, 0.0001);
+    ASSERT_EQUAL_FLOAT(p1.getZ(), 0, 0.0001);
+}
+
+void micropolygon_and_sphere_is_correct() {
+    RiSphere s(100, 32);
+
+    MeshPoint p0 = s.getPoint(0);
+    ASSERT_EQUAL_FLOAT(p0.getX(), 0, 0.0001);
+    ASSERT_EQUAL_FLOAT(p0.getY(), 100, 0.0001);
+    ASSERT_EQUAL_FLOAT(p0.getZ(), 0, 0.0001);
+    std::vector<MicroPolygon> mps = s.getMicroPolygons();
+    MeshPoint q0 = mps[0].a;
+    ASSERT_EQUAL_FLOAT(q0.getX(), 0, 0.0001);
+    ASSERT_EQUAL_FLOAT(q0.getY(), 100, 0.0001);
+    ASSERT_EQUAL_FLOAT(q0.getZ(), 0, 0.0001);
+
+    s.translate(100, 0, 0);
+    MeshPoint p1 = s.getPoint(0);
+    ASSERT_EQUAL_FLOAT(p1.getX(), 100, 0.0001);
+    ASSERT_EQUAL_FLOAT(p1.getY(), 100, 0.0001);
+    ASSERT_EQUAL_FLOAT(p1.getZ(), 0, 0.0001);
+    
+    mps = s.getMicroPolygons();
+    MeshPoint q1 = mps[0].a;
+    ASSERT_EQUAL_FLOAT(q1.getX(), 100, 0.0001);
+    ASSERT_EQUAL_FLOAT(q1.getY(), 100, 0.0001);
+    ASSERT_EQUAL_FLOAT(q1.getZ(), 0, 0.0001);
+}
 
 void mesh_test_suite() {
     TEST_CASE(meshpoint_inits_correctly);
     TEST_CASE(MicroPolygon_has_boundingbox);
     TEST_CASE(point_intersects_with_micropolygon);
     TEST_CASE(mesh_inits_and_deletes);
+    TEST_CASE(meshpoint_can_rotate);
+
+    TEST_CASE(mesh_can_be_rotated);
+    TEST_CASE(mesh_can_be_translate);
+
     TEST_CASE(sphere_has_right_size);
+    TEST_CASE(sphere_can_rotate);
+    TEST_CASE(sphere_can_translate);
     TEST_CASE(sphere_has_points_with_right_length);
+    TEST_CASE(micropolygon_and_sphere_is_correct);
     // TEST_CASE(sphere_has_micropolygons);
 }
 
@@ -150,7 +261,11 @@ void utils_test_suite() {
 }
 
 int main() {
-    RUN_TEST_SUITE(utils_test_suite);
-    RUN_TEST_SUITE(mesh_test_suite);
+    try {
+        RUN_TEST_SUITE(utils_test_suite);
+        RUN_TEST_SUITE(mesh_test_suite);
+    } catch (const char *str) {
+        cout << str << endl;
+    }
     return 0;
 }

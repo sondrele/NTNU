@@ -2,5 +2,9 @@
 # Compiled files
 ############
 *.o
-
-
+main
+fb_test
+mesh_test
+matrix_test
+# Executables and images
+*_test*

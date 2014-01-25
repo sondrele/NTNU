@@ -192,21 +192,21 @@ void can_rotate_4x1() {
     Vect vect(1, 2, 3);
 
     Vect::Rotate(vect, 'x', M_PI);
-    ASSERT_EQUAL_FLOAT(vect.getCell(0, 0), 1.0, 0.001);
-    ASSERT_EQUAL_FLOAT(vect.getCell(1, 0), -2.0, 0.001);
-    ASSERT_EQUAL_FLOAT(vect.getCell(2, 0), -3.0, 0.001);
+    ASSERT_EQUAL_FLOAT(vect.getX(), 1.0, 0.001);
+    ASSERT_EQUAL_FLOAT(vect.getY(), -2.0, 0.001);
+    ASSERT_EQUAL_FLOAT(vect.getZ(), -3.0, 0.001);
 
     Vect v2(1, 2, 3);
     Vect::Rotate(v2, 'y', M_PI * 1.5);
-    ASSERT_EQUAL_FLOAT(v2.getCell(0, 0), -1.0, 0.001);
-    ASSERT_EQUAL_FLOAT(v2.getCell(1, 0), 2.0, 0.001);
-    ASSERT_EQUAL_FLOAT(v2.getCell(2, 0), -3.0, 0.001);
+    ASSERT_EQUAL_FLOAT(v2.getX(), -3.0, 0.001);
+    ASSERT_EQUAL_FLOAT(v2.getY(), 2.0, 0.001);
+    ASSERT_EQUAL_FLOAT(v2.getZ(), 1.0, 0.001);
 
     Vect v3(1, 2, 3);
     Vect::Rotate(v3, 'z', M_PI / 2.0);
-    ASSERT_EQUAL_FLOAT(v3.getCell(0, 0), -1.0, 0.001);
-    ASSERT_EQUAL_FLOAT(v3.getCell(1, 0), -2.0, 0.001);
-    ASSERT_EQUAL_FLOAT(v3.getCell(2, 0), 3.0, 0.001);
+    ASSERT_EQUAL_FLOAT(v3.getX(), -2.0, 0.001);
+    ASSERT_EQUAL_FLOAT(v3.getY(), 1.0, 0.001);
+    ASSERT_EQUAL_FLOAT(v3.getZ(), 3.0, 0.001);
 }
 
 void can_translate_4x1() {

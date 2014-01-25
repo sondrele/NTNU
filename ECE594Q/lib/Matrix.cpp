@@ -201,8 +201,8 @@ void Vect::Scale(Vect &vect, const float dx, const float dy, const float dz) {
 
 void Vect::Rotate(Vect &vect, const char axis, const double theta) {
     Matrix rotMat(4, 4);
-    float c = cos(M_PI);
-    float s = sin(M_PI);
+    float c = cos(theta);
+    float s = sin(theta);
     float sn = -s;
 
     if (axis == 'x') {
