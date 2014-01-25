@@ -4,6 +4,8 @@
 #include <exception>
 #include "Matrix.h"
 
+#define U_PI 3.141592654
+
 class Utils {
 public:
     static float Sign(Vect, Vect, Vect);

@@ -2,6 +2,7 @@
 #include "ctest.h"
 #include <assert.h>
 #include <iostream>
+#include "Utils.h"
 
 #define _USE_MATH_DEFINES
 #include <cmath>
@@ -191,19 +192,19 @@ void can_scale_4x1() {
 void can_rotate_4x1() {
     Vect vect(1, 2, 3);
 
-    Vect::Rotate(vect, 'x', M_PI);
+    Vect::Rotate(vect, 'x', U_PI);
     ASSERT_EQUAL_FLOAT(vect.getX(), 1.0, 0.001);
     ASSERT_EQUAL_FLOAT(vect.getY(), -2.0, 0.001);
     ASSERT_EQUAL_FLOAT(vect.getZ(), -3.0, 0.001);
 
     Vect v2(1, 2, 3);
-    Vect::Rotate(v2, 'y', M_PI * 1.5);
+    Vect::Rotate(v2, 'y', U_PI * 1.5);
     ASSERT_EQUAL_FLOAT(v2.getX(), -3.0, 0.001);
     ASSERT_EQUAL_FLOAT(v2.getY(), 2.0, 0.001);
     ASSERT_EQUAL_FLOAT(v2.getZ(), 1.0, 0.001);
 
     Vect v3(1, 2, 3);
-    Vect::Rotate(v3, 'z', M_PI / 2.0);
+    Vect::Rotate(v3, 'z', U_PI / 2.0);
     ASSERT_EQUAL_FLOAT(v3.getX(), -2.0, 0.001);
     ASSERT_EQUAL_FLOAT(v3.getY(), 1.0, 0.001);
     ASSERT_EQUAL_FLOAT(v3.getZ(), 3.0, 0.001);
@@ -275,7 +276,7 @@ void can_homogenize() {
 void can_project() {
     float hither = 1;
     float yon = 1000;
-    float fov = M_PI / 3.0;
+    float fov = U_PI / 3.0;
     float aspectRatio = 1;
 
     Vect v(-10, -10, 100);

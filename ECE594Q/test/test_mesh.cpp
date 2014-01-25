@@ -32,7 +32,7 @@ void meshpoint_inits_correctly() {
 
 void meshpoint_can_rotate() {
     MeshPoint p(10, 10, 0);
-    Vect::Rotate(p, 'x', M_PI / 2.0);
+    Vect::Rotate(p, 'x', U_PI / 2.0);
 
     ASSERT_EQUAL_FLOAT(p.getX(), 10, 0.0001);
     ASSERT_EQUAL_FLOAT(p.getY(), 0, 0.0001);

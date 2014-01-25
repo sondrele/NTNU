@@ -117,7 +117,7 @@ std::vector<MicroPolygon> Mesh::getMicroPolygons() {
 }
 
 void Mesh::rotate(const char axis, const float degrees) {
-    double radians = degrees * M_PI / 180.0;
+    double radians = degrees * U_PI / 180.0;
     for (uint i = 0; i < points.size(); i++) {
         Vect::Rotate(points[i], axis, radians);
     }
@@ -137,9 +137,9 @@ Mesh(resolution, resolution)
 
     double lat, lon;
     for (uint i = 0; i < resolution; i++) {
-        lat = (2 * M_PI) * i / resolution;
+        lat = (2 * U_PI) * i / resolution;
         for (uint j = 0; j < resolution; j++) {
-            lon = (2 * M_PI) * j / resolution;
+            lon = (2 * U_PI) * j / resolution;
             float x = radius * cos(lon) * sin(lat);
             float y = radius * cos(lat);
             float z = radius * sin(lon) * sin(lat);

@@ -23,10 +23,10 @@ FrameBuffer::FrameBuffer(uint width, uint height, uint m, uint n,
 }
 
 FrameBuffer::FrameBuffer(uint width, uint height)
-: FrameBuffer(width, height, 1, 1, 1, 100, M_PI / 3.0, 1) {;}
+: FrameBuffer(width, height, 1, 1, 1, 100, U_PI / 3.0, 1) {;}
 
 FrameBuffer::FrameBuffer(uint width, uint height, uint m, uint n)
-: FrameBuffer(width, height, m, n, 1, 100, M_PI / 3.0, 1) {;}
+: FrameBuffer(width, height, m, n, 1, 100, U_PI / 3.0, 1) {;}
 
 void FrameBuffer::setPixel(uint x, uint y, uint m, uint n, PX_Sample sample) {
     if (m < this->m && n < this->n && x < this->WIDTH && y < this->HEIGHT) {
