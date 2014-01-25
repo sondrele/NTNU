@@ -19,23 +19,6 @@ void framebuffer_inits() {
     ASSERT_EQUAL_INT(px1.getN(), 2);
 }
 
-// void can_add_points() {
-//     FrameBuffer fb(100, 100);
-//     Matrix x(4, 1);
-//     Matrix y(4, 1);
-//     x.setCell(0, 0, 1);
-//     fb.addPoint(x);
-//     fb.addPoint(y);
-    
-//     Matrix p = fb.getPoint(0);
-//     ASSERT_EQUAL_INT(p.getRows(), x.getRows());
-//     ASSERT_EQUAL_INT(p.getCols(), x.getCols());
-//     ASSERT_EQUAL_FLOAT(p.getCell(0, 0), x.getCell(0, 0), 0.000001);
-
-//     Matrix q = fb.getPoint(1);
-//     ASSERT_EQUAL_INT(y.getCols(), q.getCols());
-// }
-
 void can_project_and_scale_points() {
     FrameBuffer fb(500, 500);
     Vect v = Vect(0, 0, 100);
@@ -134,41 +117,77 @@ void plot_image() {
 
 void pixels_has_sample() {
     FrameBuffer fb(1, 1, 1, 1);
-    fb.setPixel(0, 0, 0, 0, {255, 255, 255});
+    PX_Sample s = {1, 0.5, {255, 255, 255}};
+    fb.setPixel(0, 0, 0, 0, s);
     FramePixel fp = fb.getPixel(0, 0);
     PX_Color pc = fp.getColor();
-    ASSERT_EQUAL_INT(pc.R, 255);
-    ASSERT_EQUAL_INT(pc.G, 255);
-    ASSERT_EQUAL_INT(pc.B, 255);
-}
-
-void FrameBufferTestSuite() {
-    TEST_CASE(framebuffer_inits);
-    // TEST_CASE(can_add_points);
-    TEST_CASE(can_project_and_scale_points);
-    TEST_CASE(can_project_mesh_point);
-    TEST_CASE(can_project_micropolygon);
-    TEST_CASE(bounding_box_for_microPolygon_has_right_coords);
-    TEST_CASE(pixels_has_sample);
-}
-
-void pixels_has_samples() {
-    FrameBuffer fb(1, 1, 2, 2);
-    fb.setPixel(0, 0, 0, 0, {255, 255, 255});
-    fb.setPixel(0, 0, 1, 1, {255, 255, 255});
-    FramePixel px = fb.getPixel(0, 0);
-    PX_Color pc = px.getColor();
     ASSERT_EQUAL_INT(pc.R, 127);
     ASSERT_EQUAL_INT(pc.G, 127);
     ASSERT_EQUAL_INT(pc.B, 127);
+}
+
+
+void pixels_has_samples() {
+    FrameBuffer fb(1, 1, 2, 2);
+    fb.setPixel(0, 0, 0, 0, {1, 1, {255, 255, 255}});
+    fb.setPixel(0, 0, 0, 1, {1, 1, {0, 0, 0}});
+    fb.setPixel(0, 0, 1, 0, {1, 1, {255, 255, 255}});
+    fb.setPixel(0, 0, 1, 1, {1, 1, {1, 2, 3}});
+    FramePixel px = fb.getPixel(0, 0);
+    PX_Color pc = px.getColor();
+    ASSERT_EQUAL_INT(pc.R, 127);
+    ASSERT_EQUAL_INT(pc.G, 128);
+    ASSERT_EQUAL_INT(pc.B, 128);
+    fb.exportImage("./imgs/_test.jpg");
+}
+
+void pixel_has_zbuffer() {
+    FrameBuffer fb(1, 1, 2, 2);
+    fb.setPixel(0, 0, 0, 0, {10, 1, {16, 32, 64}});
+    FramePixel px = fb.getPixel(0, 0);
+    PX_Color pc = px.getColor();
+    ASSERT_EQUAL_INT(pc.R, 4);
+    ASSERT_EQUAL_INT(pc.G, 8);
+    ASSERT_EQUAL_INT(pc.B, 16);
+
+    fb.setPixel(0, 0, 0, 0, {100, 1, {255, 255, 255}});
+    px = fb.getPixel(0, 0);
+    pc = px.getColor();
+    ASSERT_EQUAL_INT(pc.R, 4);
+    ASSERT_EQUAL_INT(pc.G, 8);
+    ASSERT_EQUAL_INT(pc.B, 16);
+
+    fb.setPixel(0, 0, 0, 0, {1, 1, {0, 0, 0}});
+    px = fb.getPixel(0, 0);
+    pc = px.getColor();
+    ASSERT_EQUAL_INT(pc.R, 0);
+    ASSERT_EQUAL_INT(pc.G, 0);
+    ASSERT_EQUAL_INT(pc.B, 0);
     fb.exportImage("./imgs/_test.jpg");
 }
 
 void draw_simple_sphere() {
-    RiSphere s(10, 10);
     FrameBuffer fb(500, 500, 2, 2);
-    s.translate(0, 0, 50);
+
+    RiSphere s(10, 16);
+    s.translate(-10, -10, 50);
     fb.addMesh(s);
+
+    RiSphere s1(10, 16);
+    s1.rotate('x', 90);
+    s1.translate(10, -10, 50);
+    fb.addMesh(s1);
+
+    RiSphere s2(10, 16);
+    s2.rotate('x', 180);
+    s2.translate(-10, 10, 50);
+    fb.addMesh(s2);
+
+    RiSphere s3(10, 16);
+    s3.rotate('x', 270);
+    s3.translate(10, 10, 50);
+    fb.addMesh(s3);
+
     fb.drawShapes("./imgs/fb_test_simple.jpg");
     ASSERT_EQUAL_INT(0, 0);
 }
@@ -176,21 +195,38 @@ void draw_simple_sphere() {
 void draw_shapes_behind() {
     // FrameBuffer fb(500, 500);
     FrameBuffer fb(500, 500, 2, 2);
-    RiSphere s(10, 64);
-    s.rotate('z', 90);
+    RiSphere s(10, 32);
+    s.rotate('z', 180);
+    s.rotate('x', 90);
+    s.translate(0, 0, 70);
+    fb.addMesh(s);
     
     RiSphere s2(5, 32);
-    s2.translate(100, 0, 50);
-
-    fb.addMesh(s);
+    s2.translate(10, -10, 50);
     fb.addMesh(s2);
+
+    RiSphere s3(5, 32);
+    s3.rotate('x', -90);
+    s3.translate(-10, -10, 50);
+    fb.addMesh(s3);
+
     fb.drawShapes("./imgs/fb_test_sphere.jpg");
     ASSERT_EQUAL_INT(4, 4);
 }
 
-void drawings() {
-    TEST_CASE(plot_translated_point);
+void FrameBufferTestSuite() {
+    TEST_CASE(framebuffer_inits);
+    TEST_CASE(can_project_and_scale_points);
+    TEST_CASE(can_project_mesh_point);
+    TEST_CASE(can_project_micropolygon);
+    TEST_CASE(bounding_box_for_microPolygon_has_right_coords);
+    TEST_CASE(pixels_has_sample);
     TEST_CASE(pixels_has_samples);
+    TEST_CASE(pixel_has_zbuffer);
+}
+
+void drawings() {
+    // TEST_CASE(plot_translated_point);
     TEST_CASE(draw_simple_sphere);
     TEST_CASE(draw_shapes_behind);
 }

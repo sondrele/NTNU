@@ -175,6 +175,11 @@ Vect::Vect(const Vect &vect) : Matrix(4, 1) {
     setW(vect.getW());
 }
 
+bool Vect::equal(Vect other) {
+    return (getX() == other.getX()) && (getY() == other.getY())
+        && (getZ() == other.getZ()) && (getW() == other.getW());
+}
+
 void Vect::homogenize() {
     setX(getX() / getW());
     setY(getY() / getW());

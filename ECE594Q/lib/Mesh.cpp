@@ -49,6 +49,10 @@ BoundingBox MicroPolygon::getBoundingBox() {
     return bound;
 }
 
+float MicroPolygon::getDepth() {
+    return (a.getZ() + b.getZ() + c.getZ() + d.getZ()) / 4.0;
+}
+
 Mesh::Mesh(uint width, uint height) {
     this->width = width;
     this->height = height;
@@ -85,9 +89,12 @@ std::string Mesh::toString() {
 
 std::vector<MicroPolygon> Mesh::getMicroPolygons() {
     std::vector<MicroPolygon> mPolygons;
+    uint x = 255;
+    bool decrementColor = false;
     for (uint i = 0; i < getSize()-getWidth(); i++) {
         MicroPolygon mp;
         if ((i + 1) % getWidth() == 0) {
+            decrementColor = true;
             mp.a = points[i];
             mp.b = points[i-getWidth()+1];
             mp.c = points[i+getWidth()];
@@ -98,7 +105,11 @@ std::vector<MicroPolygon> Mesh::getMicroPolygons() {
             mp.c = points[i+getWidth()];
             mp.d = points[i+getWidth()+1];
         }
-        mp.setColor(255 * i / getSize(), 255 * i / getSize(), 0);
+        if (decrementColor) {
+            decrementColor = false;
+            x -= (255 / getWidth());
+        }
+        mp.setColor(0, x, 255);
         mPolygons.push_back(mp);
     }
     return mPolygons;

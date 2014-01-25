@@ -127,6 +127,21 @@ void point_intersects_with_micropolygon() {
     ASSERT_FALSE(mp.intersects(Vect(0, -3, 7)));
 }
 
+void micropolygon_has_depth() {
+    MeshPoint a(-2, -2, 3);
+    MeshPoint b(2, -2, 4);
+    MeshPoint c(-2, 2, 5);
+    MeshPoint d(2, 2, 6);
+    MicroPolygon mp;
+    mp.a = a;
+    mp.b = b;
+    mp.c = c;
+    mp.d = d;
+
+    float depth = mp.getDepth();
+    ASSERT_EQUAL_FLOAT(depth, 4.5, 0.000001);
+}
+
 void mesh_inits_and_deletes() {
     Mesh m(2, 2);
     m.addPoint(MeshPoint(3, 3, 3));
@@ -155,32 +170,34 @@ void sphere_has_points_with_right_length() {
     ASSERT_EQUAL_FLOAT(p.getZ(), 0, 0.0001);
 }
 
-// void sphere_has_micropolygons() {
-//     RiSphere s(10, 2);
-//     std::vector<MicroPolygon> v = s.getMicroPolygons();
-//     ASSERT_EQUAL_INT(v.size(), 2);
-//     // ASSERT_SAME(v[0].a, v[1].b);
-//     // ASSERT_SAME(v[0].b, v[1].a);
-//     // ASSERT_SAME(v[0].c, v[1].d);
-//     // ASSERT_SAME(v[0].d, v[1].c);
+void sphere_has_micropolygons() {
+    RiSphere s(10, 2);
+    std::vector<MicroPolygon> v = s.getMicroPolygons();
+    ASSERT_EQUAL_INT(v.size(), 2);
+    MicroPolygon p = v[0];
+    MicroPolygon q = v[1];
+    ASSERT_TRUE(p.a.equal(q.b));
+    ASSERT_TRUE(p.b.equal(q.a));
+    ASSERT_TRUE(p.c.equal(q.d));
+    ASSERT_TRUE(p.d.equal(q.c));
     
-//     RiSphere s2(10, 4);
-//     std::vector<MicroPolygon> v2 = s2.getMicroPolygons();
-//     ASSERT_EQUAL_INT(v2.size(), 12);
-//     MicroPolygon p0 = v2[0];
-//     MicroPolygon p3 = v2[3];
-//     ASSERT_SAME(p0.a, p3.b);
-//     ASSERT_SAME(p0.c, p3.d);
-//     MicroPolygon p1 = v2[1];
-//     ASSERT_SAME(p0.b, p1.a);
-//     ASSERT_SAME(p0.d, p1.c);
-//     MicroPolygon p4 = v2[4];
-//     ASSERT_SAME(p0.c, p4.a);
-//     ASSERT_SAME(p0.d, p4.b);
-//     MicroPolygon p8 = v2[8];
-//     ASSERT_SAME(p4.c, p8.a);
-//     ASSERT_SAME(p4.d, p8.b);
-// }
+    RiSphere s2(10, 4);
+    std::vector<MicroPolygon> v2 = s2.getMicroPolygons();
+    ASSERT_EQUAL_INT(v2.size(), 12);
+    MicroPolygon p0 = v2[0];
+    MicroPolygon p3 = v2[3];
+    ASSERT_TRUE(p0.a.equal(p3.b));
+    ASSERT_TRUE(p0.c.equal(p3.d));
+    MicroPolygon p1 = v2[1];
+    ASSERT_TRUE(p0.b.equal(p1.a));
+    ASSERT_TRUE(p0.d.equal(p1.c));
+    MicroPolygon p4 = v2[4];
+    ASSERT_TRUE(p0.c.equal(p4.a));
+    ASSERT_TRUE(p0.d.equal(p4.b));
+    MicroPolygon p8 = v2[8];
+    ASSERT_TRUE(p4.c.equal(p8.a));
+    ASSERT_TRUE(p4.d.equal(p8.b));
+}
 
 void sphere_can_rotate() {
     RiSphere s(100, 32);
@@ -242,6 +259,7 @@ void mesh_test_suite() {
     TEST_CASE(meshpoint_inits_correctly);
     TEST_CASE(MicroPolygon_has_boundingbox);
     TEST_CASE(point_intersects_with_micropolygon);
+    TEST_CASE(micropolygon_has_depth);
     TEST_CASE(mesh_inits_and_deletes);
     TEST_CASE(meshpoint_can_rotate);
 
@@ -253,7 +271,7 @@ void mesh_test_suite() {
     TEST_CASE(sphere_can_translate);
     TEST_CASE(sphere_has_points_with_right_length);
     TEST_CASE(micropolygon_and_sphere_is_correct);
-    // TEST_CASE(sphere_has_micropolygons);
+    TEST_CASE(sphere_has_micropolygons);
 }
 
 void utils_test_suite() {

@@ -28,9 +28,9 @@ FrameBuffer::FrameBuffer(uint width, uint height)
 FrameBuffer::FrameBuffer(uint width, uint height, uint m, uint n)
 : FrameBuffer(width, height, m, n, 1, 100, M_PI / 3.0, 1) {;}
 
-void FrameBuffer::setPixel(uint x, uint y, uint m, uint n, PX_Color color) {
+void FrameBuffer::setPixel(uint x, uint y, uint m, uint n, PX_Sample sample) {
     if (m < this->m && n < this->n && x < this->WIDTH && y < this->HEIGHT) {
-        pixels[FX(x, y)].setSample(m, n, color);
+        pixels[FX(x, y)].setSample(m, n, sample);
     } else
         throw "Cannot set sample on pixel";
 }
@@ -121,7 +121,6 @@ void FrameBuffer::drawShapes(const char *name) {
             Vect point(0, 0, 0);
             for (int y = box.Y_start; y < box.Y_stop; y++) {
                 for (int x = box.X_start; x < box.X_stop; x++) {
-                    unsigned char *mpColor = poly.getColor();
                     // int sampledColor[3] = {0, 0, 0};
                     // Loop over samples to get the right color
                     for (uint dn = 0; dn < n; dn++) {
@@ -131,7 +130,13 @@ void FrameBuffer::drawShapes(const char *name) {
                             point.setX(x + dx);
                             point.setY(y + dy);
                             if (poly.intersects(point)) {
-                                pixels[FX(x, y)].setSample(dm, dn, mpColor);
+                                PX_Sample sample;
+                                sample.depth = poly.getDepth();
+
+                                unsigned char *c = poly.getColor();
+                                sample.color = {c[0], c[1], c[2]};
+
+                                pixels[FX(x, y)].setSample(dm, dn, sample);
                             }
                         }
                     }
@@ -166,26 +171,71 @@ FramePixel::FramePixel(uint x, uint y, uint m, uint n) {
     this->y = y;
     this->m = m;
     this->n = n;
-    samples = std::vector<PX_Color>(m * n, {0, 0, 0});
+
+    samplePoints = std::vector<Sample>(m * n, Sample());
 }
 
-void FramePixel::setSample(uint x, uint y, PX_Color color) {
-    samples[PX(x, y)] = color;
-}
-
-void FramePixel::setSample(uint x, uint y, unsigned char *c) {
-    samples[PX(x, y)] = {c[0], c[1], c[2]};
+void FramePixel::setSample(uint x, uint y, PX_Sample sample) {
+    samplePoints[PX(x, y)].addSample(sample);
 }
 
 PX_Color FramePixel::getColor() {
     uint R = 0, G = 0, B = 0;
-    for (uint i = 0; i < samples.size(); i++) {
-        R += samples[i].R;
-        G += samples[i].G;
-        B += samples[i].B;
+    for (uint i = 0; i < samplePoints.size(); i++) {
+        PX_Color c = samplePoints[i].getColor();
+        R += c.R;
+        G += c.G;
+        B += c.B;
     }
     R /= m * n;
     G /= m * n;
     B /= m * n;
     return {(unsigned char) R, (unsigned char) G, (unsigned char) B};
+}
+
+Sample::Sample() {
+    samples.push_back({FLT_MAX, 1, {0, 0, 0}});
+}
+
+void Sample::addSample(PX_Sample sample) {
+    if (sample.opacity > 0) {
+        std::list<PX_Sample>::iterator it = samples.begin();
+        while (sample.depth > it->depth and it != samples.end() and it->opacity != 1) {
+            it++;
+        }
+        if (it->opacity >= 1 and it->depth < sample.depth)
+            return;
+        samples.insert(it, sample);
+        if (it->depth >= 1.0) {
+            samples.pop_back();
+        }
+    }
+}
+
+std::string Sample::toString() {
+    stringstream s;
+    s << "Sample: ";
+    std::list<PX_Sample>::iterator it;
+    for (it = samples.begin(); it != samples.end(); it++) {
+        s << "{D:" << it->depth << ", O:" << it->opacity << ", C:{" << (int)it->color.R << "," << (int)it->color.G << "," << (int)it->color.B << "}} ";
+    }
+    return s.str();
+}
+
+PX_Color Sample::getColor() {
+    if (samples.size() == 0) {
+        return {0, 0, 0};
+    } else {
+        PX_Color color = {0, 0, 0};
+        std::list<PX_Sample>::iterator it;
+
+        for (it = samples.begin(); it != samples.end(); it++) {
+            PX_Color c = it->color;
+            float opacity = it->opacity;
+            color.R += (int) c.R * opacity;
+            color.G += (int) c.G * opacity;
+            color.B += (int) c.B * opacity;
+        }
+        return color;
+    }
 }

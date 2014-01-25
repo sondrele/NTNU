@@ -5,8 +5,10 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstdio>
+#include <cfloat>
 
 #include <vector>
+#include <list>
 #include <algorithm>
 
 #include "CImg.h"
@@ -19,9 +21,22 @@ typedef struct {
     unsigned char B;
 } PX_Color;
 
-class Sample {
+typedef struct {
     float depth;
-    std::vector<PX_Color> colors;
+    float opacity;
+    PX_Color color;
+} PX_Sample;
+
+class Sample {
+private:
+    std::list<PX_Sample> samples;
+
+public:
+    Sample();
+    void addSample(PX_Sample);
+    PX_Sample getSample();
+    PX_Color getColor();
+    std::string toString();
 };
 
 class FramePixel {
@@ -30,12 +45,13 @@ private:
     uint y;
     uint m;
     uint n;
-    std::vector<PX_Color> samples;
+    std::vector<Sample> samplePoints;
 
 public:
     FramePixel(uint X, uint Y, uint m, uint n);
-    void setSample(uint x, uint y, PX_Color);
-    void setSample(uint x, uint y, unsigned char *);
+    // void setSample(uint x, uint y, PX_Color);
+    // void setSample(uint x, uint y, unsigned char *);
+    void setSample(uint x, uint y, PX_Sample s);
     PX_Color getColor();
     uint getX() { return x; };
     uint getM() { return m; };
@@ -63,7 +79,7 @@ public:
     FrameBuffer(uint, uint);
     FrameBuffer(uint, uint, uint, uint);
 
-    void setPixel(uint, uint, uint, uint, PX_Color); 
+    void setPixel(uint, uint, uint, uint, PX_Sample); 
     FramePixel getPixel(uint x, uint y);
     uint getSize() { return pixels.size(); };
 

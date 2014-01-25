@@ -45,6 +45,7 @@ public:
     bool intersects(Vect point);
     BoundingBox getBoundingBox();
     float *getBound();
+    float getDepth();
 };
 
 class Mesh {

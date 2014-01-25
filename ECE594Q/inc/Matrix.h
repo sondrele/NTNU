@@ -43,6 +43,8 @@ public:
     Vect(float, float, float);
     Vect(const Matrix);
     Vect(const Vect &);
+
+    bool equal(Vect other);
     void setX(float val) { setCell(0, 0, val); };
     void setY(float val) { setCell(1, 0, val); };
     void setZ(float val) { setCell(2, 0, val); };
@@ -57,20 +59,6 @@ public:
     static void Rotate(Vect &, const char, const double);
     static void Translate(Vect &, const float, const float, const float);
     static void Project(Vect &, float, float, float, float);
-};
-
-class MatrixTransform {
-private:
-    static Matrix scaleMatrix;
-    static Matrix rotateMatrix;
-    static Matrix translateMatrix;
-    static Matrix projectMatrix;
-
-public:
-    static Matrix &Scale(const Matrix &, const float, const float, const float);
-    static Matrix &Rotate(const Matrix &, const char, const double);
-    static Matrix &Translate(const Matrix &, const float, const float, const float);  
-
 };
 
 #endif // _MATRIX_H_
