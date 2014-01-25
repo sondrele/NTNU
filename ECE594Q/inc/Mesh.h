@@ -30,14 +30,19 @@ typedef struct {
 class MicroPolygon {
 private:
     unsigned char color[3];
+    float opacity;
     // Vect surfaceNormal;
     
 public:
+    MicroPolygon();
+    
     MeshPoint a;
     MeshPoint b;
     MeshPoint c;
     MeshPoint d;
 
+    void setOpacity(float opacity) {this->opacity = opacity;};
+    float getOpacity() { return opacity; };
     void setColor(unsigned char *);
     void setColor(unsigned char, unsigned char, unsigned char);
     unsigned char *getColor() { return color; };

@@ -5,14 +5,14 @@
 MeshPoint::MeshPoint(Vect &v) : Vect(v) {;}
 
 MeshPoint::MeshPoint(float x, float y, float z) : Vect(x, y, z) {
-    // point.setX(x);
-    // point.setY(y);
-    // point.setZ(z);
-    // point.setW(1);
     setW(1);
-    color[0] = 0;
-    color[1] = 0;
-    color[2] = 0;
+}
+
+MicroPolygon::MicroPolygon() {
+    opacity = 1.0;
+    color[0] = 255;
+    color[1] = 255;
+    color[2] = 255;
 }
 
 void MicroPolygon::setColor(unsigned char *RGB) {
@@ -109,7 +109,8 @@ std::vector<MicroPolygon> Mesh::getMicroPolygons() {
             decrementColor = false;
             x -= (255 / getWidth());
         }
-        mp.setColor(0, x, 255);
+        // mp.setOpacity(1);
+        // mp.setColor(0, x, 255);
         mPolygons.push_back(mp);
     }
     return mPolygons;

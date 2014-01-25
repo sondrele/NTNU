@@ -169,6 +169,17 @@ void pixel_has_zbuffer() {
 void draw_simple_sphere() {
     FrameBuffer fb(500, 500, 2, 2);
 
+    RiSphere s(10, 4);
+    s.translate(0, 0, 50);
+    fb.addMesh(s);
+
+    fb.drawShapes("./imgs/fb_test_simple.jpg");
+    ASSERT_EQUAL_INT(0, 0);
+}
+
+void draw_simple_spheres() {
+    FrameBuffer fb(500, 500, 2, 2);
+
     RiSphere s(10, 16);
     s.translate(-10, -10, 50);
     fb.addMesh(s);
@@ -226,8 +237,9 @@ void FrameBufferTestSuite() {
 }
 
 void drawings() {
-    // TEST_CASE(plot_translated_point);
+    TEST_CASE(plot_translated_point);
     TEST_CASE(draw_simple_sphere);
+    TEST_CASE(draw_simple_spheres);
     TEST_CASE(draw_shapes_behind);
 }
 

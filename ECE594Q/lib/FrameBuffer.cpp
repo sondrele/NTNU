@@ -115,33 +115,29 @@ void FrameBuffer::drawShapes(const char *name) {
         MicroPolygon poly = projectedMicroPolygons.at(i);
         
         BoundingBox box = poly.getBoundingBox();
-        // if (true || box.X_start >= 0 and box.X_stop <= WIDTH and
-        //     box.Y_start >= 0 and box.Y_stop <= HEIGHT) 
-        // {
-            Vect point(0, 0, 0);
-            for (int y = box.Y_start; y < box.Y_stop; y++) {
-                for (int x = box.X_start; x < box.X_stop; x++) {
-                    // int sampledColor[3] = {0, 0, 0};
-                    // Loop over samples to get the right color
-                    for (uint dn = 0; dn < n; dn++) {
-                        for (uint dm = 0; dm < m; dm++) {
-                            float dx = dm / (float)m;
-                            float dy = dn / (float)n;
-                            point.setX(x + dx);
-                            point.setY(y + dy);
-                            if (poly.intersects(point)) {
-                                PX_Sample sample;
-                                sample.depth = poly.getDepth();
+        Vect point(0, 0, 0);
+        for (int y = box.Y_start; y < box.Y_stop; y++) {
+            for (int x = box.X_start; x < box.X_stop; x++) {
+                // Loop over samples to get the right color
+                for (uint dn = 0; dn < n; dn++) {
+                    for (uint dm = 0; dm < m; dm++) {
+                        float dx = dm / (float)m;
+                        float dy = dn / (float)n;
+                        point.setX(x + dx);
+                        point.setY(y + dy);
+                        if (poly.intersects(point)) {
+                            unsigned char *c = poly.getColor();
+                            PX_Sample sample;
+                            sample.depth = poly.getDepth();
+                            sample.color = {c[0], c[1], c[2]};
+                            sample.opacity = poly.getOpacity();
 
-                                unsigned char *c = poly.getColor();
-                                sample.color = {c[0], c[1], c[2]};
-
-                                pixels[FX(x, y)].setSample(dm, dn, sample);
-                            }
+                            pixels[FX(x, y)].setSample(dm, dn, sample);
+                            Sample s = pixels[FX(x, y)].samplePoints[dn * m + dm];
                         }
                     }
                 }
-            // }
+            }
         }
     }
     exportImage(name);

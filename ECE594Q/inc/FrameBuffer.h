@@ -45,9 +45,9 @@ private:
     uint y;
     uint m;
     uint n;
+public:
     std::vector<Sample> samplePoints;
 
-public:
     FramePixel(uint X, uint Y, uint m, uint n);
     // void setSample(uint x, uint y, PX_Color);
     // void setSample(uint x, uint y, unsigned char *);
