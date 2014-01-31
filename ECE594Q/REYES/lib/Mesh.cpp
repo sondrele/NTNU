@@ -109,8 +109,8 @@ std::vector<MicroPolygon> Mesh::getMicroPolygons() {
             decrementColor = false;
             x -= (255 / getWidth());
         }
-        // mp.setOpacity(1);
-        // mp.setColor(0, x, 255);
+        mp.setOpacity(0.5);
+        mp.setColor(255 * i / getSize(), 255 * i / getSize(), getWidth() * 2);
         mPolygons.push_back(mp);
     }
     return mPolygons;
