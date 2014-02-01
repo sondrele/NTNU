@@ -1,7 +1,7 @@
-#include <windows.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include "ATimer.h"
 #include "scene_io.h"
-#include "Timer.h"
 
 #define IMAGE_WIDTH		1500
 #define IMAGE_HEIGHT	1500
@@ -12,7 +12,7 @@ typedef unsigned char u08;
 SceneIO *scene = NULL;
 
 
-static void loadScene(char *name) {
+static void loadScene(const char *name) {
 	/* load the scene into the SceneIO data structure using given parsing code */
 	scene = readScene(name);
 
@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
 	Timer total_timer;
 	total_timer.startTimer();
 
-	loadScene("../Scenes/test1.scene");
+	loadScene("./scenes/test1.ascii");
 
 	/* write your ray tracer here */
 	render();
@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	total_timer.stopTimer();
-	fprintf(stderr, "Total time: %.5lf secs\n\n", total_timer.getTime());
+	fprintf(stderr, "Total time: %.5lf \n", total_timer.getTime());
 	
 	return 1;
 }
