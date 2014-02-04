@@ -1,3 +1,5 @@
 #Ignore Cpputest
 cpputest/
 *.o
+matrix
+raytracer
