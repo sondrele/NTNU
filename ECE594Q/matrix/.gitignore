@@ -1,0 +1,4 @@
+*.o
+*.d
+test/all_tests
+test/lib

@@ -41,6 +41,7 @@ public:
 
     Matrix &operator = (const Matrix &);
     const friend Matrix operator +(const Matrix &, const Matrix &);
+    const friend Matrix operator -(const Matrix &, const Matrix &);
     const friend Matrix operator *(const Matrix &, const Matrix &);
 };
 
@@ -52,19 +53,30 @@ public:
     Vect(const Vect &);
 
     bool equal(Vect other);
-    void setW(float val) { setCell(3, 0, val); };
-    float getW() const { return getCell(3, 0); };
 
-    void homogenize();
     void normalize();
     Vect crossProduct(Vect v);
     float dotProduct(Vect v);
     Vect linearMult(float);
 
-    static void Scale(Vect &, const float, const float, const float);
-    static void Rotate(Vect &, const char, const double);
-    static void Translate(Vect &, const float, const float, const float);
-    static void Project(Vect &, float, float, float, float);
+};
+
+class Vect_h : public Matrix {
+public:
+    Vect_h();
+    Vect_h(float, float, float);
+    Vect_h(const Matrix);
+    Vect_h(const Vect_h &);
+
+    void setW(float val) { setCell(3, 0, val); };
+    float getW() const { return getCell(3, 0); };
+
+    void homogenize();
+
+    static void Scale(Vect_h &, const float, const float, const float);
+    static void Rotate(Vect_h &, const char, const double);
+    static void Translate(Vect_h &, const float, const float, const float);
+    static void Project(Vect_h &, float, float, float, float);
 };
 
 #endif // _MATRIX_H_
