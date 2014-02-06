@@ -11,31 +11,6 @@
 #include "raybuffer.h"
 #include "rayscene_shapes.h"
 
-class Camera {
-private:
-    Vect pos;           // E
-    Vect viewDir;       // V
-    Vect orthoUp;       // Ù
-
-    float focalDist;
-    float verticalFOV;
-
-public:
-    Vect getPos() const { return pos;}
-    void setPos(Vect d) { pos = d;}
-    float getX() { return pos.getX(); }
-    float getY() { return pos.getY(); }
-    float getZ() { return pos.getZ(); }
-    Vect getViewDir() { return viewDir;}
-    void setViewDir(Vect d) { viewDir = d;}
-    Vect getOrthoUp() { return orthoUp;}
-    void setOrthoUp(Vect d) { orthoUp = d;}
-    float getFocalDist() { return focalDist;}
-    void setFocalDist(float f) { focalDist = f;}
-    float getVerticalFOV() { return verticalFOV;}
-    void setVerticalFOV(float f) { verticalFOV = f;}
-};
-
 class Light {
 private:
     Vect pos;
@@ -57,7 +32,7 @@ public:
 
 class RayScene {
 private:
-    Camera camera;
+    // Camera camera;
     std::vector<Light> lights;
     std::vector<Shape *> shapes;
 
@@ -65,11 +40,11 @@ public:
     RayScene();
     ~RayScene();
     
-    void setCamera(Camera c) { camera = c;}
-    Camera getCamera() { return camera;}
-    void setCameraPos(Vect);
-    void setCameraViewDir(Vect);
-    void setCameraOrthoUp(Vect);
+    // void setCamera(Camera c) { camera = c;}
+    // Camera getCamera() { return camera;}
+    // void setCameraPos(Vect);
+    // void setCameraViewDir(Vect);
+    // void setCameraOrthoUp(Vect);
 
     void setLights(std::vector<Light>);
     void addLight(Light);

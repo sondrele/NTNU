@@ -193,9 +193,6 @@ TEST(RaySceneFactory, can_create_scene) {
     RayScene s;
     RaySceneFactory::CreateScene(s, scene);
 
-    Vect p = s.getCamera().getPos();
-    CHECK_EQUAL(1, p.getX());
-
     Light l = s.getLight(0);
     CHECK_EQUAL(DIRECTIONAL_LIGHT, l.getType());
     l = s.getLight(1);

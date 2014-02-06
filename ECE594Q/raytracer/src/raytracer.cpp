@@ -5,12 +5,11 @@ RayTracer::RayTracer(uint width, uint height, Vect viewDir, Vect orthoUp) {
     HEIGHT = height;
     buffer = RayBuffer(WIDTH, HEIGHT);
 
-    Camera camera;
     camera.setPos(Vect(0, 0, 0));
     camera.setVerticalFOV((float)M_PI / 2.0f);
     camera.setViewDir(viewDir);
     camera.setOrthoUp(orthoUp);
-    scene.setCamera(camera);
+    // scene.setCamera(camera);
 
     scaleConst = 2;
 
@@ -23,33 +22,30 @@ RayTracer::RayTracer(uint width, uint height) {
     scaleConst = 2;
     buffer = RayBuffer(WIDTH, HEIGHT);
 
-    Camera camera;
     camera.setPos(Vect(0, 0, 0));
     camera.setVerticalFOV((float)M_PI / 2.0f);
     camera.setViewDir(Vect(0, 0, -1));
     camera.setOrthoUp(Vect(0, 1, 0));
-    scene.setCamera(camera);
+    // scene.setCamera(camera);
 
     calculateImagePlane();
 }
 
-void RayTracer::setCameraPos(Vect cam) {
-    Vect cameraPos = cam;
-    cameraPos.normalize();
-
-    scene.setCameraPos(cameraPos);
+void RayTracer::setCameraPos(Vect camPos) {
+    camPos.normalize();
+    camera.setPos(camPos);
 }
 
 void RayTracer::setViewDirection(Vect viewDir) {
     viewDir.normalize();
-    scene.setCameraViewDir(viewDir);
+    camera.setViewDir(viewDir);
 
     calculateImagePlane();
 }
 
 void RayTracer::setOrthogonalUp(Vect orthoUp) {
     orthoUp.normalize();
-    scene.setCameraOrthoUp(orthoUp);
+    camera.setOrthoUp(orthoUp);
     
     calculateImagePlane();
 }

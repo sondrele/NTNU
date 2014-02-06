@@ -29,6 +29,22 @@ TEST(RayTracer, has_camera) {
     CHECK_EQUAL(0, camera.getZ());
 }
 
+TEST(RayTracer, can_add_camera) {
+    Camera cam;
+    cam.setPos(Vect(10, 10, 10));
+    cam.setViewDir(Vect(-1, -1, -1));
+    cam.setOrthoUp(Vect(0, 1, 0));
+    cam.setVerticalFOV((float)M_PI / 2.0f);
+
+    RayTracer rt(50, 50);
+    rt.setCamera(cam);
+    Camera c0 = rt.getCamera();
+    CHECK_EQUAL(10, c0.getX());
+    CHECK_EQUAL(-1, c0.getViewDir().getZ());
+    CHECK_EQUAL(1, c0.getOrthoUp().getY());
+    DOUBLES_EQUAL((float)M_PI / 2.0f, cam.getVerticalFOV(), 0.000001);
+}
+
 TEST(RayTracer, has_normalized_vectors) {
     RayTracer rt(10, 10);
     rt.setViewDirection(Vect(3, 4, 5));

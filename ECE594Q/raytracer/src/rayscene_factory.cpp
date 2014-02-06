@@ -16,6 +16,13 @@ Vect RaySceneFactory::PointToVect(Point p) {
     return v;
 }
 
+Sphere * RaySceneFactory::NewSphere(float radius, Vect origin) {
+    Sphere *s = new Sphere();
+    s->setRadius(radius);
+    s->setOrigin(origin);
+    return s;
+}
+
 void RaySceneFactory::CreateSphere(Sphere &sphere, SphereIO &s) {
     sphere.setRadius(s.radius);
     sphere.setOrigin(RaySceneFactory::PointToVect(s.origin));
@@ -111,13 +118,14 @@ void RaySceneFactory::CreateShapes(std::vector<Shape *> &shps, ObjIO &oio) {
 }
 
 void RaySceneFactory::CreateScene(RayScene &s, SceneIO &sio) {
-    Camera cam;
-    RaySceneFactory::CreateCamera(cam, *sio.camera);
     std::vector<Light> lts;
     RaySceneFactory::CreateLights(lts, *sio.lights);
     std::vector<Shape *> shps;
     RaySceneFactory::CreateShapes(shps, *sio.objects);
-    s.setCamera(cam);
+
+    // Camera cam;
+    // RaySceneFactory::CreateCamera(cam, *sio.camera);
+    // s.setCamera(cam);
     s.setLights(lts);
     s.setShapes(shps);
 }

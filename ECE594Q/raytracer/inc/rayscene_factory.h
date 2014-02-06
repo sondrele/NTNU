@@ -6,13 +6,15 @@
 #include "scene_io.h"
 #include "raybuffer.h"
 #include "ray.h"
-#include "rayscene_shapes.h"
+#include "camera.h"
 #include "rayscene.h"
+#include "rayscene_shapes.h"
 
 class RaySceneFactory {
 public:
     static PX_Color ColorToPX_Color(Color);
     static Vect PointToVect(Point);
+    static Sphere * NewSphere(float, Vect);
     static void CreateSphere(Sphere &s, SphereIO &sio);
     static void CreateTriangle(Triangle &t, PolygonIO &pio);
     static void CreateMesh(Mesh &m, PolySetIO &pio);

@@ -15,7 +15,8 @@ typedef unsigned char u08;
 SceneIO *scene = NULL;
 
 
-static void loadScene(const char *name) {
+static void loadScene(const 
+    char *name) {
     /* load the scene into the SceneIO data structure using given parsing code */
     scene = readScene(name);
 
@@ -24,7 +25,10 @@ static void loadScene(const char *name) {
     RayScene rayScene;
     RaySceneFactory::CreateScene(rayScene, *scene);
 
+    Camera cam;
+    RaySceneFactory::CreateCamera(cam, *(scene->camera));
     RayTracer rayTracer(IMAGE_WIDTH, IMAGE_HEIGHT);
+    rayTracer.setCamera(cam);
     rayTracer.setScene(rayScene);
 
     RayBuffer rayBuffer = rayTracer.traceRays();

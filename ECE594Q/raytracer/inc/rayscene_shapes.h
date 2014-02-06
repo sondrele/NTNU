@@ -86,7 +86,7 @@ public:
     virtual ~Mesh() {}
     virtual ShapeType getType();
 
-    void addTriangle(Triangle t) { triangles.push_back(t);}
+    void addTriangle(Triangle t);
     Triangle getTriangle(uint64_t i) { return triangles.at(i);}
     uint64_t size() { return triangles.size();}
 

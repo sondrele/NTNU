@@ -1,16 +1,19 @@
-#include "rayimage.h"
 #include <stdlib.h>
 #include <iostream>
 
-int main(int argc, char const *argv[])
-{
-    RayBuffer rb(2, 2);
-    rb.setPixel(0, 0, 255, 255, 255);
-    rb.setPixel(1, 0, 170, 170, 170);
-    rb.setPixel(0, 1, 85, 85, 85);
-    rb.setPixel(1, 1, 0, 0, 0);
+#include "raytracer.cpp"
 
-    RayImage ri;
-    ri.createImage(rb, "test.bmp");
+int main(int argc, char const *argv[]) {
+
+    Shape *s = RaySceneFactory::NewSphere(10, Vect(0, 0, -20));
+    RayScene rayScene;
+
+    RayTracer rayTracer(IMAGE_WIDTH, IMAGE_HEIGHT);
+    rayTracer.setScene(rayScene);
+
+    RayBuffer rayBuffer = rayTracer.traceRays();
+
+    RayImage img;
+    img.createImage(rayBuffer, "scene1.bmp");
     return 0;
 }

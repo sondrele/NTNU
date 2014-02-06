@@ -67,6 +67,10 @@ bool Sphere::intersects(Ray ray, float &t) {
     }
 }
 
+void Mesh::addTriangle(Triangle t) {
+    triangles.push_back(t);
+}
+
 bool Mesh::intersects(Ray ray, float &t) {
     for (uint i = 0; i < triangles.size(); i++) {
         Triangle t0 = triangles.at(i);
