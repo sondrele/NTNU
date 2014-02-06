@@ -1,5 +1,17 @@
 #include "rayscene.h"
 
+ShapeType Sphere::getType() {
+    return SPHERE;
+}
+
+ShapeType Triangle::getType() {
+    return TRIANGLE;
+}
+
+ShapeType Mesh::getType() {
+    return MESH;
+}
+
 bool Sphere::intersects(Ray ray, float &t) {
     // Transforming ray to object space
     Vect transformedOrigin = ray.getOrigin() - getOrigin();

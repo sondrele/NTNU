@@ -79,3 +79,43 @@ void RaySceneFactory::CreateCamera(Camera &c, CameraIO &cio) {
     c.setFocalDist(cio.focalDistance);
     c.setVerticalFOV(cio.verticalFOV);
 }
+
+Shape * RaySceneFactory::CreateShape(ObjIO &oio) {
+    switch(oio.type) {
+        case SPHERE_OBJ: {
+            Sphere *s = new Sphere();
+            SphereIO sio = *((SphereIO *) oio.data);
+            RaySceneFactory::CreateSphere(*s, sio);
+            return s;
+        }
+        case POLYSET_OBJ: {
+            Mesh *m = new Mesh();
+            PolySetIO pio = *((PolySetIO *) oio.data);
+            RaySceneFactory::CreateMesh(*m, pio);
+            return m;
+        }
+        default:
+        return NULL;
+    }
+}
+
+void RaySceneFactory::CreateShapes(std::vector<Shape *> &shps, ObjIO &oio) {
+    ObjIO *temp = &oio;
+    while (temp != NULL) {
+        Shape *s = RaySceneFactory::CreateShape(*temp);
+        shps.push_back(s);
+        temp = temp->next;
+    }
+}
+
+void RaySceneFactory::CreateScene(RayScene &s, SceneIO &sio) {
+    Camera cam;
+    RaySceneFactory::CreateCamera(cam, *sio.camera);
+    std::vector<Light> lts;
+    RaySceneFactory::CreateLights(lts, *sio.lights);
+    std::vector<Shape *> shps;
+    RaySceneFactory::CreateShapes(shps, *sio.objects);
+    s.setCamera(cam);
+    s.setLights(lts);
+    s.setShapes(shps);
+}

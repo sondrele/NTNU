@@ -6,8 +6,17 @@ CC=g++
 CFLAGS = $(INCLUDEPATH) -Wall -g -std=c++11
 CIMGFLAGS = $(CFLAGS) -L/usr/X11R6/lib -lm -lpthread -lX11
 LDFLAGS=
-SRCS = lib/scene_io.cpp raytracer.cpp
-OBJS = $(SRCS:.cpp=.o)
+LIBS = \
+    lib/scene_io.cpp\
+    ../matrix/src/Matrix.cpp\
+    ../matrix/src/Vect.cpp
+SRCS = raytracer.cpp\
+    src/raybuffer.cpp\
+    src/rayscene.cpp\
+    src/rayscene_factory.cpp\
+    src/rayscene_shapes.cpp\
+    src/raytracer.cpp
+OBJS = $(SRCS:.cpp=.o) $(LIBS:.cpp=.o) 
 
 %.o: %.cpp
 	$(CC) $(CFLAGS) -c -o $@ $<

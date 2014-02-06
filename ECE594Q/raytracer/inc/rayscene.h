@@ -21,7 +21,7 @@ private:
     float verticalFOV;
 
 public:
-    Vect getPos() { return pos;}
+    Vect getPos() const { return pos;}
     void setPos(Vect d) { pos = d;}
     Vect getViewDir() { return viewDir;}
     void setViewDir(Vect d) { viewDir = d;}
@@ -41,7 +41,7 @@ private:
     enum LightType type;
 
 public:
-    enum LightType getType() { return type;}
+    enum LightType getType() const { return type;}
     void setType(enum LightType t) { type = t;}
     PX_Color getColor() { return color;}
     void setColor(PX_Color c) { color = c;}
@@ -74,6 +74,8 @@ public:
     void addShape(Shape *);
     Shape * getShape(uint);
 
+    std::string toString() const;
+    friend ostream& operator <<(ostream&, const RayScene&);
 };
 
 #endif

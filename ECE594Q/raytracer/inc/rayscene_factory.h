@@ -19,6 +19,8 @@ public:
     static void CreateLights(std::vector<Light> &, LightIO &);
     static void CreateCamera(Camera &c, CameraIO &cio);
     static void CreateScene(RayScene &s, SceneIO &sio);
+    static Shape * CreateShape(ObjIO &oio);
+    static void CreateShapes(std::vector<Shape *> &shps, ObjIO &oio);
 };
 
 #endif

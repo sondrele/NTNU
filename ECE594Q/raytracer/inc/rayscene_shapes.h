@@ -5,16 +5,23 @@
 #include <stdint.h>
 #include <vector>
 #include <memory>
+#include <sstream>
 
 #include "Matrix.h"
 #include "scene_io.h"
 #include "raybuffer.h"
 #include "raytracer.h"
 
+enum ShapeType {
+    SPHERE, MESH, TRIANGLE
+};
+
 class Shape {
 public:
-    virtual bool intersects(Ray, float &) = 0;
     virtual ~Shape() {}
+    
+    virtual bool intersects(Ray, float &) = 0;
+    virtual ShapeType getType() = 0;
 };
 
 
@@ -32,6 +39,7 @@ private:
 
 public:
     virtual ~Sphere() {}
+    virtual ShapeType getType();
 
     Vect getOrigin() { return origin;}
     void setOrigin(Vect o) { origin = o;}
@@ -58,6 +66,7 @@ private:
 
 public:
     virtual ~Triangle() {}
+    virtual ShapeType getType();
 
     Vect getA() { return a;}
     void setA(Vect x) { a = x;}
@@ -76,6 +85,7 @@ private:
 
 public:
     virtual ~Mesh() {}
+    virtual ShapeType getType();
 
     void addTriangle(Triangle t) { triangles.push_back(t);}
     Triangle getTriangle(uint64_t i) { return triangles.at(i);}

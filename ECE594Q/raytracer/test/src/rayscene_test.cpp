@@ -10,3 +10,15 @@ TEST_GROUP(RaySceneTest) {
 
     }
 };
+
+TEST(RaySceneTest, can_add_shapes) {
+    RayScene s;
+
+    Shape *s0 = new Sphere();
+    s.addShape(s0);
+
+    Shape *s1 = s.getShape(0);
+    CHECK(s0 == s1);
+
+    delete s0;
+}

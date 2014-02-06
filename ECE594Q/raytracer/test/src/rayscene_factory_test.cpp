@@ -6,9 +6,11 @@
 SphereIO sphere;
 PolygonIO triangle0, triangle1;
 PolySetIO trimesh;
+ObjIO objects;
 LightIO light0;
 LightIO light1;
 CameraIO camera;
+SceneIO scene;
 
 TEST_GROUP(RaySceneFactory) {
     void setup() {
@@ -49,6 +51,14 @@ TEST_GROUP(RaySceneFactory) {
         trimesh.poly[0] = triangle0;
         trimesh.poly[1] = triangle1;
 
+        // objects.type = SPHERE_OBJ;
+        // objects.next = (ObjIO *) &trimesh;
+        // objects.data = (void *) &sphere;
+        // ObjIO *trim = objects.next;
+        // trim->type = POLYSET_OBJ;
+        // trim->next = NULL;
+        // trim->data = (void *) &trimesh;
+
         light1.next = NULL;
         light1.type = POINT_LIGHT;
         light1.position[0] = 0;
@@ -78,6 +88,9 @@ TEST_GROUP(RaySceneFactory) {
         camera.orthoUp[1] = 4;
         camera.orthoUp[2] = 4;
         camera.verticalFOV = 0.2f;
+
+        scene.camera = &camera;
+        scene.lights = &light0;
     }
     void teardown() {
         delete [] triangle0.vert;
@@ -167,7 +180,24 @@ TEST(RaySceneFactory, can_init_camera) {
     DOUBLES_EQUAL(0.2, cam.getVerticalFOV(), 0.00001);
 }
 
-TEST(RaySceneFactory, can_create_shape) {
-    RayScene scene;
-    // RaySceneFactory::CreateScene(scene)
+TEST(RaySceneFactory, can_create_shapes) {
+    std::vector<Shape *> shps;
+    // RaySceneFactory::CreateShapes(shps, objects);
+
+    // CHECK_EQUAL(2, shps.size());
+
+    // for (uint i = 0; i < shps.)
+}
+
+TEST(RaySceneFactory, can_create_scene) {
+    RayScene s;
+    RaySceneFactory::CreateScene(s, scene);
+
+    Vect p = s.getCamera().getPos();
+    CHECK_EQUAL(1, p.getX());
+
+    Light l = s.getLight(0);
+    CHECK_EQUAL(DIRECTIONAL_LIGHT, l.getType());
+    l = s.getLight(1);
+    CHECK_EQUAL(POINT_LIGHT, l.getType());
 }

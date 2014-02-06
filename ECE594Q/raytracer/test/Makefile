@@ -1,6 +1,6 @@
 #Set this to @ to keep the makefile quiet
 ifndef SILENCE
-	SILENCE = @
+    SILENCE = @
 endif
 
 #--- Inputs ----#
@@ -9,6 +9,7 @@ CPPUTEST_HOME = ../../cpputest
 
 CPPUTEST_USE_EXTENSIONS = Y
 CPP_PLATFORM = GCC
+# CXX = clang
 CPPFLAGS += -include $(CPPUTEST_HOME)/include/CppUTest/MemoryLeakDetectorNewMacros.h
 CPPUTEST_CPPFLAGS = -x c++ -g
 CFLAGS += -std=c++11 -include $(CPPUTEST_HOME)/include/CppUTest/MemoryLeakDetectorMallocMacros.h

@@ -3,6 +3,9 @@
 #include "ATimer.h"
 #include "scene_io.h"
 
+#include "rayscene.h"
+#include "rayscene_factory.h"
+
 #define IMAGE_WIDTH		1500
 #define IMAGE_HEIGHT	1500
 
@@ -18,8 +21,9 @@ static void loadScene(const char *name) {
 
 	/* hint: use the Visual Studio debugger ("watch" feature) to probe the
 	   scene data structure and learn more about it for each of the given scenes */
-
-
+    RayScene rayScene;
+    RaySceneFactory::CreateScene(rayScene, *scene);
+    cout << rayScene << endl;
 	/* write any code to transfer from the scene data structure to your own here */
 	/* */
 
@@ -53,8 +57,8 @@ void render(void) {
 
 
 int main(int argc, char *argv[]) {
-	Timer total_timer;
-	total_timer.startTimer();
+	// Timer total_timer;
+	// total_timer.startTimer();
 
 	loadScene("./scenes/test1.ascii");
 
@@ -66,8 +70,8 @@ int main(int argc, char *argv[]) {
 		deleteScene(scene);
 	}
 
-	total_timer.stopTimer();
-	fprintf(stderr, "Total time: %.5lf \n", total_timer.getTime());
+	// total_timer.stopTimer();
+	// fprintf(stderr, "Total time: %.5lf \n", total_timer.getTime());
 	
 	return 1;
 }
