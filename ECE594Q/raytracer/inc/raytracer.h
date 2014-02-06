@@ -53,6 +53,7 @@ public:
     Point_2D computePoint(uint, uint);
     Vect computeDirection(uint, uint);
     Ray computeRay(uint, uint);
+    RayBuffer traceRays();
 
     RayBuffer getRayBuffer() { return buffer; }
 };

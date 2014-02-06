@@ -3,10 +3,11 @@
 
 #include <vector>
 
-#include "rayscene.h"
-#include "rayscene_shapes.h"
-#include "raybuffer.h"
 #include "scene_io.h"
+#include "raybuffer.h"
+#include "ray.h"
+#include "rayscene_shapes.h"
+#include "rayscene.h"
 
 class RaySceneFactory {
 public:

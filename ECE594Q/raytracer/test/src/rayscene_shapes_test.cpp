@@ -88,3 +88,4 @@ TEST(RaySceneShapesTest, mesh_intesects) {
     Ray r2(Vect(0, 0, 0), Vect(1, 1, -2));
     CHECK_FALSE(m.intersects(r2, t));
 }
+

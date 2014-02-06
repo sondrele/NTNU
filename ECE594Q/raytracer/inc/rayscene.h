@@ -7,6 +7,7 @@
 
 #include "Matrix.h"
 #include "scene_io.h"
+#include "ray.h"
 #include "raybuffer.h"
 #include "rayscene_shapes.h"
 
@@ -77,9 +78,13 @@ public:
     void setShapes(std::vector<Shape *>);
     void addShape(Shape *);
     Shape * getShape(uint);
+    Intersection calculateRayIntersection(Ray);
 
     std::string toString() const;
     friend ostream& operator <<(ostream&, const RayScene&);
 };
+
+// typedef std::vector<Shape *>    ShapeVct
+// typedef ShapeVector::iterator   ShapeVctItr
 
 #endif

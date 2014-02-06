@@ -19,8 +19,19 @@ public:
 };
 
 class Intersection {
+private:
+    Ray ray;
+    float pt;
+    bool intersected;
 
-
+public:
+    Intersection();
+    Intersection(Ray);
+    Vect getOrigin() { return ray.getOrigin(); }
+    Vect getDirection() { return ray.getDirection(); }
+    void setIntersectionPoint(float);
+    float getIntersectionPoint() {return pt; }
+    bool hasIntersected() { return intersected; }
 };
 
 #endif // _RAY_H_

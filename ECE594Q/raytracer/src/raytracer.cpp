@@ -3,6 +3,7 @@
 RayTracer::RayTracer(uint width, uint height, Vect viewDir, Vect orthoUp) {
     WIDTH = width;
     HEIGHT = height;
+    buffer = RayBuffer(WIDTH, HEIGHT);
 
     Camera camera;
     camera.setPos(Vect(0, 0, 0));
@@ -19,6 +20,8 @@ RayTracer::RayTracer(uint width, uint height, Vect viewDir, Vect orthoUp) {
 RayTracer::RayTracer(uint width, uint height) {
     WIDTH = width;
     HEIGHT = height;
+    scaleConst = 2;
+    buffer = RayBuffer(WIDTH, HEIGHT);
 
     Camera camera;
     camera.setPos(Vect(0, 0, 0));
@@ -26,8 +29,6 @@ RayTracer::RayTracer(uint width, uint height) {
     camera.setViewDir(Vect(0, 0, -1));
     camera.setOrthoUp(Vect(0, 1, 0));
     scene.setCamera(camera);
-
-    scaleConst = 2;
 
     calculateImagePlane();
 }
@@ -104,12 +105,27 @@ Vect RayTracer::computeDirection(uint x, uint y) {
     Vect dx = (horizontal()).linearMult(2 * p.x - 1);
     Vect dy = (vertical()).linearMult(2 * p.y - 1);
 
-    Vect pt = imageCenter + dx + dy;
-    return pt;
+    Vect dir = imageCenter + dx + dy;
+    // dir.normalize(); TODO: fix tests
+    return dir;
 }
 
 Ray RayTracer::computeRay(uint x, uint y) {
     Vect dir = computeDirection(x, y);
     Ray r(getCameraPos(), dir);
     return r;
+}
+
+RayBuffer RayTracer::traceRays() {
+    for (uint y = 0; y < HEIGHT; y++) {
+        for (uint x = 0; x < WIDTH; x++) {
+            Ray r = computeRay(x, y);
+            Intersection is = scene.calculateRayIntersection(r);
+            if (is.hasIntersected()) {
+                PX_Color c = {255, 255, 255};
+                buffer.setPixel(x, y, c);
+            }
+        }
+    }
+    return buffer;
 }
