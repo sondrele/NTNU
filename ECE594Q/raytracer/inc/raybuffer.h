@@ -8,9 +8,9 @@
 #define PX(x, y) (y * WIDTH + x)
 
 typedef struct {
-    unsigned char R;
-    unsigned char G;
-    unsigned char B;
+    uint8_t R;
+    uint8_t G;
+    uint8_t B;
 } PX_Color;
 
 class RayPixel {
@@ -25,7 +25,7 @@ public:
     uint getX() { return X; };
     uint getY() { return Y; };
     void setColor(PX_Color);
-    void setColor(unsigned char, unsigned char, unsigned char);
+    void setColor(uint8_t, uint8_t, uint8_t);
     PX_Color getColor() { return color; };
 };
 
@@ -43,7 +43,7 @@ public:
     uint64_t size() { return pixels.size(); };
 
     void setPixel(uint, uint, PX_Color);
-    void setPixel(uint, uint, unsigned char, unsigned char, unsigned char);
+    void setPixel(uint, uint, uint8_t, uint8_t, uint8_t);
     RayPixel getPixel(uint, uint);
 };
 

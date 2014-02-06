@@ -8,7 +8,7 @@
 typedef struct {
     float x;
     float y;
-} Point;
+} Point_2D;
 
 class Ray {
 private:
@@ -62,7 +62,7 @@ public:
     Vect horizontal();
     double getVerticalFOV() { return verticalFOV; };
     double getHorizontalFOV();
-    Point computePoint(uint, uint);
+    Point_2D computePoint(uint, uint);
     Vect computeDirection(uint, uint);
     Ray computeRay(uint, uint);
 };

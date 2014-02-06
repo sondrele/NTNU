@@ -1,57 +1,63 @@
 #ifndef _RAYSCENE_H_
 #define _RAYSCENE_H_
 
+#include <cstdlib>
+#include <stdint.h>
 #include <vector>
 
 #include "Matrix.h"
 #include "scene_io.h"
+#include "raybuffer.h"
+#include "raytracer.h"
+#include "rayscene_shapes.h"
 
 class Camera {
 private:
     Vect pos;
     Vect viewDir;
     Vect orthoUp;
-    double focalDist;
-    double verticalFOV;
+
+    float focalDist;
+    float verticalFOV;
 
 public:
-    Camera();
-
+    Vect getPos() { return pos; };
+    void setPos(Vect d) { pos = d; };
+    Vect getViewDir() { return viewDir; };
+    void setViewDir(Vect d) { viewDir = d; };
+    Vect getOrthoUp() { return orthoUp; };
+    void setOrthoUp(Vect d) { orthoUp = d; };
+    float getFocalDist() { return focalDist; };
+    void setFocalDist(float f) { focalDist = f; };
+    float getVerticalFOV() { return verticalFOV; };
+    void setVerticalFOV(float f) { verticalFOV = f; };
 };
 
-class Polygon {
+class Light {
 private:
-
-public:
-};
-
-class Sphere {
-private:
-
-public:
-};
-
-class Triangle {
-private:
-    std::string name;
-
-public:
-};
-
-typedef struct {
     Vect pos;
+    Vect dir;
     PX_Color color;
-} Light;
+    enum LightType type;
 
+public:
+    enum LightType getType() { return type; };
+    void setType(enum LightType t) { type = t; };
+    PX_Color getColor() { return color; };
+    void setColor(PX_Color c) { color = c; };
+    Vect getPos() { return pos; };
+    void setPos(Vect p) { pos = p; };
+    Vect getDir() { return dir; };
+    void setDir(Vect d) { dir = d; };
+    
+};
 
 class RayScene {
 private:
-    Camera cam;
-    std::vector<Polygon> shapes;
+    Camera camera;
     std::vector<Light> lights;
 
 public:
-    RayScene(SceneIO *);
 };
 
 #endif

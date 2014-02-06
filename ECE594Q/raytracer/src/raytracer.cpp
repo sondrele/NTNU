@@ -1,5 +1,9 @@
 #include "raytracer.h"
 
+Ray::Ray() {
+    ;
+}
+
 Ray::Ray(Vect o, Vect d) {
     origin = o;
     direction = d;
@@ -73,18 +77,18 @@ Vect RayTracer::horizontal() {
     return hori;
 }
 
-Point RayTracer::computePoint(uint x, uint y) {
+Point_2D RayTracer::computePoint(uint x, uint y) {
     if (!(x < WIDTH && y < HEIGHT))
         throw "Coords out of bounds";
 
-    Point pt;
+    Point_2D pt;
     pt.x = (float)(x + 0.5) * (1 / (float) WIDTH);
     pt.y = (float)(y + 0.5) * (1 / (float) HEIGHT);
     return pt;
 }
 
 Vect RayTracer::computeDirection(uint x, uint y) {
-    Point p = computePoint(x, y);
+    Point_2D p = computePoint(x, y);
     Vect dx = (horizontal()).linearMult(2 * p.x - 1);
     Vect dy = (vertical()).linearMult(2 * p.y - 1);
 

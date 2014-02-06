@@ -4,10 +4,6 @@
 
 TEST_GROUP(RayTracer) {
     void setup() {
-        RayTracer r(20, 10);
-
-        r.setViewDirection(Vect(0, 0, 1));
-        r.setOrthogonalUp(Vect(0, 1, 0));
     }
     void teardown() {
     }
@@ -95,7 +91,7 @@ TEST(RayTracer, x_and_y_both_works) {
 TEST(RayTracer, can_compute_point) {
     RayTracer r(30, 20, Vect(0, 0, 1), Vect(0, 1, 0));
 
-    Point pt = r.computePoint(10, 5);
+    Point_2D pt = r.computePoint(10, 5);
     DOUBLES_EQUAL(0.35, pt.x, 0.00001);
     DOUBLES_EQUAL(0.275, pt.y, 0.00001);
 }
@@ -103,16 +99,16 @@ TEST(RayTracer, can_compute_point) {
 TEST(RayTracer, can_compute_points) {
     RayTracer r(2, 2, Vect(0, 0, 1), Vect(0, 1, 0));
 
-    Point p0 = r.computePoint(0, 0);
+    Point_2D p0 = r.computePoint(0, 0);
     DOUBLES_EQUAL(0.25, p0.x, 0.00001);
     DOUBLES_EQUAL(0.25, p0.y, 0.00001);
-    Point p1 = r.computePoint(1, 0);
+    Point_2D p1 = r.computePoint(1, 0);
     DOUBLES_EQUAL(0.75, p1.x, 0.00001);
     DOUBLES_EQUAL(0.25, p1.y, 0.00001);
-    Point p2 = r.computePoint(0, 1);
+    Point_2D p2 = r.computePoint(0, 1);
     DOUBLES_EQUAL(0.25, p2.x, 0.00001);
     DOUBLES_EQUAL(0.75, p2.y, 0.00001);
-    Point p3 = r.computePoint(1, 1);
+    Point_2D p3 = r.computePoint(1, 1);
     DOUBLES_EQUAL(0.75, p3.x, 0.00001);
     DOUBLES_EQUAL(0.75, p3.y, 0.00001);
 }
@@ -132,6 +128,14 @@ TEST(RayTracer, can_compute_direction) {
     Vect p3 = r.computeDirection(1, 1);
     CHECK_EQUAL(-1, p3.getX());
     CHECK_EQUAL(1, p3.getY());
+}
+
+TEST(RayTracer, ray_inits) {
+    Ray r(Vect(0, 0, -1), Vect(-1, 0, 0));
+    Vect o = r.getOrigin();
+    Vect d = r.getDirection();
+    CHECK_EQUAL(-1, o.getZ());
+    CHECK_EQUAL(-1, d.getX());
 }
 
 TEST(RayTracer, can_compute_ray) {
