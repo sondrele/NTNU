@@ -3,3 +3,4 @@ cpputest/
 *.o
 matrix
 raytracer
+main
