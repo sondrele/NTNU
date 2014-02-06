@@ -151,12 +151,12 @@ const Matrix operator *(const Matrix &a, const Matrix &b) {
 
 string Matrix::toString() const {
     stringstream s;
-    s << "Matrix[" << ROWS << "][" << COLS << "]\n";
+    // s << "Matrix[" << ROWS << "][" << COLS << "]\n";
     for (int i = 0; i < ROWS; i++) {
         for (int j = 0; j < COLS; j++) {
             s << '|' << getCell(i, j) << "|";
         }
-        s << endl;
+        // s << endl;
     }
     return s.str();
 }
