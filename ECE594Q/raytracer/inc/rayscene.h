@@ -56,6 +56,7 @@ class RayScene {
 private:
     Camera camera;
     std::vector<Light> lights;
+    std::vector<Shape> shapes;
 
 public:
 };
