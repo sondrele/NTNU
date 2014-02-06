@@ -15,6 +15,14 @@ void RayScene::setCameraPos(Vect pos) {
     camera.setPos(pos);
 }
 
+void RayScene::setCameraViewDir(Vect viewDir) {
+    camera.setViewDir(viewDir);
+}
+
+void RayScene::setCameraOrthoUp(Vect orthoUp) {
+    camera.setOrthoUp(orthoUp);
+}
+
 void RayScene::setLights(std::vector<Light> ls) {
     lights = ls;
 }

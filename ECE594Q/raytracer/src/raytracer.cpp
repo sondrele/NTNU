@@ -1,72 +1,84 @@
 #include "raytracer.h"
 
-Ray::Ray() {
-    ;
-}
+RayTracer::RayTracer(uint width, uint height, Vect viewDir, Vect orthoUp) {
+    WIDTH = width;
+    HEIGHT = height;
 
-Ray::Ray(Vect o, Vect d) {
-    origin = o;
-    direction = d;
+    Camera camera;
+    camera.setPos(Vect(0, 0, 0));
+    camera.setVerticalFOV((float)M_PI / 2.0f);
+    camera.setViewDir(viewDir);
+    camera.setOrthoUp(orthoUp);
+    scene.setCamera(camera);
+
+    scaleConst = 2;
+
+    calculateImagePlane();
 }
 
 RayTracer::RayTracer(uint width, uint height) {
     WIDTH = width;
     HEIGHT = height;
 
-    verticalFOV = M_PI / 2.0;
-    scaleConst = 2.0;
-    // rt.setViewDirection(Vect(0, 0, 1));
-    // rt.setOrthogonalUp(Vect(0, 1, 0));
+    Camera camera;
+    camera.setPos(Vect(0, 0, 0));
+    camera.setVerticalFOV((float)M_PI / 2.0f);
+    camera.setViewDir(Vect(0, 0, -1));
+    camera.setOrthoUp(Vect(0, 1, 0));
+    scene.setCamera(camera);
+
+    scaleConst = 2;
+
+    calculateImagePlane();
 }
 
-RayTracer::RayTracer(uint width, uint height, Vect viewDir, Vect orthoUp) {
-    WIDTH = width;
-    HEIGHT = height;
-
-    verticalFOV = M_PI / 2.0;
-    scaleConst = 2.0;
-
-    setViewDirection(viewDir);
-    setOrthogonalUp(orthoUp);
-}
-
-void RayTracer::setCamera(Vect cam) {
-    cameraPos = cam;
+void RayTracer::setCameraPos(Vect cam) {
+    Vect cameraPos = cam;
     cameraPos.normalize();
+
+    scene.setCameraPos(cameraPos);
 }
 
 void RayTracer::setViewDirection(Vect viewDir) {
-    viewDirection = viewDir;
-    viewDirection.normalize();
+    viewDir.normalize();
+    scene.setCameraViewDir(viewDir);
 
     calculateImagePlane();
 }
 
 void RayTracer::setOrthogonalUp(Vect orthoUp) {
-    orthogonalUp = orthoUp;
-    orthogonalUp.normalize();
+    orthoUp.normalize();
+    scene.setCameraOrthoUp(orthoUp);
     
     calculateImagePlane();
 }
 
 void RayTracer::calculateImagePlane() {
-    parallelRight = viewDirection.crossProduct(orthogonalUp);
-    parallelUp = parallelRight.crossProduct(viewDirection);
+    Vect viewDir = getViewDirection();
+    Vect orthoUp = getOrthogonalUp();
+    Vect cameraPos = getCameraPos();
+
+    parallelRight = viewDir.crossProduct(orthoUp);
+    parallelUp = parallelRight.crossProduct(viewDir);
     parallelRight.normalize();
     parallelUp.normalize();
 
-    imageCenter = cameraPos + viewDirection.linearMult(scaleConst);
+    imageCenter = cameraPos + viewDir.linearMult(scaleConst);
+}
+
+Vect RayTracer::getImageCenter() {
+    return imageCenter;
 }
 
 double RayTracer::getHorizontalFOV() {
-    double horiFov = ((float) WIDTH / (float) HEIGHT) * verticalFOV;
+    double horiFov = ((float) WIDTH / (float) HEIGHT) * getVerticalFOV();
     if (horiFov >= M_PI)
         throw "FOV too large";
     return horiFov;
 }
 
 Vect RayTracer::vertical() {
-    float f = (float) tan(verticalFOV / 2) * scaleConst;
+    float f = (float) tan(getVerticalFOV() / 2) * scaleConst;
     Vect vert = parallelUp.linearMult(f);
     return vert;
 }
@@ -98,6 +110,6 @@ Vect RayTracer::computeDirection(uint x, uint y) {
 
 Ray RayTracer::computeRay(uint x, uint y) {
     Vect dir = computeDirection(x, y);
-    Ray r(cameraPos, dir);
+    Ray r(getCameraPos(), dir);
     return r;
 }

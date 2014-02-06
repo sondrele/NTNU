@@ -9,8 +9,7 @@
 
 #include "Matrix.h"
 #include "scene_io.h"
-#include "raybuffer.h"
-#include "raytracer.h"
+#include "ray.h"
 
 enum ShapeType {
     SPHERE, MESH, TRIANGLE

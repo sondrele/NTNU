@@ -17,7 +17,7 @@ TEST(RayTracer, should_init) {
 
 TEST(RayTracer, has_camera) {
     RayTracer rt(10, 10);
-    Vect camera = rt.getCamera();
+    Camera camera = rt.getCamera();
     CHECK_EQUAL(0, camera.getX());
     CHECK_EQUAL(0, camera.getY());
     CHECK_EQUAL(0, camera.getZ());
@@ -34,8 +34,18 @@ TEST(RayTracer, has_normalized_vectors) {
 
 TEST(RayTracer, can_calculate_image_plane) {
     RayTracer rt(20, 10);
-    rt.setViewDirection(Vect(0, 0, -1));
-    rt.setOrthogonalUp(Vect(0, 1, 0));
+    // rt.setViewDirection(Vect(0, 0, -1));
+    // rt.setOrthogonalUp(Vect(0, 1, 0));
+
+    Vect viewDir = rt.getViewDirection();
+    CHECK_EQUAL(0, viewDir.getX());
+    CHECK_EQUAL(0, viewDir.getY());
+    CHECK_EQUAL(-1, viewDir.getZ());
+
+    Vect camPos = rt.getCameraPos();
+    CHECK_EQUAL(0, camPos.getX());
+    CHECK_EQUAL(0, camPos.getY());
+    CHECK_EQUAL(0, camPos.getZ());
     
     Vect pRight = rt.getParallelRight();
     CHECK_EQUAL(1, pRight.getX());
@@ -47,6 +57,7 @@ TEST(RayTracer, can_calculate_image_plane) {
     CHECK_EQUAL(1, pUp.getY());
     CHECK_EQUAL(0, pUp.getZ());
 
+    // Vect iCtr = camPos + viewDir.linearMult(2);
     Vect iCtr = rt.getImageCenter();
     CHECK_EQUAL(0, iCtr.getX());
     CHECK_EQUAL(0, iCtr.getY());

@@ -6,8 +6,8 @@
 #include "rayscene.h"
 #include "rayscene_factory.h"
 
-#define IMAGE_WIDTH		1500
-#define IMAGE_HEIGHT	1500
+#define IMAGE_WIDTH		500
+#define IMAGE_HEIGHT	500
 
 
 typedef unsigned char u08;
@@ -23,7 +23,8 @@ static void loadScene(const char *name) {
 	   scene data structure and learn more about it for each of the given scenes */
     RayScene rayScene;
     RaySceneFactory::CreateScene(rayScene, *scene);
-    cout << rayScene << endl;
+
+    RayTracer rayTracer(IMAGE_WIDTH, IMAGE_HEIGHT);
 	/* write any code to transfer from the scene data structure to your own here */
 	/* */
 

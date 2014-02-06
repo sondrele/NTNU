@@ -3,6 +3,7 @@
 RayPixel::RayPixel(uint x, uint y) {
     X = x;
     Y = y;
+    setColor(0, 0, 0);
 }
 
 void RayPixel::setColor(PX_Color c) {

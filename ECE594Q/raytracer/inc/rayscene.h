@@ -8,14 +8,13 @@
 #include "Matrix.h"
 #include "scene_io.h"
 #include "raybuffer.h"
-#include "raytracer.h"
 #include "rayscene_shapes.h"
 
 class Camera {
 private:
-    Vect pos;
-    Vect viewDir;
-    Vect orthoUp;
+    Vect pos;           // E
+    Vect viewDir;       // V
+    Vect orthoUp;       // Ù
 
     float focalDist;
     float verticalFOV;
@@ -23,6 +22,9 @@ private:
 public:
     Vect getPos() const { return pos;}
     void setPos(Vect d) { pos = d;}
+    float getX() { return pos.getX(); }
+    float getY() { return pos.getY(); }
+    float getZ() { return pos.getZ(); }
     Vect getViewDir() { return viewDir;}
     void setViewDir(Vect d) { viewDir = d;}
     Vect getOrthoUp() { return orthoUp;}
@@ -65,6 +67,8 @@ public:
     void setCamera(Camera c) { camera = c;}
     Camera getCamera() { return camera;}
     void setCameraPos(Vect);
+    void setCameraViewDir(Vect);
+    void setCameraOrthoUp(Vect);
 
     void setLights(std::vector<Light>);
     void addLight(Light);

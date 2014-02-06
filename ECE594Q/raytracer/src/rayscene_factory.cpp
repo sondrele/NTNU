@@ -80,6 +80,8 @@ void RaySceneFactory::CreateCamera(Camera &c, CameraIO &cio) {
     c.setVerticalFOV(cio.verticalFOV);
 }
 
+// void RaySceneFactory::CreateCamera()
+
 Shape * RaySceneFactory::CreateShape(ObjIO &oio) {
     switch(oio.type) {
         case SPHERE_OBJ: {

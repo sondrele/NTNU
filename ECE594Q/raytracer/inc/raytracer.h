@@ -3,42 +3,29 @@
 
 #include <cstdlib>
 #include <iostream>
+
 #include "Matrix.h"
+#include "ray.h"
+#include "raybuffer.h"
+#include "rayscene.h"
 
 typedef struct {
     float x;
     float y;
 } Point_2D;
 
-class Ray {
-private:
-    Vect origin;
-    Vect direction;
-
-public:
-    Ray();
-    Ray(Vect, Vect);
-    Vect getOrigin() { return origin;}
-    void setOrigin(Vect o) { origin = o;}
-    Vect getDirection() { return direction;}
-    void setDirection(Vect d) { direction = d;}
-
-};
-
 class RayTracer {
 private:
     uint WIDTH;
     uint HEIGHT;
-    double verticalFOV; // vertical field of view
-    float scaleConst;
-
-    Vect cameraPos; // E
-    Vect viewDirection; // V
-    Vect orthogonalUp; // U
+    float scaleConst;   // c
 
     Vect parallelRight; // A: viewDir x orthogonalUp - dir of x-axis
-    Vect parallelUp; // B: A x viewDir
-    Vect imageCenter; // M: E + cV
+    Vect parallelUp;    // B: A x viewDir
+    Vect imageCenter;   // M: E + cV
+
+    RayBuffer buffer;
+    RayScene scene;
 
     void calculateImagePlane();
 
@@ -48,23 +35,26 @@ public:
 
     uint getWidth() { return WIDTH;}
     uint getHeight() { return HEIGHT;}
-    void setCamera(Vect cam);
-    Vect getCamera() { return cameraPos;}
+    void setCameraPos(Vect cam);
+    Camera getCamera() { return scene.getCamera();}
+    Vect getCameraPos() { return getCamera().getPos(); }
     void setViewDirection(Vect);
-    Vect getViewDirection() { return viewDirection;}
+    Vect getViewDirection() { return scene.getCamera().getViewDir(); }
     void setOrthogonalUp(Vect);
-    Vect getOrthogonalUp() { return orthogonalUp;}
+    Vect getOrthogonalUp() { return scene.getCamera().getOrthoUp(); }
     Vect getParallelRight() { return parallelRight;}
     Vect getParallelUp() { return parallelUp;}
-    Vect getImageCenter() { return imageCenter;}
+    Vect getImageCenter();
 
     Vect vertical();
     Vect horizontal();
-    double getVerticalFOV() { return verticalFOV;}
+    double getVerticalFOV() { return scene.getCamera().getVerticalFOV(); }
     double getHorizontalFOV();
     Point_2D computePoint(uint, uint);
     Vect computeDirection(uint, uint);
     Ray computeRay(uint, uint);
+
+    RayBuffer getRayBuffer() { return buffer; }
 };
 
 #endif // _RAYTRACER_H_

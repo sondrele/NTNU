@@ -37,6 +37,7 @@ private:
     std::vector<RayPixel> pixels;
 
 public:
+    RayBuffer() {}
     RayBuffer(uint, uint);
     uint getWidth() { return WIDTH; }
     uint getHeight() { return HEIGHT; }
