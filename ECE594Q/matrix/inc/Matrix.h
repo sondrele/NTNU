@@ -29,12 +29,12 @@ public:
     void setCell(int, int, float);
     float getCell(int, int) const;
     
-    float getX() const { return getCell(0, 0); };
-    float getY() const { return getCell(1, 0); };
-    float getZ() const { return getCell(2, 0); };
-    void setX(float val) { setCell(0, 0, val); };
-    void setY(float val) { setCell(1, 0, val); };
-    void setZ(float val) { setCell(2, 0, val); };
+    float getX() const { return getCell(0, 0); }
+    float getY() const { return getCell(1, 0); }
+    float getZ() const { return getCell(2, 0); }
+    void setX(float val) { setCell(0, 0, val); }
+    void setY(float val) { setCell(1, 0, val); }
+    void setZ(float val) { setCell(2, 0, val); }
 
     string toString() const;
     friend ostream& operator <<(ostream&, const Matrix&);
@@ -68,8 +68,8 @@ public:
     Vect_h(const Matrix);
     Vect_h(const Vect_h &);
 
-    void setW(float val) { setCell(3, 0, val); };
-    float getW() const { return getCell(3, 0); };
+    void setW(float val) { setCell(3, 0, val); }
+    float getW() const { return getCell(3, 0); }
 
     void homogenize();
 
