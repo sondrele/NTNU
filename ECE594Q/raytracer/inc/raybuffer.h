@@ -22,11 +22,11 @@ private:
 
 public:
     RayPixel(uint, uint);
-    uint getX() { return X; };
-    uint getY() { return Y; };
+    uint getX() { return X; }
+    uint getY() { return Y; }
     void setColor(PX_Color);
     void setColor(uint8_t, uint8_t, uint8_t);
-    PX_Color getColor() { return color; };
+    PX_Color getColor() { return color; }
 };
 
 class RayBuffer {
@@ -38,9 +38,9 @@ private:
 
 public:
     RayBuffer(uint, uint);
-    uint getWidth() { return WIDTH; };
-    uint getHeight() { return HEIGHT; };
-    uint64_t size() { return pixels.size(); };
+    uint getWidth() { return WIDTH; }
+    uint getHeight() { return HEIGHT; }
+    uint64_t size() { return pixels.size(); }
 
     void setPixel(uint, uint, PX_Color);
     void setPixel(uint, uint, uint8_t, uint8_t, uint8_t);

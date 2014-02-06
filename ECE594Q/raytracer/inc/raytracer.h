@@ -18,10 +18,10 @@ private:
 public:
     Ray();
     Ray(Vect, Vect);
-    Vect getOrigin() { return origin; };
-    void setOrigin(Vect o) { origin = o; };
-    Vect getDirection() { return direction; };
-    void setDirection(Vect d) { direction = d; };
+    Vect getOrigin() { return origin;}
+    void setOrigin(Vect o) { origin = o;}
+    Vect getDirection() { return direction;}
+    void setDirection(Vect d) { direction = d;}
 
 };
 
@@ -46,21 +46,21 @@ public:
     RayTracer(uint, uint);
     RayTracer(uint, uint, Vect, Vect);
 
-    uint getWidth() { return WIDTH; };
-    uint getHeight() { return HEIGHT; };
+    uint getWidth() { return WIDTH;}
+    uint getHeight() { return HEIGHT;}
     void setCamera(Vect cam);
-    Vect getCamera() { return cameraPos; };
+    Vect getCamera() { return cameraPos;}
     void setViewDirection(Vect);
-    Vect getViewDirection() { return viewDirection; };
+    Vect getViewDirection() { return viewDirection;}
     void setOrthogonalUp(Vect);
-    Vect getOrthogonalUp() { return orthogonalUp; };
-    Vect getParallelRight() { return parallelRight; };
-    Vect getParallelUp() { return parallelUp; };
-    Vect getImageCenter() { return imageCenter; };
+    Vect getOrthogonalUp() { return orthogonalUp;}
+    Vect getParallelRight() { return parallelRight;}
+    Vect getParallelUp() { return parallelUp;}
+    Vect getImageCenter() { return imageCenter;}
 
     Vect vertical();
     Vect horizontal();
-    double getVerticalFOV() { return verticalFOV; };
+    double getVerticalFOV() { return verticalFOV;}
     double getHorizontalFOV();
     Point_2D computePoint(uint, uint);
     Vect computeDirection(uint, uint);

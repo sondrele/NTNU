@@ -18,6 +18,7 @@ public:
     static void CreateLight(Light &, LightIO &);
     static void CreateLights(std::vector<Light> &, LightIO &);
     static void CreateCamera(Camera &c, CameraIO &cio);
+    static void CreateScene(RayScene &s, SceneIO &sio);
 };
 
 #endif

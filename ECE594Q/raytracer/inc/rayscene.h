@@ -21,16 +21,16 @@ private:
     float verticalFOV;
 
 public:
-    Vect getPos() { return pos; };
-    void setPos(Vect d) { pos = d; };
-    Vect getViewDir() { return viewDir; };
-    void setViewDir(Vect d) { viewDir = d; };
-    Vect getOrthoUp() { return orthoUp; };
-    void setOrthoUp(Vect d) { orthoUp = d; };
-    float getFocalDist() { return focalDist; };
-    void setFocalDist(float f) { focalDist = f; };
-    float getVerticalFOV() { return verticalFOV; };
-    void setVerticalFOV(float f) { verticalFOV = f; };
+    Vect getPos() { return pos;}
+    void setPos(Vect d) { pos = d;}
+    Vect getViewDir() { return viewDir;}
+    void setViewDir(Vect d) { viewDir = d;}
+    Vect getOrthoUp() { return orthoUp;}
+    void setOrthoUp(Vect d) { orthoUp = d;}
+    float getFocalDist() { return focalDist;}
+    void setFocalDist(float f) { focalDist = f;}
+    float getVerticalFOV() { return verticalFOV;}
+    void setVerticalFOV(float f) { verticalFOV = f;}
 };
 
 class Light {
@@ -41,14 +41,14 @@ private:
     enum LightType type;
 
 public:
-    enum LightType getType() { return type; };
-    void setType(enum LightType t) { type = t; };
-    PX_Color getColor() { return color; };
-    void setColor(PX_Color c) { color = c; };
-    Vect getPos() { return pos; };
-    void setPos(Vect p) { pos = p; };
-    Vect getDir() { return dir; };
-    void setDir(Vect d) { dir = d; };
+    enum LightType getType() { return type;}
+    void setType(enum LightType t) { type = t;}
+    PX_Color getColor() { return color;}
+    void setColor(PX_Color c) { color = c;}
+    Vect getPos() { return pos;}
+    void setPos(Vect p) { pos = p;}
+    Vect getDir() { return dir;}
+    void setDir(Vect d) { dir = d;}
     
 };
 
@@ -56,9 +56,24 @@ class RayScene {
 private:
     Camera camera;
     std::vector<Light> lights;
-    std::vector<Shape> shapes;
+    std::vector<Shape *> shapes;
 
 public:
+    RayScene();
+    ~RayScene();
+    
+    void setCamera(Camera c) { camera = c;}
+    Camera getCamera() { return camera;}
+    void setCameraPos(Vect);
+
+    void setLights(std::vector<Light>);
+    void addLight(Light);
+    Light getLight(uint);
+
+    void setShapes(std::vector<Shape *>);
+    void addShape(Shape *);
+    Shape * getShape(uint);
+
 };
 
 #endif
