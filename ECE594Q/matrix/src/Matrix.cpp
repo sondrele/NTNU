@@ -81,7 +81,7 @@ void Matrix::setCell(int row, int col, float val) {
     if (row >= 0 and row < ROWS and col >= 0 and col < COLS)
         mat[row * COLS + col] = val;
     else
-        throw "SetCellException: Out of bounds\n";
+        throw "SetCellException: Out of bounds";
 }
 
 
@@ -89,7 +89,7 @@ float Matrix::getCell(int row, int col) const {
     if (row >= 0 and row < ROWS and col >= 0 and col < COLS)
         return mat[row * COLS + col];
 
-    throw "GetCellException: Out of bounds\n";
+    throw "GetCellException: Out of bounds" ;
 }
 
 Matrix &Matrix::operator = (const Matrix &other) {

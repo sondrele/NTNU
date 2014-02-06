@@ -8,6 +8,7 @@
 #include "ray.h"
 #include "raybuffer.h"
 #include "rayscene.h"
+#include "rayscene_shapes.h"
 
 typedef struct {
     float x;
@@ -33,6 +34,8 @@ public:
     RayTracer(uint, uint);
     RayTracer(uint, uint, Vect, Vect);
 
+    void setScene(RayScene s) { scene = s; }
+
     uint getWidth() { return WIDTH;}
     uint getHeight() { return HEIGHT;}
     void setCameraPos(Vect cam);
@@ -54,8 +57,6 @@ public:
     Vect computeDirection(uint, uint);
     Ray computeRay(uint, uint);
     RayBuffer traceRays();
-
-    RayBuffer getRayBuffer() { return buffer; }
 };
 
 #endif // _RAYTRACER_H_

@@ -47,6 +47,16 @@ TEST(RayBuffer, can_init) {
     CHECK_EQUAL(2000, rb.size());
 }
 
+TEST(RayBuffer, standard_pixel_color_is_black) {
+    RayBuffer rb(50, 40);
+    RayPixel p0 = rb.getPixel(0, 0);
+    PX_Color c = p0.getColor();
+
+    CHECK_EQUAL(0, c.R);
+    CHECK_EQUAL(0, c.G);
+    CHECK_EQUAL(0, c.B);
+}
+
 TEST(RayBuffer, can_set_pixel) {
     RayBuffer rb(30, 20);
     PX_Color c0 = {10, 20, 30};

@@ -2,10 +2,16 @@
 #include "CppUTestExt/MockSupport.h"
 #include "raytracer.h"
 
+
 TEST_GROUP(RayTracer) {
     void setup() {
+        // Sphere *s = new Sphere();
+        // s->setRadius(1);
+        // s->setOrigin(Vect(0, 0, -2));
+        // sphere0 = s;
     }
     void teardown() {
+        // delete sphere0;
     }
 };
 
@@ -34,8 +40,6 @@ TEST(RayTracer, has_normalized_vectors) {
 
 TEST(RayTracer, can_calculate_image_plane) {
     RayTracer rt(20, 10);
-    // rt.setViewDirection(Vect(0, 0, -1));
-    // rt.setOrthogonalUp(Vect(0, 1, 0));
 
     Vect viewDir = rt.getViewDirection();
     CHECK_EQUAL(0, viewDir.getX());
@@ -57,7 +61,6 @@ TEST(RayTracer, can_calculate_image_plane) {
     CHECK_EQUAL(1, pUp.getY());
     CHECK_EQUAL(0, pUp.getZ());
 
-    // Vect iCtr = camPos + viewDir.linearMult(2);
     Vect iCtr = rt.getImageCenter();
     CHECK_EQUAL(0, iCtr.getX());
     CHECK_EQUAL(0, iCtr.getY());
@@ -163,4 +166,30 @@ TEST(RayTracer, can_compute_ray) {
     CHECK_EQUAL(-1, dir.getX());
     CHECK_EQUAL(-1, dir.getY());
     CHECK_EQUAL(-2, dir.getZ());
+}
+
+TEST(RayTracer, can_export_raybuffer) {
+    RayScene scene;
+    Sphere *s = new Sphere();
+    s->setRadius(1);
+    s->setOrigin(Vect(0, 2, -10));
+    scene.addShape(s);
+
+    RayTracer rt(200, 200);
+    rt.setScene(scene);
+
+    RayBuffer b = rt.traceRays();
+    RayPixel p0 = b.getPixel(0, 0);
+    PX_Color c = p0.getColor();
+    CHECK_EQUAL(0, c.R);
+    CHECK_EQUAL(0, c.G);
+    CHECK_EQUAL(0, c.B);
+
+    // p0 = b.getPixel(0, 1);
+    // c = p0.getColor();
+    // CHECK_EQUAL(255, c.R);
+    // CHECK_EQUAL(255, c.G);
+    // CHECK_EQUAL(255, c.B);
+
+    delete s;
 }

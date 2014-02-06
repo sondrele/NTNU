@@ -124,6 +124,9 @@ RayBuffer RayTracer::traceRays() {
             if (is.hasIntersected()) {
                 PX_Color c = {255, 255, 255};
                 buffer.setPixel(x, y, c);
+            } else {
+                PX_Color c = {0, 0, 0};
+                buffer.setPixel(x, y, c);
             }
         }
     }

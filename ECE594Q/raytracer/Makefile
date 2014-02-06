@@ -1,5 +1,5 @@
 INCLUDEPATH=\
-	-I../matrix/inc\
+    -I../matrix/inc\
     -Iinc
 CC=clang++
 CC=g++
@@ -8,9 +8,11 @@ CIMGFLAGS = $(CFLAGS) -L/usr/X11R6/lib -lm -lpthread -lX11
 LDFLAGS=
 LIBS = \
     lib/scene_io.cpp\
+    lib/rayimage.cpp\
     ../matrix/src/Matrix.cpp\
     ../matrix/src/Vect.cpp
 SRCS = raytracer.cpp\
+    src/ray.cpp\
     src/raybuffer.cpp\
     src/rayscene.cpp\
     src/rayscene_factory.cpp\
@@ -24,7 +26,7 @@ OBJS = $(SRCS:.cpp=.o) $(LIBS:.cpp=.o)
 all: raytracer
 
 raytracer: $(OBJS)
-	$(CC) -o $@ $^ $(CFLAGS)
+	$(CC) -o $@ $^ $(CIMGFLAGS)
 
 IMG=main.cpp lib/rayimage.cpp src/raybuffer.cpp
 IMGOBJS = $(IMG:.cpp=.o)
