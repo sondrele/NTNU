@@ -23,7 +23,7 @@ private:
     float scaleConst;   // c
 
     RayBuffer buffer;
-    RayScene scene;
+    RayScene *scene;
     Camera camera;
 
     Vect parallelRight; // A: viewDir x orthogonalUp - dir of x-axis
@@ -35,10 +35,11 @@ private:
 public:
     RayTracer(uint, uint);
     RayTracer(uint, uint, Vect, Vect);
+    ~RayTracer();
     uint getWidth() { return WIDTH;}
     uint getHeight() { return HEIGHT;}
 
-    void setScene(RayScene s) { scene = s; }
+    void setScene(RayScene *s) { scene = s; }
     void setCamera(Camera c);
     Camera getCamera() { return camera; }
     void setCameraPos(Vect);

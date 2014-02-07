@@ -5,10 +5,10 @@ RayScene::RayScene() {
 }
 
 RayScene::~RayScene() {
-    // for (uint i = 0; i < shapes.size(); i++) {
-    //     Shape *s = shapes.at(i);
-    //     delete s;
-    // }
+    for (uint i = 0; i < shapes.size(); i++) {
+        Shape *s = shapes.at(i);
+        delete s;
+    }
 }
 
 void RayScene::setLights(std::vector<Light> ls) {
@@ -24,11 +24,6 @@ Light RayScene::getLight(uint pos) {
 }
 
 void RayScene::setShapes(std::vector<Shape *> ss) {
-    for (uint i = 0; i < ss.size(); i++) {
-        Shape *sp = ss.at(i);
-        ShapeType t = sp->getType();
-        cout << "\t\tS: " << t << endl;
-    }
     shapes = ss;
 }
 

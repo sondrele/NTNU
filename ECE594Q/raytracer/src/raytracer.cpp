@@ -4,12 +4,12 @@ RayTracer::RayTracer(uint width, uint height, Vect viewDir, Vect orthoUp) {
     WIDTH = width;
     HEIGHT = height;
     buffer = RayBuffer(WIDTH, HEIGHT);
+    scene = NULL;
 
     camera.setPos(Vect(0, 0, 0));
     camera.setVerticalFOV((float)M_PI / 2.0f);
     camera.setViewDir(viewDir);
     camera.setOrthoUp(orthoUp);
-    // scene.setCamera(camera);
 
     scaleConst = 100;
 
@@ -21,14 +21,20 @@ RayTracer::RayTracer(uint width, uint height) {
     HEIGHT = height;
     scaleConst = 100;
     buffer = RayBuffer(WIDTH, HEIGHT);
+    scene = NULL;
 
     camera.setPos(Vect(0, 0, 0));
     camera.setVerticalFOV((float)M_PI / 2.0f);
     camera.setViewDir(Vect(0, 0, -1));
     camera.setOrthoUp(Vect(0, 1, 0));
-    // scene.setCamera(camera);
 
     calculateImagePlane();
+}
+
+RayTracer::~RayTracer() {
+    if (scene != NULL) {
+        delete scene;
+    }
 }
 
 void RayTracer::setCamera(Camera c) {
@@ -117,7 +123,7 @@ RayBuffer RayTracer::traceRays() {
     for (uint y = 0; y < HEIGHT; y++) {
         for (uint x = 0; x < WIDTH; x++) {
             Ray r = computeRay(x, y);
-            Intersection is = scene.calculateRayIntersection(r);
+            Intersection is = scene->calculateRayIntersection(r);
             if (is.hasIntersected()) {
                 PX_Color c = {255, 255, 255};
                 buffer.setPixel(x, y, c);

@@ -15,26 +15,19 @@ typedef unsigned char u08;
 SceneIO *scene = NULL;
 
 
-static void loadScene(const 
-    char *name) {
+static void loadScene(const char *name, RayTracer &rt) {
     /* load the scene into the SceneIO data structure using given parsing code */
     scene = readScene(name);
 
     /* hint: use the Visual Studio debugger ("watch" feature) to probe the
        scene data structure and learn more about it for each of the given scenes */
-    RayScene rayScene;
-    RaySceneFactory::CreateScene(rayScene, *scene);
+    RayScene *rayScene = new RayScene();
+    RaySceneFactory::CreateScene(*rayScene, *scene);
 
     Camera cam;
     RaySceneFactory::CreateCamera(cam, *(scene->camera));
-    RayTracer rayTracer(IMAGE_WIDTH, IMAGE_HEIGHT);
-    rayTracer.setCamera(cam);
-    rayTracer.setScene(rayScene);
-
-    RayBuffer rayBuffer = rayTracer.traceRays();
-
-    RayImage img;
-    img.createImage(rayBuffer, "scene1.bmp");
+    rt.setCamera(cam);
+    rt.setScene(rayScene);
     return;
 }
 
@@ -51,10 +44,16 @@ int main(int argc, char *argv[]) {
     // Timer total_timer;
     // total_timer.startTimer();
     try {
-        loadScene("./scenes/test1.ascii");
+        RayTracer rayTracer(IMAGE_WIDTH, IMAGE_HEIGHT);
+
+        loadScene("./scenes/test1.ascii", rayTracer);
 
         /* write your ray tracer here */
         render();
+
+        RayBuffer rayBuffer = rayTracer.traceRays();
+        RayImage img;
+        img.createImage(rayBuffer, "scene1.bmp");
 
         /* cleanup */
         if (scene != NULL) {

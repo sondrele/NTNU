@@ -20,29 +20,21 @@ TEST_GROUP(RaySceneTest) {
     }
 
     void teardown() {
-        delete sphere0;
-        delete sphere1;
+        // delete sphere0;
+        // delete sphere1;
     }
 };
 
 TEST(RaySceneTest, can_add_shapes) {
     RayScene s;
     s.addShape(sphere0);
+    s.addShape(sphere1);
 
     Shape *s1 = s.getShape(0);
     CHECK(sphere0 == s1);
 
     Sphere *sp = (Sphere *) s1;
     CHECK_EQUAL(1, sp->getRadius());
-}
-
-TEST(RaySceneTest, removes_shapes_when_deleted) {
-    // RayScene s;
-    // std::vector<Shape *> v;
-    // v.push_back(RaySceneFactory::NewSphere(1, Vect(0, 0, 0)));
-    // v.push_back(RaySceneFactory::NewSphere(1, Vect(0, 0, 0)));
-
-    // s.setShapes(v);
 }
 
 TEST(RaySceneTest, ray_intersects_with_shape) {

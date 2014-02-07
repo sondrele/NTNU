@@ -14,8 +14,8 @@ int main(int argc, char const *argv[]) {
     std::vector<Shape *> v;
     v.push_back(RaySceneFactory::NewSphere(10, Vect(0, 0, -20)));
     v.push_back(RaySceneFactory::NewSphere(10, Vect(10, 10, -20)));
-    RayScene rayScene;
-    rayScene.setShapes(v);
+    RayScene *rayScene = new RayScene();
+    rayScene->setShapes(v);
 
     RayTracer rayTracer(IMAGE_WIDTH, IMAGE_HEIGHT);
     Camera cam;
@@ -32,9 +32,5 @@ int main(int argc, char const *argv[]) {
     RayImage img;
     img.createImage(rayBuffer, "output.bmp");
 
-    for (int i = 0; i < v.size(); ++i)
-    {
-        delete v.at(i);
-    }
     return 0;
 }

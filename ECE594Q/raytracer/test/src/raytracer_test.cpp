@@ -187,11 +187,11 @@ TEST(RayTracer, can_compute_ray) {
 }
 
 TEST(RayTracer, can_export_raybuffer) {
-    RayScene scene;
+    RayScene *scene = new RayScene();
     Sphere *s = new Sphere();
     s->setRadius(1);
     s->setOrigin(Vect(0, 2, -10));
-    scene.addShape(s);
+    scene->addShape(s);
 
     RayTracer rt(200, 200);
     rt.setScene(scene);
@@ -202,12 +202,4 @@ TEST(RayTracer, can_export_raybuffer) {
     CHECK_EQUAL(0, c.R);
     CHECK_EQUAL(0, c.G);
     CHECK_EQUAL(0, c.B);
-
-    // p0 = b.getPixel(0, 1);
-    // c = p0.getColor();
-    // CHECK_EQUAL(255, c.R);
-    // CHECK_EQUAL(255, c.G);
-    // CHECK_EQUAL(255, c.B);
-
-    delete s;
 }
