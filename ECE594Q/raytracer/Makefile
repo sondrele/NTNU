@@ -11,8 +11,7 @@ LIBS = \
     lib/rayimage.cpp\
     ../matrix/src/Matrix.cpp\
     ../matrix/src/Vect.cpp
-SRCS = raytracer.cpp\
-    src/ray.cpp\
+SRCS = src/ray.cpp\
     src/raybuffer.cpp\
     src/rayscene.cpp\
     src/rayscene_factory.cpp\
@@ -23,14 +22,15 @@ OBJS = $(SRCS:.cpp=.o) $(LIBS:.cpp=.o)
 %.o: %.cpp
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-all: raytracer
+all: raytracer main
 
-raytracer: $(OBJS)
+raytracer: raytracer.o $(OBJS)
 	$(CC) -o $@ $^ $(CIMGFLAGS)
 
 IMG=main.cpp lib/rayimage.cpp src/raybuffer.cpp
 IMGOBJS = $(IMG:.cpp=.o)
-main: $(IMGOBJS)
+
+main: main.o $(OBJS)
 	$(CC) -o $@ $^ $(CIMGFLAGS)
 
 clean:

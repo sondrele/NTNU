@@ -5,9 +5,9 @@ RayScene::RayScene() {
 }
 
 RayScene::~RayScene() {
-    // for (std::vector<Shape *>::iterator it = shapes.begin(); it != shapes.end(); ++it) {
-    //     delete * it;  
-    //     it = shapes.erase(it);
+    // for (uint i = 0; i < shapes.size(); i++) {
+    //     Shape *s = shapes.at(i);
+    //     delete s;
     // }
 }
 
@@ -44,7 +44,6 @@ Intersection RayScene::calculateRayIntersection(Ray ray) {
     for (uint i = 0; i < shapes.size(); i++) {
         float t;
         Shape *s = shapes.at(i);
-
         if (s->intersects(ray, t)) {
             Intersection is(ray);
             is.setIntersectionPoint(t);

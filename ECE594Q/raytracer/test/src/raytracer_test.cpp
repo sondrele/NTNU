@@ -5,6 +5,7 @@
 
 TEST_GROUP(RayTracer) {
     void setup() {
+
         // Sphere *s = new Sphere();
         // s->setRadius(1);
         // s->setOrigin(Vect(0, 0, -2));
@@ -33,15 +34,16 @@ TEST(RayTracer, can_add_camera) {
     Camera cam;
     cam.setPos(Vect(10, 10, 10));
     cam.setViewDir(Vect(-1, -1, -1));
-    cam.setOrthoUp(Vect(0, 1, 0));
+    cam.setOrthoUp(Vect(1, 1, 0));
     cam.setVerticalFOV((float)M_PI / 2.0f);
 
     RayTracer rt(50, 50);
     rt.setCamera(cam);
     Camera c0 = rt.getCamera();
     CHECK_EQUAL(10, c0.getX());
-    CHECK_EQUAL(-1, c0.getViewDir().getZ());
-    CHECK_EQUAL(1, c0.getOrthoUp().getY());
+    DOUBLES_EQUAL(-1/sqrt(3), c0.getViewDir().getZ(), 0.00001);
+    DOUBLES_EQUAL(1/sqrt(2), c0.getOrthoUp().getX(), 0.00001);
+    DOUBLES_EQUAL(1/sqrt(2), c0.getOrthoUp().getY(), 0.00001);
     DOUBLES_EQUAL((float)M_PI / 2.0f, cam.getVerticalFOV(), 0.000001);
 }
 
@@ -80,7 +82,7 @@ TEST(RayTracer, can_calculate_image_plane) {
     Vect iCtr = rt.getImageCenter();
     CHECK_EQUAL(0, iCtr.getX());
     CHECK_EQUAL(0, iCtr.getY());
-    CHECK_EQUAL(-2, iCtr.getZ());
+    CHECK_EQUAL(-100, iCtr.getZ());
 }
 
 TEST(RayTracer, has_vertical_vector) {
@@ -90,7 +92,7 @@ TEST(RayTracer, has_vertical_vector) {
 
     Vect v = r.vertical();
     CHECK_EQUAL(0, v.getX());
-    DOUBLES_EQUAL(2, v.getY(), 0.000001);
+    DOUBLES_EQUAL(100, v.getY(), 0.000001);
     CHECK_EQUAL(0, v.getZ());
 }
 
@@ -105,7 +107,7 @@ TEST(RayTracer, has_horizontal_vector) {
     r.setOrthogonalUp(Vect(0, 1, 0));
 
     Vect h = r.horizontal();
-    DOUBLES_EQUAL(4.8284271, h.getX(), 0.000001);
+    DOUBLES_EQUAL(241.421, h.getX(), 0.001);
     CHECK_EQUAL(0, h.getY());
     CHECK_EQUAL(0, h.getZ());
 }
@@ -148,17 +150,17 @@ TEST(RayTracer, can_compute_direction) {
     RayTracer r(2, 2, Vect(0, 0, -1), Vect(0, 1, 0));
 
     Vect p0 = r.computeDirection(0, 0);
-    CHECK_EQUAL(-1, p0.getX());
-    CHECK_EQUAL(-1, p0.getY());
+    CHECK_EQUAL(-50, p0.getX());
+    CHECK_EQUAL(-50, p0.getY());
     Vect p1 = r.computeDirection(1, 0);
-    CHECK_EQUAL(1, p1.getX());
-    CHECK_EQUAL(-1, p1.getY());
+    CHECK_EQUAL(50, p1.getX());
+    CHECK_EQUAL(-50, p1.getY());
     Vect p2 = r.computeDirection(0, 1);
-    CHECK_EQUAL(-1, p2.getX());
-    CHECK_EQUAL(1, p2.getY());
+    CHECK_EQUAL(-50, p2.getX());
+    CHECK_EQUAL(50, p2.getY());
     Vect p3 = r.computeDirection(1, 1);
-    CHECK_EQUAL(1, p3.getX());
-    CHECK_EQUAL(1, p3.getY());
+    CHECK_EQUAL(50, p3.getX());
+    CHECK_EQUAL(50, p3.getY());
 }
 
 TEST(RayTracer, ray_inits) {
@@ -179,9 +181,9 @@ TEST(RayTracer, can_compute_ray) {
     CHECK_EQUAL(0, ctr.getZ());
 
     Vect dir = r0.getDirection();
-    CHECK_EQUAL(-1, dir.getX());
-    CHECK_EQUAL(-1, dir.getY());
-    CHECK_EQUAL(-2, dir.getZ());
+    CHECK_EQUAL(-50, dir.getX());
+    CHECK_EQUAL(-50, dir.getY());
+    CHECK_EQUAL(-100, dir.getZ());
 }
 
 TEST(RayTracer, can_export_raybuffer) {

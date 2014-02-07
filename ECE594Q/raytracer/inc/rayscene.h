@@ -39,12 +39,6 @@ private:
 public:
     RayScene();
     ~RayScene();
-    
-    // void setCamera(Camera c) { camera = c;}
-    // Camera getCamera() { return camera;}
-    // void setCameraPos(Vect);
-    // void setCameraViewDir(Vect);
-    // void setCameraOrthoUp(Vect);
 
     void setLights(std::vector<Light>);
     void addLight(Light);

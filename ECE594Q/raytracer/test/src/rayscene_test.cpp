@@ -1,6 +1,7 @@
 #include "CppUTest/CommandLineTestRunner.h"
 #include "CppUTestExt/MockSupport.h"
 #include "rayscene.h"
+#include "rayscene_factory.h"
 
 Shape *sphere0;
 Shape *sphere1;
@@ -33,6 +34,15 @@ TEST(RaySceneTest, can_add_shapes) {
 
     Sphere *sp = (Sphere *) s1;
     CHECK_EQUAL(1, sp->getRadius());
+}
+
+TEST(RaySceneTest, removes_shapes_when_deleted) {
+    // RayScene s;
+    // std::vector<Shape *> v;
+    // v.push_back(RaySceneFactory::NewSphere(1, Vect(0, 0, 0)));
+    // v.push_back(RaySceneFactory::NewSphere(1, Vect(0, 0, 0)));
+
+    // s.setShapes(v);
 }
 
 TEST(RaySceneTest, ray_intersects_with_shape) {

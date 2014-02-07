@@ -39,7 +39,7 @@ public:
     uint getHeight() { return HEIGHT;}
 
     void setScene(RayScene s) { scene = s; }
-    void setCamera(Camera c) { camera = c; }
+    void setCamera(Camera c);
     Camera getCamera() { return camera; }
     void setCameraPos(Vect);
     Vect getCameraPos() { return camera.getPos(); }
