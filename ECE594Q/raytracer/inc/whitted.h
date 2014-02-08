@@ -7,6 +7,7 @@
 #include "Matrix.h"
 #include "ray.h"
 #include "rayscene.h"
+#include "rayscene_shapes.h"
 
 /*
 L           radiance of the final ray (not radiometrically correct), calculated by your
@@ -43,16 +44,16 @@ Lt          radiance of the refracted ray, also calculated recursively
 
 class Whitted {
 public:
-    static Vect Illumination(Light, Intersection, float);
+    static SColor Illumination(Light, Intersection, float);
 
-    static Vect AmbientLightning(float, float, Vect);
-    static float CalculateFattj(Vect, Light);
-    static Vect DirectIllumination(Vect, Vect, float);
-    static Vect DiffuseLightning(float, Vect, Vect, Vect);
-    static float SpecularLightning(float, Vect, Vect, float);
+    static SColor AmbientLightning(float, float, SColor);
+    static float CalculateFattj(SColor, Light);
+    static SColor DirectIllumination(SColor, SColor, float);
+    static SColor DiffuseLightning(float, SColor, SColor, SColor);
+    static float SpecularLightning(float, SColor, SColor, float);
 
-    static Vect Reflection(float, Vect);
-    static Vect Refraction(float, Vect);
+    static SColor Reflection(float, SColor);
+    static SColor Refraction(float, SColor);
 
 };
 

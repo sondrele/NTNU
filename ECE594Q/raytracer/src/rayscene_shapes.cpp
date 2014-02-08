@@ -6,10 +6,24 @@ SColor::SColor(Color c) {
     setZ(c[2]);
 }
 
+SColor::SColor(Vect v) {
+    setX(v.getX());
+    setY(v.getY());
+    setZ(v.getZ());
+}
+
 SColor::SColor(float r, float g, float b) {
     setX(r);
     setY(g);
     setZ(b);
+}
+
+SColor& SColor::operator=(const Vect &other) {
+    setX(other.getX());
+    setY(other.getY());
+    setZ(other.getZ());
+    
+    return *this;
 }
 
 Material::Material() {

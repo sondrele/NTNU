@@ -15,12 +15,14 @@
 class SColor : public Vect {
 public:
     SColor() {}
+    SColor(Vect);
     SColor(Color);
     SColor(float, float, float);
     float R() { return getX(); }
     float G() { return getY(); }
     float B() { return getZ(); }
 
+    SColor& operator=(const Vect&);
 };
 
 class Material {
