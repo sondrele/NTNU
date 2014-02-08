@@ -8,6 +8,14 @@ PX_Color RaySceneFactory::ColorToPX_Color(Color c) {
     return color;
 }
 
+Vect RaySceneFactory::ColorToVect(Color c) {
+    Vect color;
+    color.setX(c[0]);
+    color.setY(c[1]);
+    color.setZ(c[2]);
+    return color;
+}
+
 Vect RaySceneFactory::PointToVect(Point p) {
     Vect v;
     v.setX(p[0]);
@@ -21,6 +29,14 @@ Sphere * RaySceneFactory::NewSphere(float radius, Vect origin) {
     s->setRadius(radius);
     s->setOrigin(origin);
     return s;
+}
+
+void RaySceneFactory::CreateMaterial(Material &m, MaterialIO &mio) {
+    m.setDiffColor(RaySceneFactory::ColorToVect(mio.diffColor));
+    m.setAmbColor(RaySceneFactory::ColorToVect(mio.ambColor));
+    m.setSpecColor(RaySceneFactory::ColorToVect(mio.specColor));
+    m.setShininess(mio.shininess);
+    m.setTransparency(mio.ktran);
 }
 
 void RaySceneFactory::CreateSphere(Sphere &sphere, SphereIO &s) {

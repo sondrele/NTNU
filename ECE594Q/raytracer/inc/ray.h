@@ -31,7 +31,14 @@ public:
     Vect getDirection() { return ray.getDirection(); }
     void setIntersectionPoint(float);
     float getIntersectionPoint() {return pt; }
+    Vect calculateIntersectionPoint();
     bool hasIntersected() { return intersected; }
+
+    Vect getSurfaceNormal();
+    Vect getDiffuseReflectionCoeff();
+    float getScalarTransmissionCoeff();
+    float getScalarSpecularCoeff();
+    float getShininess();
 };
 
 #endif // _RAY_H_

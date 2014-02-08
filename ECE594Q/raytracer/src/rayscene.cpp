@@ -1,5 +1,13 @@
 #include "rayscene.h"
 
+Vect Light::getIntensity() {
+    Vect i;
+    i.setX(color.R / 255.0f);
+    i.setY(color.G / 255.0f);
+    i.setZ(color.B / 255.0f);
+    return i;
+}
+
 RayScene::RayScene() {
 
 }

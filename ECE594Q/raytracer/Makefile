@@ -12,10 +12,12 @@ LIBS = \
     ../matrix/src/Matrix.cpp\
     ../matrix/src/Vect.cpp
 SRCS = src/ray.cpp\
+    src/camera.cpp\
     src/raybuffer.cpp\
     src/rayscene.cpp\
     src/rayscene_factory.cpp\
     src/rayscene_shapes.cpp\
+    src/whitted.cpp\
     src/raytracer.cpp
 OBJS = $(SRCS:.cpp=.o) $(LIBS:.cpp=.o) 
 

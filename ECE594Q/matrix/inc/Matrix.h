@@ -58,7 +58,7 @@ public:
     Vect crossProduct(Vect v);
     float dotProduct(Vect v);
     Vect linearMult(float);
-
+    float euclideanDistance(Vect);
 };
 
 class Vect_h : public Matrix {

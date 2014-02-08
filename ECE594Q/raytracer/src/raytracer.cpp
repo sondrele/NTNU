@@ -119,16 +119,40 @@ Ray RayTracer::computeRay(uint x, uint y) {
     return r;
 }
 
+PX_Color RayTracer::shadeIntersection(Intersection in) {
+    Vect shade = Whitted::Illumination(scene->getLights(), in);
+    shade = Vect(0, 0, 0);
+    std::vector<Light> lts = scene->getLights();
+
+    for (uint i = 0; i < lts.size(); i++) {
+        Light l = lts.at(i);
+        Vect o = in.calculateIntersectionPoint();
+        Vect d = o - l.getPos();
+        d.normalize();
+        Ray shdw(o, d);
+        Intersection sin = scene->calculateRayIntersection(shdw);
+        if (sin.hasIntersected()) {
+            cout << "Intersection" << endl;
+            
+        } else {
+            shade = Vect(1, 1, 1);
+        }
+    }
+
+    PX_Color color;
+    color.R = (uint8_t) (255 * shade.getX());
+    color.G = (uint8_t) (255 * shade.getY());
+    color.B = (uint8_t) (255 * shade.getZ());
+    return color;;
+}
+
 RayBuffer RayTracer::traceRays() {
     for (uint y = 0; y < HEIGHT; y++) {
         for (uint x = 0; x < WIDTH; x++) {
             Ray r = computeRay(x, y);
-            Intersection is = scene->calculateRayIntersection(r);
-            if (is.hasIntersected()) {
-                PX_Color c = {255, 255, 255};
-                buffer.setPixel(x, y, c);
-            } else {
-                PX_Color c = {0, 0, 0};
+            Intersection in = scene->calculateRayIntersection(r);
+            if (in.hasIntersected()) {
+                PX_Color c = shadeIntersection(in);
                 buffer.setPixel(x, y, c);
             }
         }

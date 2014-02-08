@@ -180,15 +180,6 @@ TEST(RaySceneFactory, can_init_camera) {
     DOUBLES_EQUAL(0.2, cam.getVerticalFOV(), 0.00001);
 }
 
-TEST(RaySceneFactory, can_create_shapes) {
-    std::vector<Shape *> shps;
-    // RaySceneFactory::CreateShapes(shps, objects);
-
-    // CHECK_EQUAL(2, shps.size());
-
-    // for (uint i = 0; i < shps.)
-}
-
 TEST(RaySceneFactory, can_create_scene) {
     RayScene s;
     RaySceneFactory::CreateScene(s, scene);

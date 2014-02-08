@@ -19,7 +19,7 @@ int main(int argc, char const *argv[]) {
 
     RayTracer rayTracer(IMAGE_WIDTH, IMAGE_HEIGHT);
     Camera cam;
-    cam.setPos(Vect(0, 0, 49));
+    cam.setPos(Vect(0, 0, 10));
     cam.setVerticalFOV((float)M_PI / 2.0f);
     cam.setViewDir(Vect(0, 0, -1));
     cam.setOrthoUp(Vect(0, 1, 0));

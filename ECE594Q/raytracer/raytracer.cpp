@@ -6,8 +6,8 @@
 #include "rayscene_factory.h"
 #include "rayimage.h"
 
-#define IMAGE_WIDTH     500
-#define IMAGE_HEIGHT    500
+#define IMAGE_WIDTH     200
+#define IMAGE_HEIGHT    200
 
 
 typedef unsigned char u08;

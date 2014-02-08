@@ -59,3 +59,10 @@ Vect Vect::linearMult(float f) {
 
     return v;
 }
+
+float Vect::euclideanDistance(Vect other) {
+    float a = getX() - other.getX();
+    float b = getY() - other.getY();
+    float c = getZ() - other.getZ();
+    return sqrt(a * a + b * b + c * c);
+}

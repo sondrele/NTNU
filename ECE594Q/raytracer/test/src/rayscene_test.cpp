@@ -52,3 +52,4 @@ TEST(RaySceneTest, ray_intersects_with_shape) {
     CHECK(is.hasIntersected());
     DOUBLES_EQUAL(2.0, is.getIntersectionPoint(), 0.000001);
 }
+

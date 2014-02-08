@@ -1,5 +1,14 @@
 #include "rayscene.h"
 
+Material::Material() {
+    shininess = 1;
+    transparency = 0;
+}
+
+Sphere::Sphere() {
+    radius = 0;
+}
+
 ShapeType Sphere::getType() {
     return SPHERE;
 }

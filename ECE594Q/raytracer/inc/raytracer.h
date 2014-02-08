@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "Matrix.h"
+#include "whitted.h"
 #include "ray.h"
 #include "raybuffer.h"
 #include "camera.h"
@@ -60,6 +61,7 @@ public:
     Point_2D computePoint(uint, uint);
     Vect computeDirection(uint, uint);
     Ray computeRay(uint, uint);
+    PX_Color shadeIntersection(Intersection);
     RayBuffer traceRays();
 };
 

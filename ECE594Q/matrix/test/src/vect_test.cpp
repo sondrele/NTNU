@@ -53,3 +53,9 @@ TEST(VectTest, linear_mult) {
     CHECK_EQUAL(4, v2.getY());
     CHECK_EQUAL(6, v2.getZ());
 }
+
+TEST(VectTest, euclidean_distance) {
+    Vect v1(0, 0, 0);
+    Vect v2(0, -2, 0);
+    CHECK_EQUAL(2, v1.euclideanDistance(v2));
+}

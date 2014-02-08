@@ -17,6 +17,7 @@ private:
     Vect dir;
     PX_Color color;
     enum LightType type;
+    Vect intesity;
 
 public:
     enum LightType getType() const { return type;}
@@ -27,7 +28,7 @@ public:
     void setPos(Vect p) { pos = p;}
     Vect getDir() { return dir;}
     void setDir(Vect d) { dir = d;}
-    
+    Vect getIntensity();
 };
 
 class RayScene {
@@ -43,6 +44,7 @@ public:
     void setLights(std::vector<Light>);
     void addLight(Light);
     Light getLight(uint);
+    std::vector<Light> getLights() { return lights; }
 
     void setShapes(std::vector<Shape *>);
     void addShape(Shape *);

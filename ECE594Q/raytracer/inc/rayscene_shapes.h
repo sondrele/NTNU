@@ -10,17 +10,45 @@
 #include "Matrix.h"
 #include "scene_io.h"
 #include "ray.h"
+#include "raybuffer.h"
+
+class Material {
+private:
+    Vect diffColor;
+    Vect ambColor;
+    Vect specColor;
+    float shininess;
+    float transparency;
+
+public:
+    Material();
+    void setDiffColor(Vect c) { diffColor = c; }
+    Vect getDiffColor() { return diffColor; }
+    void setAmbColor(Vect c) { ambColor = c; }
+    Vect getAmbColor() { return ambColor; }
+    void setSpecColor(Vect c) { specColor = c; }
+    Vect getSpecColor() { return specColor; }
+    void setShininess(float c) { shininess = c; }
+    float getShininess() { return shininess; }
+    void setTransparency(float c) { transparency = c; }
+    float getTransparency() { return transparency; }
+};
 
 enum ShapeType {
     SPHERE, MESH, TRIANGLE
 };
 
 class Shape {
+private:
+    std::vector<Material> materials;
 public:
     virtual ~Shape() {}
     
     virtual bool intersects(Ray, float &) = 0;
     virtual ShapeType getType() = 0;
+
+    Material getMaterial(uint i) { return materials.at(i); }
+    void setMaterial(Material m) { materials.push_back(m); }
 };
 
 
@@ -37,6 +65,7 @@ private:
     float zlength;
 
 public:
+    Sphere();
     virtual ~Sphere() {}
     virtual ShapeType getType();
 
