@@ -121,23 +121,25 @@ Ray RayTracer::computeRay(uint x, uint y) {
 
 float RayTracer::calculateShadowScalar(Light &lt, Intersection &in) {
     Vect o = in.calculateIntersectionPoint();
-    Vect d = o - lt.getPos();
+    Vect d = lt.getPos() - o;
     d.normalize();
     Ray shdw(o, d);
     Intersection si = scene->calculateRayIntersection(shdw);
     if (si.hasIntersected()) {
-        return 0;
-    } else {
-        return  1;
+        Vect pos = si.calculateIntersectionPoint();
+        if (o.euclideanDistance(pos) < o.euclideanDistance(lt.getPos())) {
+            return 0;
+        }
     }
+    return  1;
 }
 
-PX_Color RayTracer::shadeIntersection(Intersection in) {
+SColor RayTracer::shadeIntersection(Intersection in) {
     SColor shade(0, 0, 0);
 
     SColor Cd = in.getColor();
     float kt = in.getTransparency();
-    float ka = 1;
+    float ka = 0.2f;
     SColor ambLight = Whitted::AmbientLightning(kt, ka, Cd);
 
     std::vector<Light> lts = scene->getLights();
@@ -147,23 +149,31 @@ PX_Color RayTracer::shadeIntersection(Intersection in) {
         float Sj = calculateShadowScalar(l, in);
         shade = shade + Whitted::Illumination(l, in, Sj);
     }
+
     shade = shade + ambLight;
 
-    PX_Color color;
-    color.R = (uint8_t) (255 * shade.getX());
-    color.G = (uint8_t) (255 * shade.getY());
-    color.B = (uint8_t) (255 * shade.getZ());
-    return color;;
+    return shade;
 }
 
 RayBuffer RayTracer::traceRays() {
     for (uint y = 0; y < HEIGHT; y++) {
         for (uint x = 0; x < WIDTH; x++) {
             Ray r = computeRay(x, y);
+            if (x == 8 && y == 13) { // 20 x 20
+                cout << "lol" << endl;
+            }
+            if (x == 11 && y == 14) {
+                cout << "lol" << endl;
+            }
             Intersection in = scene->calculateRayIntersection(r);
             if (in.hasIntersected()) {
-                PX_Color c = shadeIntersection(in);
-                buffer.setPixel(x, y, c);
+                SColor c = shadeIntersection(in);
+
+                PX_Color color;
+                color.R = (uint8_t) (255 * c.R());
+                color.G = (uint8_t) (255 * c.G());
+                color.B = (uint8_t) (255 * c.B());
+                buffer.setPixel(x, y, color);
             }
         }
     }

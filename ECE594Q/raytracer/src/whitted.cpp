@@ -11,12 +11,15 @@ SColor Whitted::AmbientLightning(float kt, float ka, SColor Cd) {
 
 SColor Whitted::Illumination(Light lt, Intersection in, float Sj) {
     SColor Pt = in.calculateIntersectionPoint();
+    SColor Cd = in.getColor();
     // float q = in.getShininess();
     // SColor N = in.getSurfaceNormal();
 
     // float Fattj = Whitted::CalculateFattj(Pt, lt);
     SColor Ij = lt.getIntensity();
+    
     SColor dirLight = Ij.linearMult(Sj);
+    dirLight = dirLight.mult(Cd);
     // dirLight = dirLight + Whitted::DirectIllumination(Sj, Ij, Fattj);
 
     // SColor Dj = lt.getDir();
@@ -25,7 +28,6 @@ SColor Whitted::Illumination(Light lt, Intersection in, float Sj) {
     // SColor Q = N * N.dotProduct(Dj);
     // SColor Rj = Q.linearMult(2) - Dj;
     // SColor specLight = Whitted::SpecularLightning(ks, Rj, V, q);
-
     return dirLight;
 }
 

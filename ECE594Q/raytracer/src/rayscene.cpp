@@ -40,16 +40,22 @@ Shape * RayScene::getShape(uint pos) {
 }
 
 Intersection RayScene::calculateRayIntersection(Ray ray) {
+    Intersection ins(ray);
     for (uint i = 0; i < shapes.size(); i++) {
         float t;
         Shape *s = shapes.at(i);
         if (s->intersects(ray, t)) {
-            Intersection in(ray, s);
-            in.setIntersectionPoint(t);
-            return in;
+            if (!ins.hasIntersected()) {
+                ins.setIntersectionPoint(t);
+                ins.setShape(s);
+            } 
+            else if (ins.hasIntersected() && t < ins.getIntersectionPoint()) {
+                ins.setIntersectionPoint(t);
+                ins.setShape(s);
+            }
         }
     }
-    return Intersection();
+    return ins;
 }
 
 std::string RayScene::toString() const {

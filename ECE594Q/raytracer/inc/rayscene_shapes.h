@@ -19,8 +19,13 @@ public:
     SColor(Color);
     SColor(float, float, float);
     float R() { return getX(); }
+    void R(float);
     float G() { return getY(); }
+    void G(float);
     float B() { return getZ(); }
+    void B(float);
+
+    SColor mult(SColor);
 
     SColor& operator=(const Vect&);
 };
@@ -30,6 +35,7 @@ private:
     SColor diffColor;
     SColor ambColor;
     SColor specColor;
+    // SColor emissColor;
     float shininess;
     float transparency;
 
@@ -37,6 +43,8 @@ public:
     Material();
     void setDiffColor(SColor c) { diffColor = c; }
     SColor getDiffColor() { return diffColor; }
+    // void setEmissColor(SColor c) { emissColor = c; }
+    // SColor getEmissColor() { return emissColor; }
     void setAmbColor(SColor c) { ambColor = c; }
     SColor getAmbColor() { return ambColor; }
     void setSpecColor(SColor c) { specColor = c; }

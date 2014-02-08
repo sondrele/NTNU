@@ -14,7 +14,7 @@ public:
     Vect getOrigin() { return origin;}
     void setOrigin(Vect o) { origin = o;}
     Vect getDirection() { return direction;}
-    void setDirection(Vect d) { direction = d;}
+    void setDirection(Vect d);
 
 };
 

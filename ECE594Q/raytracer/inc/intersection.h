@@ -27,6 +27,7 @@ public:
     SColor getColor();
     float getTransparency();
     float getShininess();
+    void setShape(Shape *s) { shape = s; }
     Shape * getShape() { return shape; }
 };
 

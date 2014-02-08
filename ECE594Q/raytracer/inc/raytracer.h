@@ -63,7 +63,7 @@ public:
 
     Ray computeRay(uint, uint);
     float calculateShadowScalar(Light &lt, Intersection &in);
-    PX_Color shadeIntersection(Intersection);
+    SColor shadeIntersection(Intersection);
     RayBuffer traceRays();
 };
 

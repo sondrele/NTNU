@@ -27,6 +27,7 @@ void RaySceneFactory::CreateMaterial(Material &m, MaterialIO &mio) {
     m.setDiffColor(SColor(mio.diffColor));
     m.setAmbColor(SColor(mio.ambColor));
     m.setSpecColor(SColor(mio.specColor));
+    // m.setEmissColor(SColor(mio.emissColor));
     m.setShininess(mio.shininess);
     m.setTransparency(mio.ktran);
 }
@@ -101,7 +102,7 @@ void RaySceneFactory::AddMaterials(Shape *s, MaterialIO *mio, long numMaterials)
         Material m;
         RaySceneFactory::CreateMaterial(m, mio[i]);
         s->addMaterial(m);
-        cout << "Adding material to: " << s->getType() << endl;
+        // cout << "Adding material to: " << s->getType() << endl;
     }
 }
 

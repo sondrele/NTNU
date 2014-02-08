@@ -35,16 +35,15 @@ Vect Intersection::getSurfaceNormal() {
 }
 
 SColor Intersection::getColor() {
-    if (shape->getNumMaterials() > 0) {
+    if (shape != NULL && shape->getNumMaterials() > 0) {
         return shape->getMaterial(0).getDiffColor();
     } else {
-        // cout << "No ambient color" << endl;
         return SColor(0, 0, 0);
     }
 }
 
 float Intersection::getTransparency() {
-    if (shape->getNumMaterials() > 0) {
+    if (shape != NULL && shape->getNumMaterials() > 0) {
         return shape->getMaterial(0).getTransparency();
     } else {
         // cout << "No transparency" << endl;
@@ -53,7 +52,7 @@ float Intersection::getTransparency() {
 }
 
 float Intersection::getShininess() {
-    if (shape->getNumMaterials() > 0) {
+    if (shape != NULL && shape->getNumMaterials() > 0) {
         return shape->getMaterial(0).getShininess();
     } else {
         // cout << "No shininess" << endl;

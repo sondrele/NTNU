@@ -1,29 +1,55 @@
 #include "rayscene.h"
 
 SColor::SColor(Color c) {
-    setX(c[0]);
-    setY(c[1]);
-    setZ(c[2]);
+    R(c[0]);
+    G(c[1]);
+    B(c[2]);
 }
 
 SColor::SColor(Vect v) {
-    setX(v.getX());
-    setY(v.getY());
-    setZ(v.getZ());
+    R(v.getX());
+    G(v.getY());
+    B(v.getZ());
 }
 
 SColor::SColor(float r, float g, float b) {
-    setX(r);
-    setY(g);
-    setZ(b);
+    R(r);
+    G(g);
+    B(b);
 }
 
 SColor& SColor::operator=(const Vect &other) {
-    setX(other.getX());
-    setY(other.getY());
-    setZ(other.getZ());
+    R(other.getX());
+    G(other.getY());
+    B(other.getZ());
     
     return *this;
+}
+
+void SColor::R(float r) {
+    if (r > 1.0f)
+        r = 1;
+    setX(r);
+}
+
+void SColor::G(float g) {
+    if (g > 1.0f)
+        g = 1;
+    setY(g);
+}
+
+void SColor::B(float b) {
+    if (b > 1.0f)
+        b = 1;
+    setZ(b);
+}
+
+SColor SColor::mult(SColor other) {
+    SColor c;
+    c.R(R() * other.R());
+    c.G(G() * other.G());
+    c.B(B() * other.B());
+    return c;
 }
 
 Material::Material() {
