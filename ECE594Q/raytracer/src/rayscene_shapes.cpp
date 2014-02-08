@@ -1,8 +1,36 @@
 #include "rayscene.h"
 
+SColor::SColor(Color c) {
+    setX(c[0]);
+    setY(c[1]);
+    setZ(c[2]);
+}
+
+SColor::SColor(float r, float g, float b) {
+    setX(r);
+    setY(g);
+    setZ(b);
+}
+
 Material::Material() {
     shininess = 1;
     transparency = 0;
+}
+
+Vertex::Vertex() {
+    materialPos = 0;
+}
+
+Vertex::Vertex(uint p) {
+    materialPos = p;
+}
+
+Vertex& Vertex::operator=(const Vect &other) {
+    setX(other.getX());
+    setY(other.getY());
+    setZ(other.getZ());
+    
+    return *this;
 }
 
 Sphere::Sphere() {

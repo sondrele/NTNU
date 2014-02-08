@@ -9,35 +9,24 @@ Vect Whitted::AmbientLightning(float kt, float ka, Vect Cd) {
     return Cd.linearMult(ka * (1.0f - kt));
 }
 
-Vect Whitted::Illumination(std::vector<Light> lights, Intersection in) {
+Vect Whitted::Illumination(Light lt, Intersection in, float Sj) {
     Vect Pt = in.calculateIntersectionPoint();
-    Vect Cd = in.getDiffuseReflectionCoeff();
-    float kt = in.getScalarTransmissionCoeff();
-    float ks = in.getScalarSpecularCoeff();
     // float q = in.getShininess();
     // Vect N = in.getSurfaceNormal();
-    
-    Vect ambLight = Whitted::AmbientLightning(kt, ks, Cd);
 
-    Vect dirLight;
-    for (uint i = 0; i < lights.size(); i++) {
-        Light l = lights.at(i);
+    // float Fattj = Whitted::CalculateFattj(Pt, lt);
+    Vect Ij = lt.getIntensity();
+    Vect dirLight = Ij.linearMult(Sj);
+    // dirLight = dirLight + Whitted::DirectIllumination(Sj, Ij, Fattj);
 
-        Vect Sj = Vect(1, 1, 1); // Trace ray from in.point to Light and get "visibility"
-        // Vect Ij = l.getIntensity();
-        // float Fattj = Whitted::CalculateFattj(Pt, l);
-        dirLight = dirLight + Sj;
-        // dirLight = dirLight + Whitted::DirectIllumination(Sj, Ij, Fattj);
+    // Vect Dj = lt.getDir();
+    // Vect diffLight = Whitted::DiffuseLightning(kt, Cd, N, Dj);
 
-        // Vect Dj = l.getDir();
-        // Vect diffLight = Whitted::DiffuseLightning(kt, Cd, N, Dj);
+    // Vect Q = N * N.dotProduct(Dj);
+    // Vect Rj = Q.linearMult(2) - Dj;
+    // Vect specLight = Whitted::SpecularLightning(ks, Rj, V, q);
 
-        // Vect Q = N * N.dotProduct(Dj);
-        // Vect Rj = Q.linearMult(2) - Dj;
-        // Vect specLight = Whitted::SpecularLightning(ks, Rj, V, q);
-    }
-
-    return ambLight + dirLight;
+    return dirLight;
 }
 
 float Whitted::CalculateFattj(Vect Pt, Light l) {

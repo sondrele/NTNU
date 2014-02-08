@@ -1,11 +1,7 @@
 #include "rayscene.h"
 
-Vect Light::getIntensity() {
-    Vect i;
-    i.setX(color.R / 255.0f);
-    i.setY(color.G / 255.0f);
-    i.setZ(color.B / 255.0f);
-    return i;
+SColor Light::getIntensity() {
+    return color;
 }
 
 RayScene::RayScene() {
@@ -48,9 +44,9 @@ Intersection RayScene::calculateRayIntersection(Ray ray) {
         float t;
         Shape *s = shapes.at(i);
         if (s->intersects(ray, t)) {
-            Intersection is(ray);
-            is.setIntersectionPoint(t);
-            return is;
+            Intersection in(ray, s);
+            in.setIntersectionPoint(t);
+            return in;
         }
     }
     return Intersection();

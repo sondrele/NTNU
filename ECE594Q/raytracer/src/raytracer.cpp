@@ -119,25 +119,35 @@ Ray RayTracer::computeRay(uint x, uint y) {
     return r;
 }
 
-PX_Color RayTracer::shadeIntersection(Intersection in) {
-    Vect shade = Whitted::Illumination(scene->getLights(), in);
-    shade = Vect(0, 0, 0);
-    std::vector<Light> lts = scene->getLights();
+float RayTracer::calculateShadowScalar(Light &lt, Intersection &in) {
+    Vect o = in.calculateIntersectionPoint();
+    Vect d = o - lt.getPos();
+    d.normalize();
+    Ray shdw(o, d);
+    Intersection si = scene->calculateRayIntersection(shdw);
+    if (si.hasIntersected()) {
+        return 0;
+    } else {
+        return  1;
+    }
+}
 
+PX_Color RayTracer::shadeIntersection(Intersection in) {
+    Vect shade(0, 0, 0);
+
+    SColor Cd = in.getColor();
+    float kt = in.getTransparency();
+    float ka = 1;
+    Vect ambLight = Whitted::AmbientLightning(kt, ka, Cd);
+
+    std::vector<Light> lts = scene->getLights();
     for (uint i = 0; i < lts.size(); i++) {
         Light l = lts.at(i);
-        Vect o = in.calculateIntersectionPoint();
-        Vect d = o - l.getPos();
-        d.normalize();
-        Ray shdw(o, d);
-        Intersection sin = scene->calculateRayIntersection(shdw);
-        if (sin.hasIntersected()) {
-            cout << "Intersection" << endl;
-            
-        } else {
-            shade = Vect(1, 1, 1);
-        }
+
+        float Sj = calculateShadowScalar(l, in);
+        shade = shade + Whitted::Illumination(l, in, Sj);
     }
+    shade = shade + ambLight;
 
     PX_Color color;
     color.R = (uint8_t) (255 * shade.getX());

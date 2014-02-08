@@ -8,14 +8,6 @@ PX_Color RaySceneFactory::ColorToPX_Color(Color c) {
     return color;
 }
 
-Vect RaySceneFactory::ColorToVect(Color c) {
-    Vect color;
-    color.setX(c[0]);
-    color.setY(c[1]);
-    color.setZ(c[2]);
-    return color;
-}
-
 Vect RaySceneFactory::PointToVect(Point p) {
     Vect v;
     v.setX(p[0]);
@@ -32,9 +24,9 @@ Sphere * RaySceneFactory::NewSphere(float radius, Vect origin) {
 }
 
 void RaySceneFactory::CreateMaterial(Material &m, MaterialIO &mio) {
-    m.setDiffColor(RaySceneFactory::ColorToVect(mio.diffColor));
-    m.setAmbColor(RaySceneFactory::ColorToVect(mio.ambColor));
-    m.setSpecColor(RaySceneFactory::ColorToVect(mio.specColor));
+    m.setDiffColor(SColor(mio.diffColor));
+    m.setAmbColor(SColor(mio.ambColor));
+    m.setSpecColor(SColor(mio.specColor));
     m.setShininess(mio.shininess);
     m.setTransparency(mio.ktran);
 }
@@ -70,6 +62,7 @@ void RaySceneFactory::CreateMesh(Mesh &m, PolySetIO &pio) {
 
 void RaySceneFactory::CreateLight(Light &l, LightIO &lio) {
     l.setType(lio.type);
+    l.setColor(SColor(lio.color));
     switch(lio.type) {
         case POINT_LIGHT: {
             l.setPos(RaySceneFactory::PointToVect(lio.position));
@@ -103,7 +96,14 @@ void RaySceneFactory::CreateCamera(Camera &c, CameraIO &cio) {
     c.setVerticalFOV(cio.verticalFOV);
 }
 
-// void RaySceneFactory::CreateCamera()
+void RaySceneFactory::AddMaterials(Shape *s, MaterialIO *mio, long numMaterials) {
+    for (long i = 0; i < numMaterials; i++) {
+        Material m;
+        RaySceneFactory::CreateMaterial(m, mio[i]);
+        s->addMaterial(m);
+        cout << "Adding material to: " << s->getType() << endl;
+    }
+}
 
 Shape * RaySceneFactory::CreateShape(ObjIO &oio) {
     switch(oio.type) {
@@ -111,12 +111,14 @@ Shape * RaySceneFactory::CreateShape(ObjIO &oio) {
             Sphere *s = new Sphere();
             SphereIO sio = *((SphereIO *) oio.data);
             RaySceneFactory::CreateSphere(*s, sio);
+            RaySceneFactory::AddMaterials(s, oio.material, oio.numMaterials);
             return s;
         }
         case POLYSET_OBJ: {
             Mesh *m = new Mesh();
             PolySetIO pio = *((PolySetIO *) oio.data);
             RaySceneFactory::CreateMesh(*m, pio);
+            RaySceneFactory::AddMaterials(m, oio.material, oio.numMaterials);
             return m;
         }
         default:

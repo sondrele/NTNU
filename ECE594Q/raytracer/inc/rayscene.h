@@ -8,6 +8,7 @@
 #include "Matrix.h"
 #include "scene_io.h"
 #include "ray.h"
+#include "intersection.h"
 #include "raybuffer.h"
 #include "rayscene_shapes.h"
 
@@ -15,25 +16,24 @@ class Light {
 private:
     Vect pos;
     Vect dir;
-    PX_Color color;
+    SColor color;
     enum LightType type;
-    Vect intesity;
+    SColor intesity;
 
 public:
     enum LightType getType() const { return type;}
     void setType(enum LightType t) { type = t;}
-    PX_Color getColor() { return color;}
-    void setColor(PX_Color c) { color = c;}
+    SColor getColor() { return color;}
+    void setColor(SColor c) { color = c;}
     Vect getPos() { return pos;}
     void setPos(Vect p) { pos = p;}
     Vect getDir() { return dir;}
     void setDir(Vect d) { dir = d;}
-    Vect getIntensity();
+    SColor getIntensity();
 };
 
 class RayScene {
 private:
-    // Camera camera;
     std::vector<Light> lights;
     std::vector<Shape *> shapes;
 
@@ -54,8 +54,5 @@ public:
     std::string toString() const;
     friend ostream& operator <<(ostream&, const RayScene&);
 };
-
-// typedef std::vector<Shape *>    ShapeVct
-// typedef ShapeVector::iterator   ShapeVctItr
 
 #endif

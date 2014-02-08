@@ -46,6 +46,7 @@ TEST(RaySceneTest, ray_intersects_with_shape) {
     Intersection is = s.calculateRayIntersection(r);
     CHECK(is.hasIntersected());
     DOUBLES_EQUAL(1.0, is.getIntersectionPoint(), 0.000001);
+    POINTERS_EQUAL(sphere0, is.getShape());
 
     Ray r0(Vect(0, 0, 0), Vect(0, -1, 0));
     is = s.calculateRayIntersection(r0);

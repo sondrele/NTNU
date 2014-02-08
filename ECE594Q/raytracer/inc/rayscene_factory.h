@@ -13,10 +13,10 @@
 class RaySceneFactory {
 public:
     static PX_Color ColorToPX_Color(Color);
-    static Vect ColorToVect(Color c);
     static Vect PointToVect(Point);
     static Sphere * NewSphere(float, Vect);
     static void CreateMaterial(Material &m, MaterialIO &mio);
+    static void AddMaterials(Shape *s, MaterialIO *mio, long numMaterials);
     static void CreateSphere(Sphere &s, SphereIO &sio);
     static void CreateTriangle(Triangle &t, PolygonIO &pio);
     static void CreateMesh(Mesh &m, PolySetIO &pio);

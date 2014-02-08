@@ -43,7 +43,7 @@ Lt          radiance of the refracted ray, also calculated recursively
 
 class Whitted {
 public:
-    static Vect Illumination(std::vector<Light>, Intersection);
+    static Vect Illumination(Light, Intersection, float);
 
     static Vect AmbientLightning(float, float, Vect);
     static float CalculateFattj(Vect, Light);

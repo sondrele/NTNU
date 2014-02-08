@@ -7,6 +7,7 @@ SphereIO sphere;
 PolygonIO triangle0, triangle1;
 PolySetIO trimesh;
 ObjIO objects;
+MaterialIO material;
 LightIO light0;
 LightIO light1;
 CameraIO camera;
@@ -51,13 +52,6 @@ TEST_GROUP(RaySceneFactory) {
         trimesh.poly[0] = triangle0;
         trimesh.poly[1] = triangle1;
 
-        // objects.type = SPHERE_OBJ;
-        // objects.next = (ObjIO *) &trimesh;
-        // objects.data = (void *) &sphere;
-        // ObjIO *trim = objects.next;
-        // trim->type = POLYSET_OBJ;
-        // trim->next = NULL;
-        // trim->data = (void *) &trimesh;
 
         light1.next = NULL;
         light1.type = POINT_LIGHT;

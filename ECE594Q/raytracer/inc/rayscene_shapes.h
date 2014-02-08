@@ -12,22 +12,33 @@
 #include "ray.h"
 #include "raybuffer.h"
 
+class SColor : public Vect {
+public:
+    SColor() {}
+    SColor(Color);
+    SColor(float, float, float);
+    float R() { return getX(); }
+    float G() { return getY(); }
+    float B() { return getZ(); }
+
+};
+
 class Material {
 private:
-    Vect diffColor;
-    Vect ambColor;
-    Vect specColor;
+    SColor diffColor;
+    SColor ambColor;
+    SColor specColor;
     float shininess;
     float transparency;
 
 public:
     Material();
-    void setDiffColor(Vect c) { diffColor = c; }
-    Vect getDiffColor() { return diffColor; }
-    void setAmbColor(Vect c) { ambColor = c; }
-    Vect getAmbColor() { return ambColor; }
-    void setSpecColor(Vect c) { specColor = c; }
-    Vect getSpecColor() { return specColor; }
+    void setDiffColor(SColor c) { diffColor = c; }
+    SColor getDiffColor() { return diffColor; }
+    void setAmbColor(SColor c) { ambColor = c; }
+    SColor getAmbColor() { return ambColor; }
+    void setSpecColor(SColor c) { specColor = c; }
+    SColor getSpecColor() { return specColor; }
     void setShininess(float c) { shininess = c; }
     float getShininess() { return shininess; }
     void setTransparency(float c) { transparency = c; }
@@ -47,8 +58,9 @@ public:
     virtual bool intersects(Ray, float &) = 0;
     virtual ShapeType getType() = 0;
 
+    uint64_t getNumMaterials() { return materials.size(); }
     Material getMaterial(uint i) { return materials.at(i); }
-    void setMaterial(Material m) { materials.push_back(m); }
+    void addMaterial(Material m) { materials.push_back(m); }
 };
 
 
@@ -86,11 +98,24 @@ public:
     virtual bool intersects(Ray, float &);
 };
 
+class Vertex : public Vect {
+private:
+    uint materialPos;
+
+public:
+    Vertex();
+    Vertex(uint p);
+    void setMaterialPos(uint p) { materialPos = p; }
+    uint getMaterialPost() { return materialPos; }
+
+    Vertex& operator=(const Vect&);
+};
+
 class Triangle : public Shape {
 private:
-    Vect a;
-    Vect b;
-    Vect c;
+    Vertex a;
+    Vertex b;
+    Vertex c;
 
 public:
     virtual ~Triangle() {}

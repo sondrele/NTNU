@@ -60,7 +60,9 @@ public:
     double getHorizontalFOV();
     Point_2D computePoint(uint, uint);
     Vect computeDirection(uint, uint);
+
     Ray computeRay(uint, uint);
+    float calculateShadowScalar(Light &lt, Intersection &in);
     PX_Color shadeIntersection(Intersection);
     RayBuffer traceRays();
 };
