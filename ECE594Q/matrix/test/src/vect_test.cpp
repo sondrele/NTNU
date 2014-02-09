@@ -59,3 +59,13 @@ TEST(VectTest, euclidean_distance) {
     Vect v2(0, -2, 0);
     CHECK_EQUAL(2, v1.euclideanDistance(v2));
 }
+
+TEST(VectTest, linear_mult_with_other_vector) {
+    Vect v(1, 2, 3);
+    Vect o(-1, -2, 3);
+    Vect a = v.linearMult(o);
+
+    CHECK_EQUAL(-1, a.getX());
+    CHECK_EQUAL(-4, a.getY());
+    CHECK_EQUAL(9, a.getZ());
+}

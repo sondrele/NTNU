@@ -58,6 +58,7 @@ public:
     Vect crossProduct(Vect v);
     float dotProduct(Vect v);
     Vect linearMult(float);
+    Vect linearMult(Vect);
     float euclideanDistance(Vect);
 };
 

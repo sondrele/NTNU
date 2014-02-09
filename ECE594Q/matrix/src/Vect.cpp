@@ -60,6 +60,15 @@ Vect Vect::linearMult(float f) {
     return v;
 }
 
+Vect Vect::linearMult(Vect other) {
+    Vect v;
+    v.setX(getX() * other.getX());
+    v.setY(getY() * other.getY());
+    v.setZ(getZ() * other.getZ());
+
+    return v;
+}
+
 float Vect::euclideanDistance(Vect other) {
     float a = getX() - other.getX();
     float b = getY() - other.getY();
