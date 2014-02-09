@@ -38,10 +38,6 @@ Vect Intersection::calculateSurfaceNormal() {
         return Vect(0, 0, 0);
 }
 
-Vect Intersection::getSurfaceNormal() {
-    throw "getSurfaceNormal not implemented";
-}
-
 SColor Intersection::getColor() {
     if (shape != NULL && shape->getNumMaterials() > 0) {
         return shape->getMaterial(0).getDiffColor();

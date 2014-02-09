@@ -120,14 +120,15 @@ Ray RayTracer::computeRay(uint x, uint y) {
 
 float RayTracer::calculateShadowScalar(Light &lt, Intersection &in) {
     Vect p = lt.getPos();
-    Vect o = in.calculateIntersectionPoint();
-    Vect d = p - o;
-    d.normalize();
-    Ray shdw(o, d);
+    Vect ori = in.calculateIntersectionPoint() + in.calculateSurfaceNormal().linearMult(0.00001f);
+    Vect dir = p - ori;
+    dir.normalize();
+    Ray shdw(ori, dir);
+
     Intersection si = scene->calculateRayIntersection(shdw);
     if (si.hasIntersected()) {
         Vect pos = si.calculateIntersectionPoint();
-        if (o.euclideanDistance(pos) < o.euclideanDistance(lt.getPos())) {
+        if (ori.euclideanDistance(pos) < ori.euclideanDistance(lt.getPos())) {
             return 0;
         }
     }
