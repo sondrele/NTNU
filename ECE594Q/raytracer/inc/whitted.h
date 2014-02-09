@@ -47,9 +47,9 @@ public:
     static SColor Illumination(Light *, Intersection, float);
 
     static SColor AmbientLightning(float, SColor, SColor);
-    static float CalculateFattj(SColor, Light *);
+    static float CalculateFattj(Vect, Light *);
     static SColor DirectIllumination(SColor, SColor, float);
-    static SColor DiffuseLightning(float, SColor, SColor, SColor);
+    static SColor DiffuseLightning(float, SColor, Vect, Vect);
     static float SpecularLightning(float, SColor, SColor, float);
 
     static SColor Reflection(float, SColor);

@@ -8,30 +8,7 @@ SColor Whitted::AmbientLightning(float kt, SColor ka, SColor Cd) {
     return Cd.linearMult(ka).linearMult((1.0f - kt));
 }
 
-SColor Whitted::Illumination(Light *lt, Intersection in, float Sj) {
-    SColor Pt = in.calculateIntersectionPoint();
-    Material *mat = in.getMaterial();
-    SColor Cd = mat->getDiffColor();
-    // float q = in.getShininess();
-    // SColor N = in.getSurfaceNormal();
-
-    float Fattj = Whitted::CalculateFattj(Pt, lt);
-    SColor Ij = lt->getIntensity();
-    
-    SColor dirLight = Ij.linearMult(Sj * Fattj);
-    dirLight = dirLight.mult(Cd);
-    // dirLight = dirLight + Whitted::DirectIllumination(Sj, Ij, Fattj);
-
-    // SColor Dj = lt.getDir();
-    // SColor diffLight = Whitted::DiffuseLightning(kt, Cd, N, Dj);
-
-    // SColor Q = N * N.dotProduct(Dj);
-    // SColor Rj = Q.linearMult(2) - Dj;
-    // SColor specLight = Whitted::SpecularLightning(ks, Rj, V, q);
-    return dirLight;
-}
-
-float Whitted::CalculateFattj(SColor Pt, Light *l) {
+float Whitted::CalculateFattj(Vect Pt, Light *l) {
     if (l->getType() == POINT_LIGHT) {
         float dist = Pt.euclideanDistance(l->getPos());
         return (float) min(1.0, 1.0/(0.25 + 0.1 * dist + 0.01 * dist * dist));
@@ -40,17 +17,41 @@ float Whitted::CalculateFattj(SColor Pt, Light *l) {
     }
 }
 
-// SColor Whitted::DirectIllumination(SColor Sj, SColor Ij, float Fattj) {
-//     return (Sj.dotProduct(Ij)).linearMult(Fattj);
-// }
+SColor Whitted::Illumination(Light *lt, Intersection in, float Sj) {
+    Vect Pt = in.calculateIntersectionPoint();
+    Vect pos = lt->getPos();
+    Material *mat = in.getMaterial();
+    float kt = mat->getTransparency();
+    SColor Cd = mat->getDiffColor();
+    // float q = in.getShininess();
+    // SColor N = in.getSurfaceNormal();
 
-// SColor Whitted::DiffuseLightning(float kt, SColor Cd, SColor N, SColor D) {
-//     float a = (1.0 - kt);
-//     float b = max(0, N.dotProduct(D));
+    float Fattj = Whitted::CalculateFattj(Pt, lt);
+    SColor Ij = lt->getIntensity();
+    
+    SColor dirLight = Ij.linearMult(Sj * Fattj);
+    
+    Vect Dj = pos - Pt;
+    Dj.normalize();
+    Vect N = in.calculateSurfaceNormal();
+    SColor diffuseLight = Whitted::DiffuseLightning(kt, Cd, N, Dj);
 
-//     // TODO: Flip normal if the ray is inside a transparent object
-//     return Cd.linearMult(a * b);
-// }
+    dirLight = dirLight.linearMult(diffuseLight);
+    // dirLight = dirLight.linearMult(Cd);
+
+    // SColor Q = N * N.dotProduct(Dj);
+    // SColor Rj = Q.linearMult(2) - Dj;
+    // SColor specLight = Whitted::SpecularLightning(ks, Rj, V, q);
+    return dirLight;
+}
+
+SColor Whitted::DiffuseLightning(float kt, SColor Cd, Vect N, Vect D) {
+    float a = (1.0f - kt);
+    float b = max(0.0f, N.dotProduct(D));
+
+    // TODO: Flip normal if the ray is inside a transparent object
+    return Cd.linearMult(a * b);
+}
 
 // SColor Whitted::SpecularLightning(float ks, SColor Rj, SColor V, float q) {̈́
 //     float a = Rj.dotProduct(V);
