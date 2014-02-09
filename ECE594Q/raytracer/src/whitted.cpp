@@ -9,7 +9,7 @@ SColor Whitted::AmbientLightning(float kt, float ka, SColor Cd) {
     return Cd.linearMult(ka * (1.0f - kt));
 }
 
-SColor Whitted::Illumination(Light lt, Intersection in, float Sj) {
+SColor Whitted::Illumination(Light *lt, Intersection in, float Sj) {
     SColor Pt = in.calculateIntersectionPoint();
     Material *mat = in.getMaterial();
     SColor Cd = mat->getDiffColor();
@@ -17,7 +17,7 @@ SColor Whitted::Illumination(Light lt, Intersection in, float Sj) {
     // SColor N = in.getSurfaceNormal();
 
     // float Fattj = Whitted::CalculateFattj(Pt, lt);
-    SColor Ij = lt.getIntensity();
+    SColor Ij = lt->getIntensity();
     
     SColor dirLight = Ij.linearMult(Sj);
     dirLight = dirLight.mult(Cd);
@@ -32,9 +32,9 @@ SColor Whitted::Illumination(Light lt, Intersection in, float Sj) {
     return dirLight;
 }
 
-float Whitted::CalculateFattj(SColor Pt, Light l) {
-    if (l.getType() == POINT_LIGHT) {
-        float dist = Pt.euclideanDistance(l.getPos());
+float Whitted::CalculateFattj(SColor Pt, Light *l) {
+    if (l->getType() == POINT_LIGHT) {
+        float dist = Pt.euclideanDistance(l->getPos());
         return (float) min(1.0, 1.0/(0.25 + 0.1 * dist + 0.01 * dist * dist));
     } else {
         return 1.0;

@@ -149,7 +149,7 @@ SColor RayTracer::shadeIntersection(Intersection in) {
         Light *l = lts.at(i);
 
         float Sj = calculateShadowScalar(*l, in);
-        shade = shade + Whitted::Illumination(*l, in, Sj);
+        shade = shade + Whitted::Illumination(l, in, Sj);
     }
 
     shade = shade + ambLight;
