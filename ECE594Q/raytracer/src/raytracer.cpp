@@ -142,7 +142,7 @@ SColor RayTracer::shadeIntersection(Intersection in) {
 
     SColor Cd = mat->getDiffColor();
     float kt = mat->getTransparency();
-    float ka = 0.2f;
+    SColor ka = mat->getAmbColor();
     SColor ambLight = Whitted::AmbientLightning(kt, ka, Cd);
     std::vector<Light *> lts = scene->getLights();
     for (uint i = 0; i < lts.size(); i++) {

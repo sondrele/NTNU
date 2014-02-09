@@ -2,11 +2,10 @@
 
 
 // Use ambColor given in the material paramter
-SColor Whitted::AmbientLightning(float kt, float ka, SColor Cd) {
+SColor Whitted::AmbientLightning(float kt, SColor ka, SColor Cd) {
     assert(kt >= 0 && kt <= 1);
-    assert(ka >= 0 && ka <= 1);
 
-    return Cd.linearMult(ka * (1.0f - kt));
+    return Cd.linearMult(ka).linearMult((1.0f - kt));
 }
 
 SColor Whitted::Illumination(Light *lt, Intersection in, float Sj) {

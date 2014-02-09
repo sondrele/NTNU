@@ -46,7 +46,7 @@ class Whitted {
 public:
     static SColor Illumination(Light *, Intersection, float);
 
-    static SColor AmbientLightning(float, float, SColor);
+    static SColor AmbientLightning(float, SColor, SColor);
     static float CalculateFattj(SColor, Light *);
     static SColor DirectIllumination(SColor, SColor, float);
     static SColor DiffuseLightning(float, SColor, SColor, SColor);
