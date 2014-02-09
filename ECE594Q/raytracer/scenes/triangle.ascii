@@ -1,13 +1,17 @@
 Composer format 2.1 ascii
 camera {
-  position 0 0 0
-  viewDirection 0 0 -1
+  position 0 3 5
+  viewDirection 0 -0.5 -1
   focalDistance 12.2118
   orthoUp 0 1 0
   verticalFOV 0.785398
 }
 point_light {
-  position 0 -100 -5
+  position -100 0 -4
+  color 1 1 1
+}
+point_light {
+  position 100 0 -4
   color 1 1 1
 }
 poly_set {
@@ -29,20 +33,20 @@ poly_set {
   numPolys 3
   poly {
     numVertices 3
-    pos 0 -1 -4
-    pos 1 -1 -6
+    pos -1 -1 -4
+    pos 1 -1 -4
     pos 0 1 -5
   }
   poly {
     numVertices 3
-    pos 0 -1 -4
-    pos -1 -1 -6
+    pos -1.5 -1 -6
+    pos -1 -1 -4
     pos 0 1 -5
   }
   poly {
     numVertices 3
-    pos -1 -1 -6
-    pos 1 -1 -6
+    pos 1.5 -1 -6
+    pos 1 -1 -4
     pos 0 1 -5
   }
 }

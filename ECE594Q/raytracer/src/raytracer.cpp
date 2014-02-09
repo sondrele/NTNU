@@ -120,7 +120,7 @@ Ray RayTracer::computeRay(uint x, uint y) {
 
 float RayTracer::calculateShadowScalar(Light &lt, Intersection &in) {
     Vect p = lt.getPos();
-    Vect ori = in.calculateIntersectionPoint() + in.calculateSurfaceNormal().linearMult(0.00001f);
+    Vect ori = in.calculateIntersectionPoint() + in.calculateSurfaceNormal().linearMult(0.0001f);
     Vect dir = p - ori;
     dir.normalize();
     Ray shdw(ori, dir);
@@ -144,7 +144,7 @@ SColor RayTracer::shadeIntersection(Intersection in) {
     // }
     SColor Cd = mat->getDiffColor();
     float kt = mat->getTransparency();
-    float ka = 1;
+    float ka = 0.2f;
     SColor ambLight = Whitted::AmbientLightning(kt, ka, Cd);
     std::vector<Light> lts = scene->getLights();
     for (uint i = 0; i < lts.size(); i++) {
