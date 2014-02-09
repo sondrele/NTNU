@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
     try {
         RayTracer rayTracer(IMAGE_WIDTH, IMAGE_HEIGHT);
 
-        loadScene("./scenes/sphere.ascii", rayTracer);
+        loadScene("./scenes/test1.ascii", rayTracer);
 
         /* write your ray tracer here */
         render();

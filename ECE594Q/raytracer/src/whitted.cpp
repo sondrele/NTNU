@@ -15,10 +15,10 @@ SColor Whitted::Illumination(Light *lt, Intersection in, float Sj) {
     // float q = in.getShininess();
     // SColor N = in.getSurfaceNormal();
 
-    // float Fattj = Whitted::CalculateFattj(Pt, lt);
+    float Fattj = Whitted::CalculateFattj(Pt, lt);
     SColor Ij = lt->getIntensity();
     
-    SColor dirLight = Ij.linearMult(Sj);
+    SColor dirLight = Ij.linearMult(Sj * Fattj);
     dirLight = dirLight.mult(Cd);
     // dirLight = dirLight + Whitted::DirectIllumination(Sj, Ij, Fattj);
 
