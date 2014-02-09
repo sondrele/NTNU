@@ -24,29 +24,30 @@ Vertex RaySceneFactory::PointToVertex(Point p) {
     return v;
 }
 
-void RaySceneFactory::CreateLight(Light &l, LightIO &lio) {
-    l.setType(lio.type);
-    l.setColor(SColor(lio.color));
+Light * RaySceneFactory::CreateLight(LightIO &lio) {
+    Light *l = new Light();
+    l->setType(lio.type);
+    l->setColor(SColor(lio.color));
     switch(lio.type) {
         case POINT_LIGHT: {
-            l.setPos(RaySceneFactory::PointToVect(lio.position));
+            l->setPos(RaySceneFactory::PointToVect(lio.position));
             break;
         }
         case DIRECTIONAL_LIGHT: {
-            l.setDir(RaySceneFactory::PointToVect(lio.direction));
+            l->setDir(RaySceneFactory::PointToVect(lio.direction));
             break;
         }
         case SPOT_LIGHT:
         default:
         break;
     }
+    return l;
 }
 
-void RaySceneFactory::CreateLights(std::vector<Light> &lts, LightIO &lio) {
+void RaySceneFactory::CreateLights(std::vector<Light *> &lts, LightIO &lio) {
     LightIO *temp = &lio;
     while (temp != NULL) {
-        Light l;
-        RaySceneFactory::CreateLight(l, *temp);
+        Light *l = RaySceneFactory::CreateLight(*temp);
         lts.push_back(l);
         temp = temp->next;
     }
@@ -153,7 +154,7 @@ void RaySceneFactory::CreateShapes(std::vector<Shape *> &shps, ObjIO &oio) {
 }
 
 void RaySceneFactory::CreateScene(RayScene &s, SceneIO &sio) {
-    std::vector<Light> lts;
+    std::vector<Light *> lts;
     RaySceneFactory::CreateLights(lts, *sio.lights);
     std::vector<Shape *> shps;
     RaySceneFactory::CreateShapes(shps, *sio.objects);

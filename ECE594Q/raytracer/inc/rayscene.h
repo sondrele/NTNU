@@ -34,17 +34,17 @@ public:
 
 class RayScene {
 private:
-    std::vector<Light> lights;
+    std::vector<Light *> lights;
     std::vector<Shape *> shapes;
 
 public:
     RayScene();
     ~RayScene();
 
-    void setLights(std::vector<Light>);
-    void addLight(Light);
-    Light getLight(uint);
-    std::vector<Light> getLights() { return lights; }
+    void setLights(std::vector<Light *>);
+    void addLight(Light *);
+    Light * getLight(uint);
+    std::vector<Light *> getLights() { return lights; }
 
     void setShapes(std::vector<Shape *>);
     void addShape(Shape *);

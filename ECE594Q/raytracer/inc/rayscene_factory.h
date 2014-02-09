@@ -15,8 +15,8 @@ public:
     static PX_Color ColorToPX_Color(Color);
     static Vect PointToVect(Point);
     static Vertex PointToVertex(Point);
-    static void CreateLight(Light &, LightIO &);
-    static void CreateLights(std::vector<Light> &, LightIO &);
+    static Light * CreateLight(LightIO &);
+    static void CreateLights(std::vector<Light *> &, LightIO &);
     static Sphere * NewSphere(float, Vect);
     static void CreateSphere(Sphere &s, SphereIO &sio);
     static Vertex CreateVertex(VertexIO &);

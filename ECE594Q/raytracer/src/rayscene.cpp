@@ -13,17 +13,21 @@ RayScene::~RayScene() {
         Shape *s = shapes.at(i);
         delete s;
     }
+
+    for (uint i = 0; i < lights.size(); i++) {
+        delete lights.at(i);
+    }
 }
 
-void RayScene::setLights(std::vector<Light> ls) {
+void RayScene::setLights(std::vector<Light *> ls) {
     lights = ls;
 }
 
-void RayScene::addLight(Light l) {
+void RayScene::addLight(Light *l) {
     lights.push_back(l);
 }
 
-Light RayScene::getLight(uint pos) {
+Light * RayScene::getLight(uint pos) {
     return lights.at(pos);
 }
 
@@ -64,8 +68,8 @@ std::string RayScene::toString() const {
     s << "\tCamera: " << endl;
     s << "\tLigts:" << endl;
     for (uint i = 0; i < lights.size(); i++) {
-        Light l = lights.at(i);
-        s << "\t\tL" << i << ": " << l.getPos() << endl;
+        Light *l = lights.at(i);
+        s << "\t\tL" << i << ": " << l->getPos() << endl;
     }
     s << "\tShapes:" << endl;
     for (uint i = 0; i < shapes.size(); i++) {

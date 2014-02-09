@@ -174,25 +174,27 @@ TEST(RaySceneFactory, can_init_mesh) {
 }
 
 TEST(RaySceneFactory, can_init_light) {
-    Light l;
-    RaySceneFactory::CreateLight(l, light0);
+    Light *l = RaySceneFactory::CreateLight(light0);
 
-    Vect d = l.getDir();
+    Vect d = l->getDir();
     CHECK_EQUAL(2, d.getX());
     CHECK_EQUAL(2, d.getY());
     CHECK_EQUAL(2, d.getZ());
+    delete l;
 }
 
 TEST(RaySceneFactory, can_init_lights) {
-    std::vector<Light> lts;
+    std::vector<Light *> lts;
     RaySceneFactory::CreateLights(lts, light0);
 
     CHECK_EQUAL(2, lts.size());
 
-    Vect p = lts[1].getPos();
+    Vect p = lts[1]->getPos();
     CHECK_EQUAL(0, p.getX());
     CHECK_EQUAL(1, p.getY());
     CHECK_EQUAL(2, p.getZ());
+    delete lts[0];
+    delete lts[1];
 }
 
 TEST(RaySceneFactory, can_init_camera) {
@@ -208,8 +210,8 @@ TEST(RaySceneFactory, can_create_scene) {
     RayScene s;
     RaySceneFactory::CreateScene(s, scene);
 
-    Light l = s.getLight(0);
-    CHECK_EQUAL(DIRECTIONAL_LIGHT, l.getType());
+    Light *l = s.getLight(0);
+    CHECK_EQUAL(DIRECTIONAL_LIGHT, l->getType());
     l = s.getLight(1);
-    CHECK_EQUAL(POINT_LIGHT, l.getType());
+    CHECK_EQUAL(POINT_LIGHT, l->getType());
 }
