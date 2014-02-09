@@ -38,28 +38,10 @@ Vect Intersection::calculateSurfaceNormal() {
         return Vect(0, 0, 0);
 }
 
-SColor Intersection::getColor() {
+Material * Intersection::getMaterial() {
     if (shape != NULL && shape->getNumMaterials() > 0) {
-        return shape->getMaterial(0).getDiffColor();
+        return shape->getMaterial();
     } else {
-        return SColor(0, 0, 0);
-    }
-}
-
-float Intersection::getTransparency() {
-    if (shape != NULL && shape->getNumMaterials() > 0) {
-        return shape->getMaterial(0).getTransparency();
-    } else {
-        // cout << "No transparency" << endl;
-        return 0;
-    }
-}
-
-float Intersection::getShininess() {
-    if (shape != NULL && shape->getNumMaterials() > 0) {
-        return shape->getMaterial(0).getShininess();
-    } else {
-        // cout << "No shininess" << endl;
-        return 0;
+        return NULL;
     }
 }

@@ -14,18 +14,21 @@ class RaySceneFactory {
 public:
     static PX_Color ColorToPX_Color(Color);
     static Vect PointToVect(Point);
-    static Sphere * NewSphere(float, Vect);
-    static void CreateMaterial(Material &m, MaterialIO &mio);
-    static void AddMaterials(Shape *s, MaterialIO *mio, long numMaterials);
-    static void CreateSphere(Sphere &s, SphereIO &sio);
-    static void CreateTriangle(Triangle &t, PolygonIO &pio);
-    static void CreateMesh(Mesh &m, PolySetIO &pio);
+    static Vertex PointToVertex(Point);
     static void CreateLight(Light &, LightIO &);
     static void CreateLights(std::vector<Light> &, LightIO &);
-    static void CreateCamera(Camera &c, CameraIO &cio);
-    static void CreateScene(RayScene &s, SceneIO &sio);
+    static Sphere * NewSphere(float, Vect);
+    static void CreateSphere(Sphere &s, SphereIO &sio);
+    static Vertex CreateVertex(VertexIO &);
+    static Triangle * CreateTriangle(PolygonIO &pio);
+    static void CreateMesh(Mesh &, PolySetIO &, std::vector<Material*>);
+    static Material * CreateMaterial(MaterialIO &mio);
+    static std::vector<Material *> CreateMaterials(MaterialIO *mio, long numMaterials);
+    static void AddMaterials(Shape*, std::vector<Material*>);
     static Shape * CreateShape(ObjIO &oio);
     static void CreateShapes(std::vector<Shape *> &shps, ObjIO &oio);
+    static void CreateCamera(Camera &c, CameraIO &cio);
+    static void CreateScene(RayScene &s, SceneIO &sio);
 };
 
 #endif

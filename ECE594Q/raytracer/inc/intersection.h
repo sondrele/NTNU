@@ -4,8 +4,9 @@
 #include "ray.h"
 #include "rayscene_shapes.h"
 
-class Shape;
 class SColor;
+class Shape;
+class Material;
 
 class Intersection {
 private:
@@ -27,12 +28,9 @@ public:
     Vect calculateIntersectionPoint();
     Vect calculateSurfaceNormal();
 
-    Vect getSurfaceNormal();
-    SColor getColor();
-    float getTransparency();
-    float getShininess();
     void setShape(Shape *s) { shape = s; }
     Shape * getShape() { return shape; }
+    Material *getMaterial();
 };
 
 #endif

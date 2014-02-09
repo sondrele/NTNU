@@ -11,7 +11,8 @@ SColor Whitted::AmbientLightning(float kt, float ka, SColor Cd) {
 
 SColor Whitted::Illumination(Light lt, Intersection in, float Sj) {
     SColor Pt = in.calculateIntersectionPoint();
-    SColor Cd = in.getColor();
+    Material *mat = in.getMaterial();
+    SColor Cd = mat->getDiffColor();
     // float q = in.getShininess();
     // SColor N = in.getSurfaceNormal();
 

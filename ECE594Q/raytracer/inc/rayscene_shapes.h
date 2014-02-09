@@ -63,8 +63,9 @@ enum ShapeType {
 class Intersection;
 
 class Shape {
-private:
-    std::vector<Material> materials;
+protected:
+    std::vector<Material *> materials;
+
 public:
     Shape();
     virtual ~Shape();
@@ -72,10 +73,10 @@ public:
     virtual ShapeType getType() = 0;
     virtual Intersection intersects(Ray) = 0;
     virtual Vect surfaceNormal(Vect, Vect) = 0;
+    virtual Material * getMaterial() = 0;
 
     uint64_t getNumMaterials() { return materials.size(); }
-    Material getMaterial(uint i) { return materials.at(i); }
-    void addMaterial(Material m) { materials.push_back(m); }
+    void addMaterial(Material *m) { materials.push_back(m); }
 };
 
 
@@ -110,19 +111,20 @@ public:
     float getZlen() { return zlength;}
     void setZ(float zlen, Vect z) { zlength = zlen; zaxis = z;}
 
+    virtual Material * getMaterial();
     virtual Intersection intersects(Ray);
     virtual Vect surfaceNormal(Vect, Vect);
 };
 
 class Vertex : public Vect {
 private:
-    uint materialPos;
+    uint matIndex;
 
 public:
-    Vertex();
-    Vertex(uint p);
-    void setMaterialPos(uint p) { materialPos = p; }
-    uint getMaterialPost() { return materialPos; }
+    Vertex() {};
+    Vertex(float, float, float);
+    void setMaterialIndex(uint i) { matIndex = i; }
+    uint getMaterialIndex() { return matIndex; }
 
     Vertex& operator=(const Vect&);
 };
@@ -132,35 +134,39 @@ private:
     Vertex a;
     Vertex b;
     Vertex c;
+    // Material *mat;
 
 public:
-    virtual ~Triangle() {}
+    Triangle();
+    virtual ~Triangle();
     virtual ShapeType getType() { return TRIANGLE; }
 
-    Vect getA() { return a;}
-    void setA(Vect x) { a = x;}
-    Vect getB() { return b;}
-    void setB(Vect y) { b = y;}
-    Vect getC() { return c;}
-    void setC(Vect z) { c = z;}
+    Vertex getA() { return a;}
+    void setA(Vertex x) { a = x;}
+    Vertex getB() { return b;}
+    void setB(Vertex y) { b = y;}
+    Vertex getC() { return c;}
+    void setC(Vertex z) { c = z;}
+    void setMaterial(Material m);
 
+    virtual Material * getMaterial();
     virtual Intersection intersects(Ray);
     virtual Vect surfaceNormal(Vect, Vect);
 };
 
 class Mesh : public Shape {
 private:
-    std::string name;
     std::vector<Triangle *> triangles;
 
 public:
     virtual ~Mesh();
     virtual ShapeType getType() { return MESH; }
 
-    void addTriangle(Triangle t);
-    Triangle *getTriangle(uint64_t i) { return triangles.at(i);}
+    void addTriangle(Triangle *t);
+    Triangle * getTriangle(uint64_t i) { return triangles.at(i);}
     uint64_t size() { return triangles.size();}
 
+    virtual Material * getMaterial();
     virtual Intersection intersects(Ray);
     virtual Vect surfaceNormal(Vect, Vect);
 };

@@ -16,49 +16,12 @@ Vect RaySceneFactory::PointToVect(Point p) {
     return v;
 }
 
-Sphere * RaySceneFactory::NewSphere(float radius, Vect origin) {
-    Sphere *s = new Sphere();
-    s->setRadius(radius);
-    s->setOrigin(origin);
-    return s;
-}
-
-void RaySceneFactory::CreateMaterial(Material &m, MaterialIO &mio) {
-    m.setDiffColor(SColor(mio.diffColor));
-    m.setAmbColor(SColor(mio.ambColor));
-    m.setSpecColor(SColor(mio.specColor));
-    // m.setEmissColor(SColor(mio.emissColor));
-    m.setShininess(mio.shininess);
-    m.setTransparency(mio.ktran);
-}
-
-void RaySceneFactory::CreateSphere(Sphere &sphere, SphereIO &s) {
-    sphere.setRadius(s.radius);
-    sphere.setOrigin(RaySceneFactory::PointToVect(s.origin));
-    sphere.setX(s.xlength, RaySceneFactory::PointToVect(s.xaxis));
-    sphere.setY(s.ylength, RaySceneFactory::PointToVect(s.yaxis));
-    sphere.setZ(s.zlength, RaySceneFactory::PointToVect(s.zaxis));
-}
-
-void RaySceneFactory::CreateTriangle(Triangle &t, PolygonIO &pio) {
-    if (pio.numVertices == 3) {
-        VertexIO p0 = pio.vert[0];
-        VertexIO p1 = pio.vert[1];
-        VertexIO p2 = pio.vert[2];
-
-        t.setA(RaySceneFactory::PointToVect(p0.pos));
-        t.setB(RaySceneFactory::PointToVect(p1.pos));
-        t.setC(RaySceneFactory::PointToVect(p2.pos));
-    }
-
-}
-
-void RaySceneFactory::CreateMesh(Mesh &m, PolySetIO &pio) {
-    for (int i = 0; i < pio.numPolys; i++) {
-        Triangle t;
-        RaySceneFactory::CreateTriangle(t, pio.poly[i]);
-        m.addTriangle(t);
-    }
+Vertex RaySceneFactory::PointToVertex(Point p) {
+    Vertex v;
+    v.setX(p[0]);
+    v.setY(p[1]);
+    v.setZ(p[2]);
+    return v;
 }
 
 void RaySceneFactory::CreateLight(Light &l, LightIO &lio) {
@@ -89,20 +52,71 @@ void RaySceneFactory::CreateLights(std::vector<Light> &lts, LightIO &lio) {
     }
 }
 
-void RaySceneFactory::CreateCamera(Camera &c, CameraIO &cio) {
-    c.setPos(RaySceneFactory::PointToVect(cio.position));
-    c.setViewDir(RaySceneFactory::PointToVect(cio.viewDirection));
-    c.setOrthoUp(RaySceneFactory::PointToVect(cio.orthoUp));
-    c.setFocalDist(cio.focalDistance);
-    c.setVerticalFOV(cio.verticalFOV);
+Sphere * RaySceneFactory::NewSphere(float radius, Vect origin) {
+    Sphere *s = new Sphere();
+    s->setRadius(radius);
+    s->setOrigin(origin);
+    return s;
 }
 
-void RaySceneFactory::AddMaterials(Shape *s, MaterialIO *mio, long numMaterials) {
+void RaySceneFactory::CreateSphere(Sphere &sphere, SphereIO &s) {
+    sphere.setRadius(s.radius);
+    sphere.setOrigin(RaySceneFactory::PointToVect(s.origin));
+    sphere.setX(s.xlength, RaySceneFactory::PointToVect(s.xaxis));
+    sphere.setY(s.ylength, RaySceneFactory::PointToVect(s.yaxis));
+    sphere.setZ(s.zlength, RaySceneFactory::PointToVect(s.zaxis));
+}
+
+Vertex RaySceneFactory::CreateVertex(VertexIO &vio) {
+    Vertex v = RaySceneFactory::PointToVertex(vio.pos);
+    v.setMaterialIndex((uint)vio.materialIndex);
+    return v;
+}
+
+Triangle * RaySceneFactory::CreateTriangle(PolygonIO &pio) {
+    Triangle *t = new Triangle();
+    Vertex v0 = RaySceneFactory::CreateVertex(pio.vert[0]);
+    Vertex v1 = RaySceneFactory::CreateVertex(pio.vert[1]);
+    Vertex v2 = RaySceneFactory::CreateVertex(pio.vert[2]);
+    t->setA(v0);
+    t->setB(v1);
+    t->setC(v2);
+    return t;
+}
+
+void RaySceneFactory::CreateMesh(Mesh &m, PolySetIO &pio, std::vector<Material *> mats) {
+    for (int i = 0; i < pio.numPolys; i++) {
+        Triangle *t = RaySceneFactory::CreateTriangle(pio.poly[i]);
+        Material *y = new Material();
+        *y = *(mats[t->getA().getMaterialIndex()]);
+        t->addMaterial(y);
+        m.addTriangle(t);
+    }
+}
+
+Material * RaySceneFactory::CreateMaterial(MaterialIO &mio) {
+    Material *m = new Material();
+    m->setDiffColor(SColor(mio.diffColor));
+    m->setAmbColor(SColor(mio.ambColor));
+    m->setSpecColor(SColor(mio.specColor));
+    // m->setEmissColor(SColor(mio.emissColor));
+    m->setShininess(mio.shininess);
+    m->setTransparency(mio.ktran);
+    return m;
+}
+
+std::vector<Material *> RaySceneFactory::CreateMaterials(MaterialIO *mio, long numMaterials) {
+    std::vector<Material *> mats;
     for (long i = 0; i < numMaterials; i++) {
-        Material m;
-        RaySceneFactory::CreateMaterial(m, mio[i]);
-        s->addMaterial(m);
-        // cout << "Adding material to: " << s->getType() << endl;
+        Material *m = RaySceneFactory::CreateMaterial(mio[i]);
+        mats.push_back(m);
+    }
+    return mats;
+}
+
+void RaySceneFactory::AddMaterials(Shape *s, std::vector<Material *> mats) {
+    for (uint i = 0; i < mats.size(); i++) {
+        s->addMaterial(mats[i]);
     }
 }
 
@@ -111,15 +125,17 @@ Shape * RaySceneFactory::CreateShape(ObjIO &oio) {
         case SPHERE_OBJ: {
             Sphere *s = new Sphere();
             SphereIO sio = *((SphereIO *) oio.data);
+            std::vector<Material *> mats = RaySceneFactory::CreateMaterials(oio.material, oio.numMaterials);
+            RaySceneFactory::AddMaterials(s, mats);
             RaySceneFactory::CreateSphere(*s, sio);
-            RaySceneFactory::AddMaterials(s, oio.material, oio.numMaterials);
             return s;
         }
         case POLYSET_OBJ: {
             Mesh *m = new Mesh();
             PolySetIO pio = *((PolySetIO *) oio.data);
-            RaySceneFactory::CreateMesh(*m, pio);
-            RaySceneFactory::AddMaterials(m, oio.material, oio.numMaterials);
+            std::vector<Material *> mats = RaySceneFactory::CreateMaterials(oio.material, oio.numMaterials);
+            RaySceneFactory::AddMaterials(m, mats);
+            RaySceneFactory::CreateMesh(*m, pio, mats);
             return m;
         }
         default:
@@ -142,9 +158,14 @@ void RaySceneFactory::CreateScene(RayScene &s, SceneIO &sio) {
     std::vector<Shape *> shps;
     RaySceneFactory::CreateShapes(shps, *sio.objects);
 
-    // Camera cam;
-    // RaySceneFactory::CreateCamera(cam, *sio.camera);
-    // s.setCamera(cam);
     s.setLights(lts);
     s.setShapes(shps);
+}
+
+void RaySceneFactory::CreateCamera(Camera &c, CameraIO &cio) {
+    c.setPos(RaySceneFactory::PointToVect(cio.position));
+    c.setViewDir(RaySceneFactory::PointToVect(cio.viewDirection));
+    c.setOrthoUp(RaySceneFactory::PointToVect(cio.orthoUp));
+    c.setFocalDist(cio.focalDistance);
+    c.setVerticalFOV(cio.verticalFOV);
 }

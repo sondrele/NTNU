@@ -20,10 +20,10 @@ TEST_GROUP(IntersectionTest) {
         r1 = new Ray(Vect(0, SIN_PI_4, 0), Vect(0, 0, -1));
 
         Mesh *m = new Mesh();
-        Triangle t;
-        t.setA(Vect(2, 0, -3));
-        t.setB(Vect(-2, 0, -3));
-        t.setC(Vect(0, 2, -1));
+        Triangle *t = new Triangle();
+        t->setA(Vertex(2, 0, -3));
+        t->setB(Vertex(-2, 0, -3));
+        t->setC(Vertex(0, 2, -1));
         m->addTriangle(t);
         m0 = m;
     }

@@ -57,12 +57,10 @@ Material::Material() {
     transparency = 0;
 }
 
-Vertex::Vertex() {
-    materialPos = 0;
-}
-
-Vertex::Vertex(uint p) {
-    materialPos = p;
+Vertex::Vertex(float a, float b, float c) {
+    setX(a);
+    setY(b);
+    setZ(c);
 }
 
 Vertex& Vertex::operator=(const Vect &other) {
@@ -78,7 +76,9 @@ Shape::Shape() {
 }
 
 Shape::~Shape() {
-
+    for (uint i = 0; i < materials.size(); i++) {
+        delete materials[i];
+    }
 }
 
 Sphere::Sphere() {
@@ -90,6 +90,10 @@ Vect Sphere::surfaceNormal(Vect o, Vect pt) {
     Vect normal = pt - origin;
     normal.normalize();
     return normal;
+}
+
+Material * Sphere::getMaterial() {
+    return materials[0];
 }
 
 Intersection Sphere::intersects(Ray ray) {
@@ -154,10 +158,13 @@ Mesh::~Mesh() {
     }
 }
 
-void Mesh::addTriangle(Triangle t) {
-    Triangle *tri = new Triangle();
-    *tri = t;
-    triangles.push_back(tri);
+Material * Mesh::getMaterial() {
+    cout << "Mesh has no material" << endl;
+    return materials[0];
+}
+
+void Mesh::addTriangle(Triangle *t) {
+    triangles.push_back(t);
 }
 
 Intersection Mesh::intersects(Ray ray) {
@@ -175,6 +182,18 @@ Vect Mesh::surfaceNormal(Vect o, Vect pt) {
     (void) o;
     throw "Mesh has no surface normal";
     return pt;
+}
+
+Triangle::Triangle() {
+    // mat = NULL;
+}
+
+Triangle::~Triangle() {
+    // delete mat;
+}
+
+Material * Triangle::getMaterial() {
+    return materials[0];
 }
 
 Intersection Triangle::intersects(Ray ray) {

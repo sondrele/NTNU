@@ -40,12 +40,15 @@ TEST_GROUP(RaySceneFactory) {
         triangle0.vert[1].pos[0] = 0.4f;
         triangle0.vert[1].pos[1] = 0.5f;
         triangle0.vert[1].pos[2] = 0.6f;
+        triangle0.vert[1].materialIndex = 0;
+        triangle0.vert[0].materialIndex = 0;
 
         triangle1.numVertices = 3;
         triangle1.vert = new VertexIO[3];
         triangle1.vert[0].pos[0] = 0.4f;
         triangle1.vert[0].pos[1] = 0.5f;
         triangle1.vert[0].pos[2] = 0.6f;
+        triangle1.vert[0].materialIndex = 0;
 
         trimesh.numPolys = 2;
         trimesh.poly = new PolygonIO[2];
@@ -85,6 +88,12 @@ TEST_GROUP(RaySceneFactory) {
 
         scene.camera = &camera;
         scene.lights = &light0;
+
+        material.diffColor[0] = 5;
+        material.diffColor[1] = 5;
+        material.diffColor[2] = 5;
+        material.shininess = 1;
+        material.ktran = 0.5f;
     }
     void teardown() {
         delete [] triangle0.vert;
@@ -119,22 +128,43 @@ TEST(RaySceneFactory, can_convert_color_to_PX_Color) {
 }
 
 TEST(RaySceneFactory, can_init_triangle) {
-    Triangle t;
-    RaySceneFactory::CreateTriangle(t, triangle0);
-    Vect b = t.getB();
+    Triangle *t = RaySceneFactory::CreateTriangle(triangle0);
+    Vect b = t->getB();
+    delete t;
     DOUBLES_EQUAL(0.4, b.getX(), 0.00001);
     DOUBLES_EQUAL(0.5, b.getY(), 0.00001);
     DOUBLES_EQUAL(0.6, b.getZ(), 0.00001);
 }
 
+TEST(RaySceneFactory, can_create_material) {
+    Material *m = RaySceneFactory::CreateMaterial(material);
+
+    DOUBLES_EQUAL(1, m->getShininess(), 0.00001);
+    DOUBLES_EQUAL(0.5f, m->getTransparency(), 0.00001);
+
+    delete m;
+}
+
 TEST(RaySceneFactory, can_init_mesh) {
+    Material *ms = RaySceneFactory::CreateMaterial(material);
+    std::vector<Material *> v;
+    v.push_back(ms);
+
     Mesh m;
-    RaySceneFactory::CreateMesh(m, trimesh);
+    RaySceneFactory::AddMaterials(&m, v);
+    RaySceneFactory::CreateMesh(m, trimesh, v);
+    Material *mat = m.getMaterial();
+    POINTERS_EQUAL(ms, mat);
+
     Triangle *t0 = m.getTriangle(0);
     Vect b = t0->getB();
     DOUBLES_EQUAL(0.4, b.getX(), 0.00001);
     DOUBLES_EQUAL(0.5, b.getY(), 0.00001);
     DOUBLES_EQUAL(0.6, b.getZ(), 0.00001);
+    mat = t0->getMaterial();
+    CHECK(ms != mat);
+    DOUBLES_EQUAL(1, mat->getShininess(), 0.00001);
+    DOUBLES_EQUAL(0.5f, mat->getTransparency(), 0.00001);
 
     Triangle *t1 = m.getTriangle(1);
     Vect a = t1->getA();

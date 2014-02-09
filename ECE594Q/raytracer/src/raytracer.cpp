@@ -138,11 +138,14 @@ float RayTracer::calculateShadowScalar(Light &lt, Intersection &in) {
 SColor RayTracer::shadeIntersection(Intersection in) {
     SColor shade(0, 0, 0);
 
-    SColor Cd = in.getColor();
-    float kt = in.getTransparency();
-    float ka = 0.2f;
+    Material *mat = in.getMaterial();
+    // if (mat == NULL) {
+    //     return shade;
+    // }
+    SColor Cd = mat->getDiffColor();
+    float kt = mat->getTransparency();
+    float ka = 1;
     SColor ambLight = Whitted::AmbientLightning(kt, ka, Cd);
-
     std::vector<Light> lts = scene->getLights();
     for (uint i = 0; i < lts.size(); i++) {
         Light l = lts.at(i);
@@ -163,7 +166,6 @@ RayBuffer RayTracer::traceRays() {
             Intersection in = scene->calculateRayIntersection(r);
             if (in.hasIntersected()) {
                 SColor c = shadeIntersection(in);
-
                 PX_Color color;
                 color.R = (uint8_t) (255 * c.R());
                 color.G = (uint8_t) (255 * c.G());

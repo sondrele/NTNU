@@ -13,9 +13,9 @@ TEST_GROUP(RaySceneShapesTest) {
 
 TEST(RaySceneShapesTest, triangle_intersects) {
     Triangle t0;
-    t0.setA(Vect(0, 0, 1));
-    t0.setB(Vect(-1, -1, 2));
-    t0.setC(Vect(1, -1, 2));
+    t0.setA(Vertex(0, 0, 1));
+    t0.setB(Vertex(-1, -1, 2));
+    t0.setC(Vertex(1, -1, 2));
 
     Intersection is;
     Ray r0(Vect(0, 0, 0), Vect(0, -0.25, 1));
@@ -37,15 +37,19 @@ TEST(RaySceneShapesTest, triangle_intersects) {
 }
 
 TEST(RaySceneShapesTest, mesh_intesects) {
-    Triangle t0;
-    t0.setA(Vect(0, 0, 1));
-    t0.setB(Vect(-1, -1, 2));
-    t0.setC(Vect(1, -1, 2));
+    Material *m0 = new Material();
+    Triangle *t0 = new Triangle();
+    t0->addMaterial(m0);
+    t0->setA(Vertex(0, 0, 1));
+    t0->setB(Vertex(-1, -1, 2));
+    t0->setC(Vertex(1, -1, 2));
 
-    Triangle t1;
-    t1.setA(Vect(0, 0, 1));
-    t1.setB(Vect(-1, 1, 2));
-    t1.setC(Vect(1, 1, 2));
+    Material *m1 = new Material();
+    Triangle *t1 = new Triangle();
+    t1->addMaterial(m1);
+    t1->setA(Vertex(0, 0, 1));
+    t1->setB(Vertex(-1, 1, 2));
+    t1->setC(Vertex(1, 1, 2));
 
     Mesh m;
     m.addTriangle(t0);
@@ -62,5 +66,6 @@ TEST(RaySceneShapesTest, mesh_intesects) {
     Ray r2(Vect(0, 0, 0), Vect(1, 1, -2));
     is = m.intersects(r2);
     CHECK_FALSE(is.hasIntersected());
+
 }
 
