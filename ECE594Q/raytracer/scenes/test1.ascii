@@ -10,14 +10,6 @@ point_light {
   position -1.84647 0.778452 2.67544
   color 1 1 1
 }
-point_light {
-  position -7.78433 2.38677 -5.08224
-  color 1 1 1
-}
-directional_light {
-  direction 0.580339 -0.523277 -0.62401
-  color 1 1 1
-}
 sphere {
   name NULL
   numMaterials 1

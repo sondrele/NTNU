@@ -40,18 +40,18 @@ Shape * RayScene::getShape(uint pos) {
 }
 
 Intersection RayScene::calculateRayIntersection(Ray ray) {
-    Intersection ins(ray);
+    Intersection ins;
     for (uint i = 0; i < shapes.size(); i++) {
-        float t;
         Shape *s = shapes.at(i);
-        if (s->intersects(ray, t)) {
+        Intersection j = s->intersects(ray);
+        if (j.hasIntersected()) {
             if (!ins.hasIntersected()) {
-                ins.setIntersectionPoint(t);
-                ins.setShape(s);
+                ins = j;
             } 
-            else if (ins.hasIntersected() && t < ins.getIntersectionPoint()) {
-                ins.setIntersectionPoint(t);
-                ins.setShape(s);
+            else if (ins.hasIntersected() &&
+                j.getIntersectionPoint() < ins.getIntersectionPoint())
+            {
+                ins = j;
             }
         }
     }

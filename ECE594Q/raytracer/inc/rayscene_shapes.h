@@ -10,6 +10,7 @@
 #include "Matrix.h"
 #include "scene_io.h"
 #include "ray.h"
+#include "intersection.h"
 #include "raybuffer.h"
 
 class SColor : public Vect {
@@ -59,14 +60,18 @@ enum ShapeType {
     SPHERE, MESH, TRIANGLE
 };
 
+class Intersection;
+
 class Shape {
 private:
     std::vector<Material> materials;
 public:
-    virtual ~Shape() {}
+    Shape();
+    virtual ~Shape();
     
-    virtual bool intersects(Ray, float &) = 0;
     virtual ShapeType getType() = 0;
+    virtual Intersection intersects(Ray) = 0;
+    virtual Vect surfaceNormal(Vect) = 0;
 
     uint64_t getNumMaterials() { return materials.size(); }
     Material getMaterial(uint i) { return materials.at(i); }
@@ -89,7 +94,7 @@ private:
 public:
     Sphere();
     virtual ~Sphere() {}
-    virtual ShapeType getType();
+    virtual ShapeType getType() { return SPHERE; }
 
     Vect getOrigin() { return origin;}
     void setOrigin(Vect o) { origin = o;}
@@ -105,7 +110,8 @@ public:
     float getZlen() { return zlength;}
     void setZ(float zlen, Vect z) { zlength = zlen; zaxis = z;}
 
-    virtual bool intersects(Ray, float &);
+    virtual Intersection intersects(Ray);
+    virtual Vect surfaceNormal(Vect);
 };
 
 class Vertex : public Vect {
@@ -129,7 +135,7 @@ private:
 
 public:
     virtual ~Triangle() {}
-    virtual ShapeType getType();
+    virtual ShapeType getType() { return TRIANGLE; }
 
     Vect getA() { return a;}
     void setA(Vect x) { a = x;}
@@ -137,24 +143,26 @@ public:
     void setB(Vect y) { b = y;}
     Vect getC() { return c;}
     void setC(Vect z) { c = z;}
-    virtual bool intersects(Ray, float &);
 
+    virtual Intersection intersects(Ray);
+    virtual Vect surfaceNormal(Vect);
 };
 
 class Mesh : public Shape {
 private:
     std::string name;
-    std::vector<Triangle> triangles;
+    std::vector<Triangle *> triangles;
 
 public:
-    virtual ~Mesh() {}
-    virtual ShapeType getType();
+    virtual ~Mesh();
+    virtual ShapeType getType() { return MESH; }
 
     void addTriangle(Triangle t);
-    Triangle getTriangle(uint64_t i) { return triangles.at(i);}
+    Triangle *getTriangle(uint64_t i) { return triangles.at(i);}
     uint64_t size() { return triangles.size();}
 
-    virtual bool intersects(Ray, float &);
+    virtual Intersection intersects(Ray);
+    virtual Vect surfaceNormal(Vect);
 };
 
 #endif // _RAYSCENE_SHAPES_H_

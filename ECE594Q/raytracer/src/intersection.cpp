@@ -27,7 +27,14 @@ void Intersection::setIntersectionPoint(float t) {
 }
 
 Vect Intersection::calculateIntersectionPoint() {
-    return (ray.getDirection()).linearMult(pt);
+    return (ray.getDirection()).linearMult(pt) + ray.getOrigin();
+}
+
+Vect Intersection::calculateSurfaceNormal() {
+    if (shape != NULL) {
+        return shape->surfaceNormal(calculateIntersectionPoint());
+    } else
+        return Vect(0, 0, 0);
 }
 
 Vect Intersection::getSurfaceNormal() {

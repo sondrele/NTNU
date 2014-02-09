@@ -4,6 +4,9 @@
 #include "ray.h"
 #include "rayscene_shapes.h"
 
+class Shape;
+class SColor;
+
 class Intersection {
 private:
     Ray ray;
@@ -20,8 +23,9 @@ public:
     Vect getDirection() { return ray.getDirection(); }
     void setIntersectionPoint(float);
     float getIntersectionPoint() {return pt; }
-    Vect calculateIntersectionPoint();
     bool hasIntersected() { return intersected; }
+    Vect calculateIntersectionPoint();
+    Vect calculateSurfaceNormal();
 
     Vect getSurfaceNormal();
     SColor getColor();

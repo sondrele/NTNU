@@ -130,14 +130,14 @@ TEST(RaySceneFactory, can_init_triangle) {
 TEST(RaySceneFactory, can_init_mesh) {
     Mesh m;
     RaySceneFactory::CreateMesh(m, trimesh);
-    Triangle t0 = m.getTriangle(0);
-    Vect b = t0.getB();
+    Triangle *t0 = m.getTriangle(0);
+    Vect b = t0->getB();
     DOUBLES_EQUAL(0.4, b.getX(), 0.00001);
     DOUBLES_EQUAL(0.5, b.getY(), 0.00001);
     DOUBLES_EQUAL(0.6, b.getZ(), 0.00001);
 
-    Triangle t1 = m.getTriangle(1);
-    Vect a = t1.getA();
+    Triangle *t1 = m.getTriangle(1);
+    Vect a = t1->getA();
     DOUBLES_EQUAL(0.4, a.getX(), 0.00001);
     DOUBLES_EQUAL(0.5, a.getY(), 0.00001);
     DOUBLES_EQUAL(0.6, a.getZ(), 0.00001);

@@ -164,11 +164,11 @@ TEST(RayTracer, can_compute_direction) {
 }
 
 TEST(RayTracer, ray_inits) {
-    Ray r(Vect(0, 0, -1), Vect(-2, 0, 0));
+    Ray r(Vect(0, 0, -1), Vect(-1, 0, 0));
     Vect o = r.getOrigin();
     Vect d = r.getDirection();
     CHECK_EQUAL(-1, o.getZ());
-    CHECK_EQUAL(-2, d.getX());
+    CHECK_EQUAL(-1, d.getX());
 }
 
 TEST(RayTracer, can_compute_ray) {
@@ -181,9 +181,9 @@ TEST(RayTracer, can_compute_ray) {
     CHECK_EQUAL(0, ctr.getZ());
 
     Vect dir = r0.getDirection();
-    CHECK_EQUAL(-50, dir.getX());
-    CHECK_EQUAL(-50, dir.getY());
-    CHECK_EQUAL(-100, dir.getZ());
+    DOUBLES_EQUAL(-0.408248, dir.getX(), 0.00001);
+    DOUBLES_EQUAL(-0.408248, dir.getY(), 0.00001);
+    DOUBLES_EQUAL(-0.816497, dir.getZ(), 0.00001);
 }
 
 TEST(RayTracer, can_export_raybuffer) {

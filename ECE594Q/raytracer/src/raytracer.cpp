@@ -3,6 +3,7 @@
 RayTracer::RayTracer(uint width, uint height, Vect viewDir, Vect orthoUp) {
     WIDTH = width;
     HEIGHT = height;
+    scaleConst = 100;
     buffer = RayBuffer(WIDTH, HEIGHT);
     scene = NULL;
 
@@ -10,8 +11,6 @@ RayTracer::RayTracer(uint width, uint height, Vect viewDir, Vect orthoUp) {
     camera.setVerticalFOV((float)M_PI / 2.0f);
     camera.setViewDir(viewDir);
     camera.setOrthoUp(orthoUp);
-
-    scaleConst = 100;
 
     calculateImagePlane();
 }
@@ -120,8 +119,9 @@ Ray RayTracer::computeRay(uint x, uint y) {
 }
 
 float RayTracer::calculateShadowScalar(Light &lt, Intersection &in) {
+    Vect p = lt.getPos();
     Vect o = in.calculateIntersectionPoint();
-    Vect d = lt.getPos() - o;
+    Vect d = p - o;
     d.normalize();
     Ray shdw(o, d);
     Intersection si = scene->calculateRayIntersection(shdw);
@@ -159,12 +159,6 @@ RayBuffer RayTracer::traceRays() {
     for (uint y = 0; y < HEIGHT; y++) {
         for (uint x = 0; x < WIDTH; x++) {
             Ray r = computeRay(x, y);
-            if (x == 8 && y == 13) { // 20 x 20
-                cout << "lol" << endl;
-            }
-            if (x == 11 && y == 14) {
-                cout << "lol" << endl;
-            }
             Intersection in = scene->calculateRayIntersection(r);
             if (in.hasIntersected()) {
                 SColor c = shadeIntersection(in);

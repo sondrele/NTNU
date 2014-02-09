@@ -2,3 +2,6 @@ cpputest
 *.bmp
 *.jpg
 *.jpeg
+.cproject
+.project
+.settings

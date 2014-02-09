@@ -73,23 +73,26 @@ Vertex& Vertex::operator=(const Vect &other) {
     return *this;
 }
 
+Shape::Shape() {
+
+}
+
+Shape::~Shape() {
+    
+}
+
 Sphere::Sphere() {
     radius = 0;
 }
 
-ShapeType Sphere::getType() {
-    return SPHERE;
+Vect Sphere::surfaceNormal(Vect pt) {
+    Vect normal = pt - origin;
+    normal.normalize();
+    return normal;
 }
 
-ShapeType Triangle::getType() {
-    return TRIANGLE;
-}
-
-ShapeType Mesh::getType() {
-    return MESH;
-}
-
-bool Sphere::intersects(Ray ray, float &t) {
+Intersection Sphere::intersects(Ray ray) {
+    Intersection is(ray, this);
     // Transforming ray to object space
     Vect transformedOrigin = ray.getOrigin() - getOrigin();
 
@@ -106,7 +109,7 @@ bool Sphere::intersects(Ray ray, float &t) {
     // if discriminant is negative there are no real roots, so return 
     // false as ray misses sphere
     if (disc < 0)
-        return false;
+        return is;
 
     // compute q as described above
     float distSqrt = sqrtf(disc);
@@ -130,34 +133,50 @@ bool Sphere::intersects(Ray ray, float &t) {
     // if t1 is less than zero, the object is in the ray's negative direction
     // and consequently the ray misses the sphere
     if (t1 < 0)
-        return false;
+        return is;
 
     // if t0 is less than zero, the intersection point is at t1
     if (t0 < 0) {
-        t = t1;
-        return true;
+        is.setIntersectionPoint(t1);
+        return is;
     }
     // else the intersection point is at t0
     else {
-        t = t0;
-        return true;
+        is.setIntersectionPoint(t0);
+        return is;
+    }
+}
+
+Mesh::~Mesh() {
+    for (uint i = 0; i < triangles.size(); i++) {
+        delete triangles[i];
     }
 }
 
 void Mesh::addTriangle(Triangle t) {
-    triangles.push_back(t);
+    Triangle *tri = new Triangle();
+    *tri = t;
+    triangles.push_back(tri);
 }
 
-bool Mesh::intersects(Ray ray, float &t) {
+Intersection Mesh::intersects(Ray ray) {
+    Intersection is;
     for (uint i = 0; i < triangles.size(); i++) {
-        Triangle t0 = triangles.at(i);
-        if (t0.intersects(ray, t))
-            return true;
+        Triangle *t0 = triangles.at(i);
+        is = t0->intersects(ray);
+        if (is.hasIntersected())
+            return is;
     }
-    return false;
+    return is;
 }
 
-bool Triangle::intersects(Ray ray, float &t) {
+Vect Mesh::surfaceNormal(Vect pt) {
+    return pt;
+}
+
+Intersection Triangle::intersects(Ray ray) {
+    Intersection is(ray, this);
+
     Vect p = ray.getOrigin();
     Vect d = ray.getDirection();
     Vect v0 = getA();
@@ -165,7 +184,7 @@ bool Triangle::intersects(Ray ray, float &t) {
     Vect v2 = getC();
 
     Vect e1, e2, h, s, q;
-    float a0,f,u,v;
+    float a0, f, u, v;
 
     e1 = v1 - v0;
     e2 = v2 - v0;
@@ -174,29 +193,42 @@ bool Triangle::intersects(Ray ray, float &t) {
     a0 = e1.dotProduct(h);
 
     if (a0 > -0.00001 && a0 < 0.00001)
-        return false;
+        return is;
 
-    f = 1/a0;
+    f = 1 / a0;
     s = p - v0;
     u = f * (s.dotProduct(h));
 
     if (u < 0.0 || u > 1.0)
-        return false;
+        return is;
 
     q = s.crossProduct(e1);
     v = f * d.dotProduct(q);
 
     if (v < 0.0 || u + v > 1.0)
-        return false;
+        return is;
 
     // at this stage we can compute t to find out where
     // the intersection point is on the line
-    t = f * e2.dotProduct(q);
+    float t = f * e2.dotProduct(q);
 
-    if (t > 0.00001) // ray intersection
-        return true;
+    if (t > 0.00001) { // ray intersection
+        is.setIntersectionPoint(t);
+        return is;
+    }
 
     else // this means that there is a line intersection
          // but not a ray intersection
-         return false;
+         return is;
+}
+
+Vect Triangle::surfaceNormal(Vect pt) {
+    (void) pt;
+
+    Vect v = getB() - getA();
+    Vect w = getC() - getA();
+
+    Vect N = v.crossProduct(w);
+    N.normalize();
+    return N;
 }
