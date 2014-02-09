@@ -50,7 +50,7 @@ public:
     static float CalculateFattj(Vect, Light *);
     static SColor DirectIllumination(SColor, SColor, float);
     static SColor DiffuseLightning(float, SColor, Vect, Vect);
-    static float SpecularLightning(float, SColor, SColor, float);
+    static SColor SpecularLightning(float, SColor, Vect, Vect, Vect);
 
     static SColor Reflection(float, SColor);
     static SColor Refraction(float, SColor);

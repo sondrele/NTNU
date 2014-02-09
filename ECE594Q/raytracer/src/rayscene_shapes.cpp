@@ -29,18 +29,24 @@ SColor& SColor::operator=(const Vect &other) {
 void SColor::R(float r) {
     if (r > 1.0f)
         r = 1;
+    if (r < 0)
+        r = 0;
     setX(r);
 }
 
 void SColor::G(float g) {
     if (g > 1.0f)
         g = 1;
+    if (g < 0)
+        g = 0;
     setY(g);
 }
 
 void SColor::B(float b) {
     if (b > 1.0f)
         b = 1;
+    if (b < 0)
+        b = 0;
     setZ(b);
 }
 
@@ -159,7 +165,6 @@ Mesh::~Mesh() {
 }
 
 Material * Mesh::getMaterial() {
-    cout << "Mesh has no material" << endl;
     return materials[0];
 }
 

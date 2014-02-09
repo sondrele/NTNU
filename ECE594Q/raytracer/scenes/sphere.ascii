@@ -7,11 +7,7 @@ camera {
   verticalFOV 0.785398
 }
 point_light {
-  position 0 -10 -5
-  color 1 1 1
-}
-point_light {
-  position -10 0 -5
+  position -10 0 -3
   color 1 1 1
 }
 sphere {
@@ -20,7 +16,7 @@ sphere {
   material {
     diffColor 0.56 0.35 0.14
     ambColor 0.2 0.2 0.2
-    specColor 0 0 0
+    specColor 0.1 0.1 0.1
     emisColor 0 0 0
     shininess 0.2
     ktran 0

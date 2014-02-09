@@ -22,10 +22,9 @@ SColor Whitted::Illumination(Light *lt, Intersection in, float Sj) {
     Vect pos = lt->getPos();
     Material *mat = in.getMaterial();
     float kt = mat->getTransparency();
+    SColor ks = mat->getSpecColor();
     SColor Cd = mat->getDiffColor();
-    // float q = in.getShininess();
-    // SColor N = in.getSurfaceNormal();
-
+    float q = mat->getShininess() * 128;
     float Fattj = Whitted::CalculateFattj(Pt, lt);
     SColor Ij = lt->getIntensity();
     
@@ -36,27 +35,38 @@ SColor Whitted::Illumination(Light *lt, Intersection in, float Sj) {
     Vect N = in.calculateSurfaceNormal();
     SColor diffuseLight = Whitted::DiffuseLightning(kt, Cd, N, Dj);
 
-    dirLight = dirLight.linearMult(diffuseLight);
+    Vect V = in.getDirection().linearMult(-1);
+    SColor specLight = Whitted::SpecularLightning(q, ks, N, Dj, V);
+
+    dirLight = dirLight.linearMult(diffuseLight + specLight);
     // dirLight = dirLight.linearMult(Cd);
 
     // SColor Q = N * N.dotProduct(Dj);
     // SColor Rj = Q.linearMult(2) - Dj;
-    // SColor specLight = Whitted::SpecularLightning(ks, Rj, V, q);
     return dirLight;
 }
 
-SColor Whitted::DiffuseLightning(float kt, SColor Cd, Vect N, Vect D) {
+SColor Whitted::DiffuseLightning(float kt, SColor Cd, Vect N, Vect Dj) {
     float a = (1.0f - kt);
-    float b = max(0.0f, N.dotProduct(D));
+    float b = max(0.0f, N.dotProduct(Dj));
 
     // TODO: Flip normal if the ray is inside a transparent object
     return Cd.linearMult(a * b);
 }
 
-// SColor Whitted::SpecularLightning(float ks, SColor Rj, SColor V, float q) {̈́
-//     float a = Rj.dotProduct(V);
-//     return ks * pow(a, q);
-// }
+SColor Whitted::SpecularLightning(float q, SColor ks, Vect N, Vect Dj, Vect V) {
+    float t;
+    t = N.dotProduct(Dj); 
+    Vect Q = N.linearMult(t);
+    Vect Rj = Q.linearMult(2);
+    Rj = Rj - Dj;
+    t = Rj.dotProduct(V);
+    t = max(t, 0.0f);
+    assert(t >= 0);
+
+    float f = pow(t, q);
+    return ks.linearMult(f);
+}
 
 // SColor Whitted::Reflection(float ks, SColor Ls) {
 //     assert(ks >= 0 && ks <= 1);
