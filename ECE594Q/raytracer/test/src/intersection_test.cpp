@@ -2,7 +2,7 @@
 #include "CppUTestExt/MockSupport.h"
 #include "intersection.h"
 
-float p = 0.7071067812f;
+#define SIN_PI_4  0.7071067812f
 
 Shape *s0;
 Shape *m0;
@@ -17,7 +17,7 @@ TEST_GROUP(IntersectionTest) {
         s0 = sp;
 
         r0 = new Ray(Vect(0, 0, 0), Vect(0, 0, -1));
-        r1 = new Ray(Vect(0, p, 0), Vect(0, 0, -1));
+        r1 = new Ray(Vect(0, SIN_PI_4, 0), Vect(0, 0, -1));
 
         Mesh *m = new Mesh();
         Triangle t;
@@ -63,7 +63,7 @@ TEST(IntersectionTest, ray_creates_intersection_2) {
 
     Vect v = is.calculateIntersectionPoint();
     DOUBLES_EQUAL(0, v.getX(), 0.00001);
-    DOUBLES_EQUAL(p, v.getY(), 0.00001);
+    DOUBLES_EQUAL(SIN_PI_4, v.getY(), 0.00001);
     DOUBLES_EQUAL(-4.292893, v.getZ(), 0.00001);
 
     POINTERS_EQUAL(s0, is.getShape());
@@ -84,18 +84,18 @@ TEST(IntersectionTest, can_intersect_with_mesh) {
     
     Vect v = is.calculateIntersectionPoint();
     DOUBLES_EQUAL(0, v.getX(), 0.00001);
-    DOUBLES_EQUAL(p, v.getY(), 0.00001);
+    DOUBLES_EQUAL(SIN_PI_4, v.getY(), 0.00001);
     DOUBLES_EQUAL(-2.292893, v.getZ(), 0.00001);
 }
 
-// TEST(IntersectionTest, can_get_surface_normal_of_mesh) {
-//     float t;
-//     m0->intersects(*r1, t);
-//     Intersection is(*r1, m0);
-//     is.setIntersectionPoint(t);
+TEST(IntersectionTest, can_get_surface_normal_of_mesh) {
+    Intersection is = m0->intersects(*r1);
 
-//     Vect n = is.calculateSurfaceNormal();
-//     DOUBLES_EQUAL(0, n.getX(), 0.00001);
-//     DOUBLES_EQUAL(-0.707106, n.getY(), 0.00001);
-//     DOUBLES_EQUAL(0.707106, n.getZ(), 0.00001);
-// }
+    Shape *s = is.getShape();
+    CHECK_EQUAL(TRIANGLE, s->getType());
+
+    Vect n = is.calculateSurfaceNormal();
+    DOUBLES_EQUAL(0, n.getX(), 0.00001);
+    DOUBLES_EQUAL(-0.707106, n.getY(), 0.00001);
+    DOUBLES_EQUAL(0.707106, n.getZ(), 0.00001);
+}

@@ -78,14 +78,15 @@ Shape::Shape() {
 }
 
 Shape::~Shape() {
-    
+
 }
 
 Sphere::Sphere() {
     radius = 0;
 }
 
-Vect Sphere::surfaceNormal(Vect pt) {
+Vect Sphere::surfaceNormal(Vect o, Vect pt) {
+    (void) o;
     Vect normal = pt - origin;
     normal.normalize();
     return normal;
@@ -170,7 +171,9 @@ Intersection Mesh::intersects(Ray ray) {
     return is;
 }
 
-Vect Mesh::surfaceNormal(Vect pt) {
+Vect Mesh::surfaceNormal(Vect o, Vect pt) {
+    (void) o;
+    throw "Mesh has no surface normal";
     return pt;
 }
 
@@ -222,13 +225,16 @@ Intersection Triangle::intersects(Ray ray) {
          return is;
 }
 
-Vect Triangle::surfaceNormal(Vect pt) {
+Vect Triangle::surfaceNormal(Vect dir, Vect pt) {
     (void) pt;
 
     Vect v = getB() - getA();
     Vect w = getC() - getA();
-
     Vect N = v.crossProduct(w);
     N.normalize();
+
+    if (N.dotProduct(dir) > 0)
+        N = N.linearMult(-1);
+    
     return N;
 }

@@ -32,7 +32,8 @@ Vect Intersection::calculateIntersectionPoint() {
 
 Vect Intersection::calculateSurfaceNormal() {
     if (shape != NULL) {
-        return shape->surfaceNormal(calculateIntersectionPoint());
+        return shape->surfaceNormal(ray.getDirection(), 
+            calculateIntersectionPoint());
     } else
         return Vect(0, 0, 0);
 }

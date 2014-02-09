@@ -71,7 +71,7 @@ public:
     
     virtual ShapeType getType() = 0;
     virtual Intersection intersects(Ray) = 0;
-    virtual Vect surfaceNormal(Vect) = 0;
+    virtual Vect surfaceNormal(Vect, Vect) = 0;
 
     uint64_t getNumMaterials() { return materials.size(); }
     Material getMaterial(uint i) { return materials.at(i); }
@@ -111,7 +111,7 @@ public:
     void setZ(float zlen, Vect z) { zlength = zlen; zaxis = z;}
 
     virtual Intersection intersects(Ray);
-    virtual Vect surfaceNormal(Vect);
+    virtual Vect surfaceNormal(Vect, Vect);
 };
 
 class Vertex : public Vect {
@@ -145,7 +145,7 @@ public:
     void setC(Vect z) { c = z;}
 
     virtual Intersection intersects(Ray);
-    virtual Vect surfaceNormal(Vect);
+    virtual Vect surfaceNormal(Vect, Vect);
 };
 
 class Mesh : public Shape {
@@ -162,7 +162,7 @@ public:
     uint64_t size() { return triangles.size();}
 
     virtual Intersection intersects(Ray);
-    virtual Vect surfaceNormal(Vect);
+    virtual Vect surfaceNormal(Vect, Vect);
 };
 
 #endif // _RAYSCENE_SHAPES_H_
