@@ -16,19 +16,17 @@ class Light {
 private:
     Vect pos;
     Vect dir;
-    SColor color;
     enum LightType type;
-    SColor intesity;
+    SColor intensity;
 
 public:
     enum LightType getType() const { return type;}
     void setType(enum LightType t) { type = t;}
-    SColor getColor() { return color;}
-    void setColor(SColor c) { color = c;}
     Vect getPos() { return pos;}
     void setPos(Vect p) { pos = p;}
     Vect getDir() { return dir;}
     void setDir(Vect d) { dir = d;}
+    void setIntensity(SColor);
     SColor getIntensity();
 };
 

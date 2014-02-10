@@ -1,8 +1,13 @@
 #include "rayscene.h"
 
 SColor Light::getIntensity() {
-    return color;
+    return intensity;
 }
+
+void Light::setIntensity(SColor i) {
+    intensity = i;
+}
+
 
 RayScene::RayScene() {
 

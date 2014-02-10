@@ -106,8 +106,8 @@ TEST(IntersectionTest, can_generate_reflective_ray) {
     Ray reflection = is.calculateReflection();
     Vect o = reflection.getOrigin();
     DOUBLES_EQUAL(0, o.getX(), 0.00001);
-    DOUBLES_EQUAL(SIN_PI_4, o.getY(), 0.00001);
-    DOUBLES_EQUAL(-4.292893, o.getZ(), 0.00001);
+    DOUBLES_EQUAL(SIN_PI_4, o.getY(), 0.0001);
+    DOUBLES_EQUAL(-4.292893, o.getZ(), 0.0001);
 
     Vect d = reflection.getDirection();
     DOUBLES_EQUAL(0, d.getX(), 0.00001);

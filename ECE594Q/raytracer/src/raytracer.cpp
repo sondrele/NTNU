@@ -138,16 +138,21 @@ Ray RayTracer::computeRay(uint x, uint y) {
 
 float RayTracer::calculateShadowScalar(Light &lt, Intersection &in) {
     Vect p = lt.getPos();
-    if (lt.getType() == DIRECTIONAL_LIGHT) {
-        p = lt.getDir().linearMult(FLT_MAX);
-    }
     Vect ori = in.calculateIntersectionPoint() + in.calculateSurfaceNormal().linearMult(0.0001f);
-    Vect dir = p - ori;
-    dir.normalize();
+    Vect dir;
+    if (lt.getType() == DIRECTIONAL_LIGHT) {
+        dir = lt.getDir().invert();
+    } else {
+        dir = p - ori;
+        dir.normalize();
+    }
     Ray shdw(ori, dir);
 
     Intersection si = scene->calculateRayIntersection(shdw);
     if (si.hasIntersected()) {
+        if (lt.getType() == DIRECTIONAL_LIGHT) {
+            return 0;
+        }
         Vect pos = si.calculateIntersectionPoint();
         if (ori.euclideanDistance(pos) < ori.euclideanDistance(lt.getPos())) {
             return 0;
@@ -192,17 +197,15 @@ SColor RayTracer::shadeIntersection(Intersection in, uint d) {
 RayBuffer RayTracer::traceRays() {
     for (uint y = 0; y < HEIGHT; y++) {
         for (uint x = 0; x < WIDTH; x++) {
-            if (true || x == 5 && y == 29) {
-                Ray r = computeRay(x, y);
-                Intersection in = scene->calculateRayIntersection(r);
-                if (in.hasIntersected()) {
-                    SColor c = shadeIntersection(in, depth);
-                    PX_Color color;
-                    color.R = (uint8_t) (255 * c.R());
-                    color.G = (uint8_t) (255 * c.G());
-                    color.B = (uint8_t) (255 * c.B());
-                    buffer.setPixel(x, y, color);
-                }
+            Ray r = computeRay(x, y);
+            Intersection in = scene->calculateRayIntersection(r);
+            if (in.hasIntersected()) {
+                SColor c = shadeIntersection(in, depth);
+                PX_Color color;
+                color.R = (uint8_t) (255 * c.R());
+                color.G = (uint8_t) (255 * c.G());
+                color.B = (uint8_t) (255 * c.B());
+                buffer.setPixel(x, y, color);
             }
         }
     }

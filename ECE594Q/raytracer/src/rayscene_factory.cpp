@@ -27,7 +27,7 @@ Vertex RaySceneFactory::PointToVertex(Point p) {
 Light * RaySceneFactory::CreateLight(LightIO &lio) {
     Light *l = new Light();
     l->setType(lio.type);
-    l->setColor(SColor(lio.color));
+    l->setIntensity(SColor(lio.color));
     switch(lio.type) {
         case POINT_LIGHT: {
             l->setPos(RaySceneFactory::PointToVect(lio.position));

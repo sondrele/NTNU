@@ -30,8 +30,13 @@ SColor Whitted::Illumination(Light *lt, Intersection in, float Sj) {
     
     SColor dirLight = Ij.linearMult(Sj * Fattj);
     
-    Vect Dj = pos - Pt;
-    Dj.normalize();
+    Vect Dj;
+    if (lt->getType() == DIRECTIONAL_LIGHT) {
+        Dj = lt->getDir().invert();
+    } else {
+        Dj = pos - Pt;
+        Dj.normalize();
+    }
     Vect N = in.calculateSurfaceNormal();
     SColor diffuseLight = Whitted::DiffuseLightning(kt, Cd, N, Dj);
 
