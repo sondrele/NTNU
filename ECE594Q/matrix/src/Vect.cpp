@@ -69,6 +69,10 @@ Vect Vect::linearMult(Vect other) {
     return v;
 }
 
+Vect Vect::invert() {
+    return linearMult(-1);
+}
+
 float Vect::euclideanDistance(Vect other) {
     float a = getX() - other.getX();
     float b = getY() - other.getY();

@@ -59,6 +59,7 @@ public:
     float dotProduct(Vect v);
     Vect linearMult(float);
     Vect linearMult(Vect);
+    Vect invert();
     float euclideanDistance(Vect);
 };
 

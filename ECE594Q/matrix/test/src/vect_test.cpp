@@ -69,3 +69,11 @@ TEST(VectTest, linear_mult_with_other_vector) {
     CHECK_EQUAL(-4, a.getY());
     CHECK_EQUAL(9, a.getZ());
 }
+
+TEST(VectTest, can_invert_vector) {
+    Vect v(1, 2, -3);
+    Vect i = v.invert();
+    CHECK_EQUAL(-1, i.getX());
+    CHECK_EQUAL(-2, i.getY());
+    CHECK_EQUAL(3, i.getZ());
+}
