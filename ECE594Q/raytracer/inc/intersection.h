@@ -1,6 +1,9 @@
 #ifndef _INTERSECTION_H_
 #define _INTERSECTION_H_
 
+#include <cstdlib>
+#include <sstream>
+
 #include "ray.h"
 #include "rayscene_shapes.h"
 
@@ -33,6 +36,8 @@ public:
     void setShape(Shape *s) { shape = s; }
     Shape * getShape() { return shape; }
     Material *getMaterial();
+
+    std::string toString();
 };
 
 #endif

@@ -57,7 +57,7 @@ Ray Intersection::calculateRefraction() {
         Vect d0 = getDirection();
         Ray r;
         r.switchMedium();
-        r.setOrigin(calculateIntersectionPoint() - N.linearMult(0.0001f));
+        r.setOrigin(calculateIntersectionPoint() + d0.linearMult(0.001f));
         r.setDirection(d0);
         return r;
     } else {
@@ -71,4 +71,14 @@ Material * Intersection::getMaterial() {
     } else {
         return NULL;
     }
+}
+
+std::string Intersection::toString() {
+    stringstream s;
+    s << "Intersected: " << intersected << endl;
+    s << "  Ray: O=" << ray.getOrigin() << ", D=" << ray.getDirection() << ", inVacuum: " << ray.inVacuum() << endl;
+    s << "  Intersectionpoint: " << calculateIntersectionPoint() << endl;
+    if (shape != NULL)
+        s << "  Shape: " << shape->getType() << " - " << shape << endl;
+    return s.str();
 }

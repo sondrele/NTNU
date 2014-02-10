@@ -1,7 +1,7 @@
 #include "ray.h"
 
 Ray::Ray() {
-    
+    vacuum = true;
 }
 
 Ray::Ray(Vect o, Vect d) {

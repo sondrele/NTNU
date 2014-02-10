@@ -137,8 +137,9 @@ Ray RayTracer::computeRay(uint x, uint y) {
 }
 
 SColor RayTracer::calculateShadowScalar(Light &lt, Intersection &in) {
+    // cout << in.toString() << endl;
     Vect p = lt.getPos();
-    Vect ori = in.calculateIntersectionPoint() + in.calculateSurfaceNormal().linearMult(0.0001f);
+    Vect ori = in.calculateIntersectionPoint();// + in.calculateSurfaceNormal().linearMult(0.0001f);
     Vect dir;
     if (lt.getType() == DIRECTIONAL_LIGHT) {
         dir = lt.getDir().invert();
@@ -146,6 +147,7 @@ SColor RayTracer::calculateShadowScalar(Light &lt, Intersection &in) {
         dir = p - ori;
         dir.normalize();
     }
+    ori = ori + dir.linearMult(0.0001f);
     Ray shdw(ori, dir);
 
     Intersection ins = scene->calculateRayIntersection(shdw);
@@ -173,7 +175,7 @@ SColor RayTracer::calculateShadowScalar(Light &lt, Intersection &in) {
         float m = max(Cd.R(), max(Cd.G(), Cd.B()));
         Cd.R(Cd.R()/m); Cd.G(Cd.G()/m); Cd.B(Cd.B()/m);
         SColor Si = Cd.linearMult(mat->getTransparency());
-        return Si;//.linearMult(calculateShadowScalar(lt, ins));
+        return Si.linearMult(calculateShadowScalar(lt, ins));
     }
 }
 
