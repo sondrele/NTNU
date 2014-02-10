@@ -65,7 +65,7 @@ public:
     Vect computeDirection(uint, uint);
 
     Ray computeRay(uint, uint);
-    float calculateShadowScalar(Light &, Intersection &);
+    SColor calculateShadowScalar(Light &, Intersection &);
     SColor shadeIntersection(Intersection, uint);
     RayBuffer traceRays();
 };

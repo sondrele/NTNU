@@ -44,7 +44,7 @@ Lt          radiance of the refracted ray, also calculated recursively
 
 class Whitted {
 public:
-    static SColor Illumination(Light *, Intersection, float);
+    static SColor Illumination(Light *, Intersection, SColor);
 
     static SColor AmbientLightning(float, SColor, SColor);
     static float CalculateFattj(Vect, Light *);

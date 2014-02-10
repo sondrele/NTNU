@@ -17,7 +17,7 @@ float Whitted::CalculateFattj(Vect Pt, Light *l) {
     }
 }
 
-SColor Whitted::Illumination(Light *lt, Intersection in, float Sj) {
+SColor Whitted::Illumination(Light *lt, Intersection in, SColor Sj) {
     Vect Pt = in.calculateIntersectionPoint();
     Vect pos = lt->getPos();
     Material *mat = in.getMaterial();
@@ -28,7 +28,7 @@ SColor Whitted::Illumination(Light *lt, Intersection in, float Sj) {
     float Fattj = Whitted::CalculateFattj(Pt, lt);
     SColor Ij = lt->getIntensity();
     
-    SColor dirLight = Ij.linearMult(Sj * Fattj);
+    SColor dirLight = Ij.linearMult(Sj).linearMult(Fattj);
     
     Vect Dj;
     if (lt->getType() == DIRECTIONAL_LIGHT) {

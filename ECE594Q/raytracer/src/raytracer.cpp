@@ -136,7 +136,7 @@ Ray RayTracer::computeRay(uint x, uint y) {
     return r;
 }
 
-float RayTracer::calculateShadowScalar(Light &lt, Intersection &in) {
+SColor RayTracer::calculateShadowScalar(Light &lt, Intersection &in) {
     Vect p = lt.getPos();
     Vect ori = in.calculateIntersectionPoint() + in.calculateSurfaceNormal().linearMult(0.0001f);
     Vect dir;
@@ -151,14 +151,14 @@ float RayTracer::calculateShadowScalar(Light &lt, Intersection &in) {
     Intersection si = scene->calculateRayIntersection(shdw);
     if (si.hasIntersected()) {
         if (lt.getType() == DIRECTIONAL_LIGHT) {
-            return 0;
+            return SColor(0, 0, 0);
         }
         Vect pos = si.calculateIntersectionPoint();
         if (ori.euclideanDistance(pos) < ori.euclideanDistance(lt.getPos())) {
-            return 0;
+            return SColor(0, 0, 0);
         }
     }
-    return  1;
+    return SColor(1, 1, 1);
 }
 
 SColor RayTracer::shadeIntersection(Intersection in, uint d) {
@@ -181,7 +181,7 @@ SColor RayTracer::shadeIntersection(Intersection in, uint d) {
     for (uint i = 0; i < lts.size(); i++) {
         Light *l = lts.at(i);
 
-        float Sj = calculateShadowScalar(*l, in);
+        SColor Sj = calculateShadowScalar(*l, in);
         shade = shade + Whitted::Illumination(l, in, Sj);
     }
     
