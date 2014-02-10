@@ -83,3 +83,10 @@ float Vect::euclideanDistance(Vect other) {
     float c = getZ() - other.getZ();
     return sqrt(a * a + b * b + c * c);
 }
+
+float Vect::radians(Vect other) {
+    Vect v = *this;
+    v.normalize();
+    other.normalize();
+    return acos(v.dotProduct(other));
+}

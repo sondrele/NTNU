@@ -62,6 +62,7 @@ public:
     Vect linearMult(Vect);
     Vect invert();
     float euclideanDistance(Vect);
+    float radians(Vect);
 };
 
 class Vect_h : public Matrix {

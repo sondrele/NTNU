@@ -77,3 +77,9 @@ TEST(VectTest, can_invert_vector) {
     CHECK_EQUAL(-2, i.getY());
     CHECK_EQUAL(3, i.getZ());
 }
+
+TEST(VectTest, can_get_angle_between_vectors) {
+    Vect v0(-1, 1, 0);
+    Vect v1(0, 1, 0);
+    DOUBLES_EQUAL(0.785398, v0.radians(v1), 0.00001);
+}
