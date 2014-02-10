@@ -148,29 +148,32 @@ SColor RayTracer::calculateShadowScalar(Light &lt, Intersection &in) {
     }
     Ray shdw(ori, dir);
 
-    Intersection si = scene->calculateRayIntersection(shdw);
-    Material *mat = si.getMaterial();
+    Intersection ins = scene->calculateRayIntersection(shdw);
+    Material *mat = ins.getMaterial();
     
-    if (!si.hasIntersected()) {
+    if (!ins.hasIntersected()) {
         // The point is in direct light
         return SColor(1, 1, 1);
     } else if (mat->getTransparency() <= 0.00000001) {
         // The material is fully opaque
-        Vect pos = si.calculateIntersectionPoint();
+        Vect pos = ins.calculateIntersectionPoint();
         if (lt.getType() == DIRECTIONAL_LIGHT ||
             ori.euclideanDistance(pos) < ori.euclideanDistance(lt.getPos())) {
-            // The ray intersects with an object behind the lightsource
-            // or a direction light, thus fully in light
+            // The ray intersects with an object before the light source
             return SColor(0, 0, 0);
         } else {
+            // The ray intersects with an object behind the lightsource
+            // or a direction light, thus fully in light
             return SColor(1, 1, 1);
         }
     } else { // The shape is transparent
+        // Normalize the color for this material, and recursively trace for other
+        // transparent objects
         SColor Cd = mat->getDiffColor();
         float m = max(Cd.R(), max(Cd.G(), Cd.B()));
         Cd.R(Cd.R()/m); Cd.G(Cd.G()/m); Cd.B(Cd.B()/m);
-
-        return Cd.linearMult(mat->getTransparency());
+        SColor Si = Cd.linearMult(mat->getTransparency());
+        return Si;//.linearMult(calculateShadowScalar(lt, ins));
     }
 }
 
@@ -222,14 +225,12 @@ RayBuffer RayTracer::traceRays() {
         for (uint x = 0; x < WIDTH; x++) {
             Ray r = computeRay(x, y);
             Intersection in = scene->calculateRayIntersection(r);
-            if (in.hasIntersected()) {
-                SColor c = shadeIntersection(in, depth);
-                PX_Color color;
-                color.R = (uint8_t) (255 * c.R());
-                color.G = (uint8_t) (255 * c.G());
-                color.B = (uint8_t) (255 * c.B());
-                buffer.setPixel(x, y, color);
-            }
+            SColor c = shadeIntersection(in, depth);
+            PX_Color color;
+            color.R = (uint8_t) (255 * c.R());
+            color.G = (uint8_t) (255 * c.G());
+            color.B = (uint8_t) (255 * c.B());
+            buffer.setPixel(x, y, color);
         }
     }
     return buffer;

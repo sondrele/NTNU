@@ -30,9 +30,8 @@ all: raytracer main
 raytracer: raytracer.o $(OBJS)
 	$(CC) -o $@ $^ $(CIMGFLAGS)
 
-IMG=main.cpp lib/rayimage.cpp src/raybuffer.cpp
-IMGOBJS = $(IMG:.cpp=.o)
-
+prod: raytracer.o $(OBJS)
+	$(CC) -o $@ $^ $(CIMGFLAGS) -O3
 test1: all
 	./raytracer test1 150 150 2
 
