@@ -55,6 +55,7 @@ public:
     static SColor Reflection(float, SColor);
     static SColor Refraction(float, SColor);
 
+    static float GetOutgoingRads(float, float, float);
 };
 
 #endif // _WHITTED_H_

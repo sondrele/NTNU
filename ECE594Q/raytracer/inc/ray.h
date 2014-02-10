@@ -3,6 +3,9 @@
 
 #include "Matrix.h"
 
+#define N1      1.0f
+#define N2      1.5f
+
 class Ray {
 private:
     Vect origin;

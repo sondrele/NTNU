@@ -81,3 +81,8 @@ SColor Whitted::SpecularLightning(float q, SColor ks, Vect N, Vect Dj, Vect V) {
 // SColor Whitted::Refraction(float kt, SColor Lt) {
 //     return Lt.linearMult(kt);
 // }
+
+float Whitted::GetOutgoingRads(float t0, float n1, float n2) {
+    return asin(sin(t0) * n1 / n2);
+}
+

@@ -53,6 +53,24 @@ Ray Intersection::calculateReflection() {
 
 Ray Intersection::calculateRefraction() {
     if (intersected) {
+        // Vect N = calculateSurfaceNormal();
+        // Vect I = getDirection().invert();
+        // Vect d0 = getDirection();
+        // float t1 = I.radians(N);
+        // float t2 = asin(sin(t1) * N1 / N2);
+        // Vect Q = N.linearMult(I.dotProduct(N));
+        // Q = Q - I;
+        // Vect M = Q.linearMult((float)(sin(t2) / sin(t1)));
+        // Vect P = N.linearMult((float) -cos(t2));
+        // Vect T = M + P;
+        // T.normalize();
+        // // cout << N.invert().radians(T) << endl;
+        // Ray r;
+        // r.switchMedium();
+        // r.setOrigin(calculateIntersectionPoint() + d0.linearMult(0.001f));
+        // r.setDirection(T);
+        // return r;
+
         Vect N = calculateSurfaceNormal();
         Vect d0 = getDirection();
         Ray r;
