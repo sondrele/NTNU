@@ -2,6 +2,7 @@
 #define _RAYTRACER_H_
 
 #include <cstdlib>
+#include <cfloat>
 #include <iostream>
 
 #include "Matrix.h"

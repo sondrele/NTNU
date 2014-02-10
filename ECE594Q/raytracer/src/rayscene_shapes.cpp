@@ -173,14 +173,19 @@ void Mesh::addTriangle(Triangle *t) {
 }
 
 Intersection Mesh::intersects(Ray ray) {
-    Intersection is;
+    Intersection ins;
     for (uint i = 0; i < triangles.size(); i++) {
         Triangle *t0 = triangles.at(i);
-        is = t0->intersects(ray);
-        if (is.hasIntersected())
-            return is;
+        Intersection j = t0->intersects(ray);
+        if (!ins.hasIntersected()) {
+            ins = j;
+        } else if (ins.hasIntersected() &&
+            j.getIntersectionPoint() < ins.getIntersectionPoint())
+        {
+            ins = j;
+        }
     }
-    return is;
+    return ins;
 }
 
 Vect Mesh::surfaceNormal(Vect o, Vect pt) {

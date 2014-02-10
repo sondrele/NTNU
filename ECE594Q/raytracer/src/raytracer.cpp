@@ -138,6 +138,9 @@ Ray RayTracer::computeRay(uint x, uint y) {
 
 float RayTracer::calculateShadowScalar(Light &lt, Intersection &in) {
     Vect p = lt.getPos();
+    if (lt.getType() == DIRECTIONAL_LIGHT) {
+        p = lt.getDir().linearMult(FLT_MAX);
+    }
     Vect ori = in.calculateIntersectionPoint() + in.calculateSurfaceNormal().linearMult(0.0001f);
     Vect dir = p - ori;
     dir.normalize();
@@ -189,15 +192,17 @@ SColor RayTracer::shadeIntersection(Intersection in, uint d) {
 RayBuffer RayTracer::traceRays() {
     for (uint y = 0; y < HEIGHT; y++) {
         for (uint x = 0; x < WIDTH; x++) {
-            Ray r = computeRay(x, y);
-            Intersection in = scene->calculateRayIntersection(r);
-            if (in.hasIntersected()) {
-                SColor c = shadeIntersection(in, depth);
-                PX_Color color;
-                color.R = (uint8_t) (255 * c.R());
-                color.G = (uint8_t) (255 * c.G());
-                color.B = (uint8_t) (255 * c.B());
-                buffer.setPixel(x, y, color);
+            if (true || x == 5 && y == 29) {
+                Ray r = computeRay(x, y);
+                Intersection in = scene->calculateRayIntersection(r);
+                if (in.hasIntersected()) {
+                    SColor c = shadeIntersection(in, depth);
+                    PX_Color color;
+                    color.R = (uint8_t) (255 * c.R());
+                    color.G = (uint8_t) (255 * c.G());
+                    color.B = (uint8_t) (255 * c.B());
+                    buffer.setPixel(x, y, color);
+                }
             }
         }
     }

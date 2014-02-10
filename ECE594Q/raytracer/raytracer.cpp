@@ -23,9 +23,7 @@ std::string out;
 static void loadScene(const char *name, RayTracer &rayTracer) {
     /* load the scene into the SceneIO data structure using given parsing code */
     scene = readScene(name);
-
-    /* hint: use the Visual Studio debugger ("watch" feature) to probe the
-       scene data structure and learn more about it for each of the given scenes */
+    
     RayScene *rayScene = new RayScene();
     RaySceneFactory::CreateScene(*rayScene, *scene);
 
