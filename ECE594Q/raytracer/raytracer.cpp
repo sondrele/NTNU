@@ -6,6 +6,9 @@
 #include "rayscene_factory.h"
 #include "rayimage.h"
 
+#define PATH            "./scenes/"
+#define ASCII           ".ascii"
+#define IMG             ".bmp"
 #define IMAGE_WIDTH     220
 #define IMAGE_HEIGHT    220
 
@@ -40,20 +43,42 @@ void render(void) {
 
 
 
-int main(int argc, char *argv[]) {
-    // Timer total_timer;
-    // total_timer.startTimer();
-    try {
-        RayTracer rayTracer(IMAGE_WIDTH, IMAGE_HEIGHT, 10);
+uint w, h, d;
+std::string in;
+std::string out;
 
-        loadScene("./scenes/test1.ascii", rayTracer);
+void parse_input(int argc, char *argv[]) {
+    if (argc == 5) {
+        in = std::string(PATH) + std::string(argv[1]) + std::string(ASCII);
+        out = std::string(argv[1]) + std::string(IMG);
+        w = atoi(argv[2]);
+        h = atoi(argv[3]);
+        d = atoi(argv[4]);
+    } else {
+        cout << "./raytracer scene w h d" << endl;
+        w = IMAGE_WIDTH;
+        h = IMAGE_HEIGHT;
+        d = 2;
+        in = std::string(PATH) + std::string("test1.ascii");
+        out = std::string("test1.bmp");
+    }
+}
+
+int main(int argc, char *argv[]) {
+    parse_input(argc, argv);
+
+    try {
+
+        RayTracer rayTracer(w, h, d);
+
+        loadScene(in.c_str(), rayTracer);
 
         /* write your ray tracer here */
         render();
 
         RayBuffer rayBuffer = rayTracer.traceRays();
         RayImage img;
-        img.createImage(rayBuffer, "test1.bmp");
+        img.createImage(rayBuffer, out.c_str());
 
         /* cleanup */
         if (scene != NULL) {
