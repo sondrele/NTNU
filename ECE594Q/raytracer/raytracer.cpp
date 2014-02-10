@@ -12,13 +12,15 @@
 #define IMAGE_WIDTH     220
 #define IMAGE_HEIGHT    220
 
-
 typedef unsigned char u08;
 
 SceneIO *scene = NULL;
 
+uint w, h, d;
+std::string in;
+std::string out;
 
-static void loadScene(const char *name, RayTracer &rt) {
+static void loadScene(const char *name, RayTracer &rayTracer) {
     /* load the scene into the SceneIO data structure using given parsing code */
     scene = readScene(name);
 
@@ -29,25 +31,17 @@ static void loadScene(const char *name, RayTracer &rt) {
 
     Camera cam;
     RaySceneFactory::CreateCamera(cam, *(scene->camera));
-    rt.setCamera(cam);
-    rt.setScene(rayScene);
-    return;
+    rayTracer.setCamera(cam);
+    rayTracer.setScene(rayScene);
 }
 
-
-/* just a place holder, feel free to edit */
-void render(void) {
-
-
+static void render(RayTracer &rayTracer) {
+    RayBuffer rayBuffer = rayTracer.traceRays();
+    RayImage img;
+    img.createImage(rayBuffer, out.c_str());
 }
 
-
-
-uint w, h, d;
-std::string in;
-std::string out;
-
-void parse_input(int argc, char *argv[]) {
+static void parse_input(int argc, char *argv[]) {
     if (argc == 5) {
         in = std::string(PATH) + std::string(argv[1]) + std::string(ASCII);
         out = std::string(argv[1]) + std::string(IMG);
@@ -70,15 +64,10 @@ int main(int argc, char *argv[]) {
     try {
 
         RayTracer rayTracer(w, h, d);
-
         loadScene(in.c_str(), rayTracer);
 
         /* write your ray tracer here */
-        render();
-
-        RayBuffer rayBuffer = rayTracer.traceRays();
-        RayImage img;
-        img.createImage(rayBuffer, out.c_str());
+        render(rayTracer);
 
         /* cleanup */
         if (scene != NULL) {
@@ -88,8 +77,5 @@ int main(int argc, char *argv[]) {
         cout << str << endl;
     }
 
-    // total_timer.stopTimer();
-    // fprintf(stderr, "Total time: %.5lf \n", total_timer.getTime());
-    
     return 1;
 }
