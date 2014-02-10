@@ -149,16 +149,29 @@ SColor RayTracer::calculateShadowScalar(Light &lt, Intersection &in) {
     Ray shdw(ori, dir);
 
     Intersection si = scene->calculateRayIntersection(shdw);
-    if (si.hasIntersected()) {
-        if (lt.getType() == DIRECTIONAL_LIGHT) {
-            return SColor(0, 0, 0);
-        }
+    Material *mat = si.getMaterial();
+    
+    if (!si.hasIntersected()) {
+        // The point is in direct light
+        return SColor(1, 1, 1);
+    } else if (mat->getTransparency() <= 0.00000001) {
+        // The material is fully opaque
         Vect pos = si.calculateIntersectionPoint();
-        if (ori.euclideanDistance(pos) < ori.euclideanDistance(lt.getPos())) {
+        if (lt.getType() == DIRECTIONAL_LIGHT ||
+            ori.euclideanDistance(pos) < ori.euclideanDistance(lt.getPos())) {
+            // The ray intersects with an object behind the lightsource
+            // or a direction light, thus fully in light
             return SColor(0, 0, 0);
+        } else {
+            return SColor(1, 1, 1);
         }
+    } else { // The shape is transparent
+        SColor Cd = mat->getDiffColor();
+        float m = max(Cd.R(), max(Cd.G(), Cd.B()));
+        Cd.R(Cd.R()/m); Cd.G(Cd.G()/m); Cd.B(Cd.B()/m);
+
+        return Cd.linearMult(mat->getTransparency());
     }
-    return SColor(1, 1, 1);
 }
 
 SColor RayTracer::shadeIntersection(Intersection in, uint d) {
