@@ -51,6 +51,20 @@ Ray Intersection::calculateReflection() {
     }
 }
 
+Ray Intersection::calculateRefraction() {
+    if (intersected) {
+        Vect N = calculateSurfaceNormal();
+        Vect d0 = getDirection();
+        Ray r;
+        r.switchMedium();
+        r.setOrigin(calculateIntersectionPoint() - N.linearMult(0.0001f));
+        r.setDirection(d0);
+        return r;
+    } else {
+        throw "Cannot calculate refraction when no intersection has occured";
+    }
+}
+
 Material * Intersection::getMaterial() {
     if (shape != NULL && shape->getNumMaterials() > 0) {
         return shape->getMaterial();

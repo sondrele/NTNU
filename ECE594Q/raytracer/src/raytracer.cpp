@@ -185,11 +185,21 @@ SColor RayTracer::shadeIntersection(Intersection in, uint d) {
         shade = shade + Whitted::Illumination(l, in, Sj);
     }
     
-    Ray r = in.calculateReflection();
-    Intersection rin = scene->calculateRayIntersection(r);
-    SColor reflection = shadeIntersection(rin, d-1).linearMult(ks);
+    SColor reflection;
+    if (ks.length() > 0) {
+        Ray r = in.calculateReflection();
+        Intersection rin = scene->calculateRayIntersection(r);
+        reflection = shadeIntersection(rin, d-1).linearMult(ks);
+    }
 
-    shade = ambLight + shade + reflection;
+    SColor refraction;
+    if (kt > 0) {
+        Ray r = in.calculateRefraction();
+        Intersection rin = scene->calculateRayIntersection(r);
+        refraction = shadeIntersection(rin, d-1).linearMult(kt);
+    }
+
+    shade = ambLight + shade + reflection + refraction;
 
     return shade;
 }

@@ -104,6 +104,7 @@ TEST(IntersectionTest, can_generate_reflective_ray) {
     Intersection is = s0->intersects(*r1);
 
     Ray reflection = is.calculateReflection();
+    CHECK(reflection.inVacuum());
     Vect o = reflection.getOrigin();
     DOUBLES_EQUAL(0, o.getX(), 0.00001);
     DOUBLES_EQUAL(SIN_PI_4, o.getY(), 0.0001);
@@ -113,4 +114,21 @@ TEST(IntersectionTest, can_generate_reflective_ray) {
     DOUBLES_EQUAL(0, d.getX(), 0.00001);
     DOUBLES_EQUAL(1, d.getY(), 0.00001);
     DOUBLES_EQUAL(0, d.getZ(), 0.00001);    
+}
+
+TEST(IntersectionTest, can_generate_refractive_ray) {
+    Intersection is = s0->intersects(*r1);
+
+    Ray refraction = is.calculateRefraction();
+    CHECK(!refraction.inVacuum());
+
+    Vect o = refraction.getOrigin();
+    DOUBLES_EQUAL(0, o.getX(), 0.00001);
+    DOUBLES_EQUAL(SIN_PI_4, o.getY(), 0.0001);
+    DOUBLES_EQUAL(-4.292893, o.getZ(), 0.0001);
+
+    Vect d = refraction.getDirection();
+    DOUBLES_EQUAL(0, d.getX(), 0.00001);
+    DOUBLES_EQUAL(0, d.getY(), 0.00001);
+    DOUBLES_EQUAL(-1, d.getZ(), 0.00001);    
 }

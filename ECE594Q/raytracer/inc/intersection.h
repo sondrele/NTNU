@@ -28,6 +28,7 @@ public:
     Vect calculateIntersectionPoint();
     Vect calculateSurfaceNormal();
     Ray calculateReflection();
+    Ray calculateRefraction();
 
     void setShape(Shape *s) { shape = s; }
     Shape * getShape() { return shape; }
