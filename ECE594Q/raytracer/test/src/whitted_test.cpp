@@ -1,4 +1,4 @@
-#include "CppUTest/CommandLineTestRunner.h"
+    #include "CppUTest/CommandLineTestRunner.h"
 #include "CppUTestExt/MockSupport.h"
 #include "whitted.h"
 
