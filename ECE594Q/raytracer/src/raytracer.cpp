@@ -147,7 +147,7 @@ SColor RayTracer::calculateShadowScalar(Light &lt, Intersection &in) {
         dir = p - ori;
         dir.normalize();
     }
-    ori = ori + dir.linearMult(0.0001f);
+    ori = ori + dir.linearMult(0.001f);
     Ray shdw(ori, dir);
 
     Intersection ins = scene->calculateRayIntersection(shdw);
