@@ -43,7 +43,7 @@ Ray Intersection::calculateReflection() {
         Vect N = calculateSurfaceNormal();
         Vect d0 = getDirection().linearMult(-1);
         Ray r;
-        r.setOrigin(calculateIntersectionPoint());
+        r.setOrigin(calculateIntersectionPoint() + N.linearMult(0.0001f));
         r.setDirection(N.linearMult(d0.dotProduct(N) * 2) - d0);
         return r;
     } else {

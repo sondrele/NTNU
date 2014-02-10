@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
     // Timer total_timer;
     // total_timer.startTimer();
     try {
-        RayTracer rayTracer(IMAGE_WIDTH, IMAGE_HEIGHT, 2);
+        RayTracer rayTracer(IMAGE_WIDTH, IMAGE_HEIGHT, 10);
 
         loadScene("./scenes/test1.ascii", rayTracer);
 
@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
 
         RayBuffer rayBuffer = rayTracer.traceRays();
         RayImage img;
-        img.createImage(rayBuffer, "scene1.bmp");
+        img.createImage(rayBuffer, "test1.bmp");
 
         /* cleanup */
         if (scene != NULL) {
