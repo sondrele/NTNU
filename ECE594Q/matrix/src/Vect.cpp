@@ -29,8 +29,12 @@ bool Vect::equal(Vect other) {
         && (getZ() == other.getZ());
 }
 
+float Vect::length() {
+    return sqrt((getX() * getX()) + (getY() * getY()) + (getZ() * getZ()));
+}
+
 void Vect::normalize() {
-    float absVal = sqrt((getX() * getX()) + (getY() * getY()) + (getZ() * getZ()));
+    float absVal = length();
     if (absVal != 0) {
         setX(getX() / absVal);
         setY(getY() / absVal);

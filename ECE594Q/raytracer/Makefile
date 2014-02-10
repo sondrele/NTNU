@@ -33,8 +33,8 @@ raytracer: raytracer.o $(OBJS)
 IMG=main.cpp lib/rayimage.cpp src/raybuffer.cpp
 IMGOBJS = $(IMG:.cpp=.o)
 
-main: main.o $(OBJS)
-	$(CC) -o $@ $^ $(CIMGFLAGS)
+test1: all
+	./raytracer test1 150 150 2
 
 clean:
 	rm -f *.o

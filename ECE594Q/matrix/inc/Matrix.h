@@ -54,6 +54,7 @@ public:
 
     bool equal(Vect other);
 
+    float length();
     void normalize();
     Vect crossProduct(Vect v);
     float dotProduct(Vect v);

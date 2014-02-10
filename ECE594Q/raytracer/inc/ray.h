@@ -7,6 +7,7 @@ class Ray {
 private:
     Vect origin;
     Vect direction;
+    bool vacuum;
 
 public:
     Ray();
@@ -15,6 +16,8 @@ public:
     void setOrigin(Vect o) { origin = o;}
     Vect getDirection() { return direction;}
     void setDirection(Vect d);
+    void switchMedium();
+    bool inVacuum();
 };
 
 #endif // _RAY_H_

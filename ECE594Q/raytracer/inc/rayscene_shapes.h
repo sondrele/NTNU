@@ -54,6 +54,9 @@ public:
     float getShininess() { return shininess; }
     void setTransparency(float c) { transparency = c; }
     float getTransparency() { return transparency; }
+
+    bool isReflective();
+    bool isRefractive();
 };
 
 enum ShapeType {

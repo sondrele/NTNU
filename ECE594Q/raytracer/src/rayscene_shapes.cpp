@@ -63,6 +63,14 @@ Material::Material() {
     transparency = 0;
 }
 
+bool Material::isReflective() {
+    return specColor.length() > 0;
+}
+
+bool Material::isRefractive() {
+    return transparency > 0;
+}
+
 Vertex::Vertex(float a, float b, float c) {
     setX(a);
     setY(b);
