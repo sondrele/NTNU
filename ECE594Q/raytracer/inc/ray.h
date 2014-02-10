@@ -15,7 +15,6 @@ public:
     void setOrigin(Vect o) { origin = o;}
     Vect getDirection() { return direction;}
     void setDirection(Vect d);
-
 };
 
 #endif // _RAY_H_

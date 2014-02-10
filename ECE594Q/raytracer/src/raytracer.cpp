@@ -1,23 +1,9 @@
 #include "raytracer.h"
 
-RayTracer::RayTracer(uint width, uint height, Vect viewDir, Vect orthoUp) {
-    WIDTH = width;
-    HEIGHT = height;
-    scaleConst = 100;
-    buffer = RayBuffer(WIDTH, HEIGHT);
-    scene = NULL;
-
-    camera.setPos(Vect(0, 0, 0));
-    camera.setVerticalFOV((float)M_PI / 2.0f);
-    camera.setViewDir(viewDir);
-    camera.setOrthoUp(orthoUp);
-
-    calculateImagePlane();
-}
-
 RayTracer::RayTracer(uint width, uint height) {
     WIDTH = width;
     HEIGHT = height;
+    depth = 1;
     scaleConst = 100;
     buffer = RayBuffer(WIDTH, HEIGHT);
     scene = NULL;
@@ -26,6 +12,38 @@ RayTracer::RayTracer(uint width, uint height) {
     camera.setVerticalFOV((float)M_PI / 2.0f);
     camera.setViewDir(Vect(0, 0, -1));
     camera.setOrthoUp(Vect(0, 1, 0));
+
+    calculateImagePlane();
+}
+
+RayTracer::RayTracer(uint width, uint height, uint d) {
+    WIDTH = width;
+    HEIGHT = height;
+    depth = d;
+    scaleConst = 100;
+    buffer = RayBuffer(WIDTH, HEIGHT);
+    scene = NULL;
+
+    camera.setPos(Vect(0, 0, 0));
+    camera.setVerticalFOV((float)M_PI / 2.0f);
+    camera.setViewDir(Vect(0, 0, -1));
+    camera.setOrthoUp(Vect(0, 1, 0));
+
+    calculateImagePlane();
+}
+
+RayTracer::RayTracer(uint width, uint height, Vect viewDir, Vect orthoUp) {
+    WIDTH = width;
+    HEIGHT = height;
+    depth = 1;
+    scaleConst = 100;
+    buffer = RayBuffer(WIDTH, HEIGHT);
+    scene = NULL;
+
+    camera.setPos(Vect(0, 0, 0));
+    camera.setVerticalFOV((float)M_PI / 2.0f);
+    camera.setViewDir(viewDir);
+    camera.setOrthoUp(orthoUp);
 
     calculateImagePlane();
 }
@@ -135,16 +153,21 @@ float RayTracer::calculateShadowScalar(Light &lt, Intersection &in) {
     return  1;
 }
 
-SColor RayTracer::shadeIntersection(Intersection in) {
+SColor RayTracer::shadeIntersection(Intersection in, uint d) {
     SColor shade(0, 0, 0);
 
+    if (d == 0) {
+        // terminate recursion
+        return shade;
+    }
+    
     Material *mat = in.getMaterial();
 
-    SColor Cd = mat->getDiffColor();
     float kt = mat->getTransparency();
     SColor ka = mat->getAmbColor();
+    SColor Cd = mat->getDiffColor();
     SColor ambLight = Whitted::AmbientLightning(kt, ka, Cd);
-    
+
     std::vector<Light *> lts = scene->getLights();
     for (uint i = 0; i < lts.size(); i++) {
         Light *l = lts.at(i);
@@ -164,7 +187,7 @@ RayBuffer RayTracer::traceRays() {
             Ray r = computeRay(x, y);
             Intersection in = scene->calculateRayIntersection(r);
             if (in.hasIntersected()) {
-                SColor c = shadeIntersection(in);
+                SColor c = shadeIntersection(in, depth);
                 PX_Color color;
                 color.R = (uint8_t) (255 * c.R());
                 color.G = (uint8_t) (255 * c.G());

@@ -21,6 +21,7 @@ class RayTracer {
 private:
     uint WIDTH;
     uint HEIGHT;
+    uint depth;
     float scaleConst;   // c
 
     RayBuffer buffer;
@@ -35,6 +36,7 @@ private:
 
 public:
     RayTracer(uint, uint);
+    RayTracer(uint, uint, uint);
     RayTracer(uint, uint, Vect, Vect);
     ~RayTracer();
     uint getWidth() { return WIDTH;}
@@ -62,8 +64,8 @@ public:
     Vect computeDirection(uint, uint);
 
     Ray computeRay(uint, uint);
-    float calculateShadowScalar(Light &lt, Intersection &in);
-    SColor shadeIntersection(Intersection);
+    float calculateShadowScalar(Light &, Intersection &);
+    SColor shadeIntersection(Intersection, uint);
     RayBuffer traceRays();
 };
 

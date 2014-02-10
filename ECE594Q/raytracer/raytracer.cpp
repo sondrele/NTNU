@@ -44,9 +44,9 @@ int main(int argc, char *argv[]) {
     // Timer total_timer;
     // total_timer.startTimer();
     try {
-        RayTracer rayTracer(IMAGE_WIDTH, IMAGE_HEIGHT);
+        RayTracer rayTracer(IMAGE_WIDTH, IMAGE_HEIGHT, 2);
 
-        loadScene("./scenes/sphere.ascii", rayTracer);
+        loadScene("./scenes/test1.ascii", rayTracer);
 
         /* write your ray tracer here */
         render();

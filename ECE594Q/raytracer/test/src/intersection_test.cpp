@@ -99,3 +99,18 @@ TEST(IntersectionTest, can_get_surface_normal_of_mesh) {
     DOUBLES_EQUAL(-0.707106, n.getY(), 0.00001);
     DOUBLES_EQUAL(0.707106, n.getZ(), 0.00001);
 }
+
+TEST(IntersectionTest, can_generate_reflective_ray) {
+    Intersection is = s0->intersects(*r1);
+
+    Ray reflection = is.calculateReflection();
+    Vect o = reflection.getOrigin();
+    DOUBLES_EQUAL(0, o.getX(), 0.00001);
+    DOUBLES_EQUAL(SIN_PI_4, o.getY(), 0.00001);
+    DOUBLES_EQUAL(-4.292893, o.getZ(), 0.00001);
+
+    Vect d = reflection.getDirection();
+    DOUBLES_EQUAL(0, d.getX(), 0.00001);
+    DOUBLES_EQUAL(1, d.getY(), 0.00001);
+    DOUBLES_EQUAL(0, d.getZ(), 0.00001);    
+}

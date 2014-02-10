@@ -27,6 +27,7 @@ public:
     bool hasIntersected() { return intersected; }
     Vect calculateIntersectionPoint();
     Vect calculateSurfaceNormal();
+    Ray calculateReflection();
 
     void setShape(Shape *s) { shape = s; }
     Shape * getShape() { return shape; }

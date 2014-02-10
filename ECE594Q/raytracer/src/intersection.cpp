@@ -38,6 +38,19 @@ Vect Intersection::calculateSurfaceNormal() {
         return Vect(0, 0, 0);
 }
 
+Ray Intersection::calculateReflection() {
+    if (intersected) {
+        Vect N = calculateSurfaceNormal();
+        Vect d0 = getDirection().linearMult(-1);
+        Ray r;
+        r.setOrigin(calculateIntersectionPoint());
+        r.setDirection(N.linearMult(d0.dotProduct(N) * 2) - d0);
+        return r;
+    } else {
+        throw "Cannot calculate reflection when no intersection has occured";
+    }
+}
+
 Material * Intersection::getMaterial() {
     if (shape != NULL && shape->getNumMaterials() > 0) {
         return shape->getMaterial();
