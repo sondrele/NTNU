@@ -1,0 +1,24 @@
+{
+    "folders":
+    [
+        {
+            "folder_exclude_patterns":
+            [
+                "*.o",
+                "*.d",
+                "cpputest",
+                "raytracer/matrix"
+            ],
+            "path": "."
+        }
+    ],
+    "settings":
+    {
+        "sublimegdb_commandline": "gdb -interpreter=mi raytracer",
+        "sublimegdb_workingdir": "${folder:${project_path:ECE594Q/raytracer/raytracer.cpp}}/",
+        "NTNU_options":
+        [
+            "-Wall", "-g"
+        ]
+    }
+}
