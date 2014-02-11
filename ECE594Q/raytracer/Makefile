@@ -3,7 +3,8 @@ INCLUDEPATH=\
     -Iinc
 CC=clang++
 CC=g++
-CFLAGS = $(INCLUDEPATH) -Wall -g -std=c++11 -O3 -lm -fopenmp
+CFLAGS = $(INCLUDEPATH) -Wall -g -std=c++11 -O3 
+#-lm -fopenmp
 CIMGFLAGS = $(CFLAGS) -L/usr/X11R6/lib -lm -lpthread -lX11
 LDFLAGS=
 LIBS = \
@@ -34,5 +35,6 @@ test1: all
 	./raytracer test1 150 150 2
 
 clean:
+	rm *.bmp
 	rm -f *.o
 	rm -rf **/*.o
