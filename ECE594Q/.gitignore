@@ -5,3 +5,12 @@ cpputest
 .cproject
 .project
 .settings
+#Ignore Cpputest
+cpputest/
+*.o
+matrix
+raytracer
+main
+*.TODO
+*.jpg
+*.scene

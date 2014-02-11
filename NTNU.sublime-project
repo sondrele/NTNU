@@ -7,15 +7,16 @@
                 "*.o",
                 "*.d",
                 "cpputest",
-                "raytracer/matrix"
+                "raytracer",
+                "REYES"
             ],
             "path": "."
         }
     ],
     "settings":
     {
-        "sublimegdb_commandline": "gdb -interpreter=mi raytracer",
-        "sublimegdb_workingdir": "${folder:${project_path:ECE594Q/raytracer/raytracer.cpp}}/",
+        "sublimegdb_commandline": "gdb -interpreter=mi montecarlo",
+        "sublimegdb_workingdir": "${folder:${project_path:ECE594Q/monetecarlo/montecarlo.cpp}}/",
         "NTNU_options":
         [
             "-Wall", "-g"
