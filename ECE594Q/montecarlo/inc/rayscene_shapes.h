@@ -164,6 +164,8 @@ private:
     Vertex a;
     Vertex b;
     Vertex c;
+    bool hasPerVertexNormal;
+    bool hasPerVertexMaterial;
 
 public:
     Triangle();
@@ -177,6 +179,8 @@ public:
     Vertex getC() { return c;}
     void setC(Vertex z) { c = z;}
     void setMaterial(Material *m, char);
+    void setPerVertexNormal(bool);
+    void setPerVertexMaterial(bool);
 
     virtual Material * getMaterial();
     Material * getMaterial(char);
@@ -206,8 +210,8 @@ public:
     uint64_t size() { return triangles.size();}
     void hasTextureCoords(bool coords) { textureCoords = coords; }
     bool hasTextureCoords() { return textureCoords; }
-    void perObjectMaterial(bool mat) { objectMaterial = mat; }
-    bool perObjectMaterial() { return objectMaterial; }
+    void perVertexMaterial(bool mat) { objectMaterial = mat; }
+    bool perVertexMaterial() { return objectMaterial; }
     void perVertexNormal(bool norm) { hasPerSurfaceNormal = norm; }
     bool perVertexNormal() { return hasPerSurfaceNormal; }
 

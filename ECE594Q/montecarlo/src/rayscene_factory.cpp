@@ -110,12 +110,14 @@ void RaySceneFactory::CreateMesh(Mesh &m, PolySetIO &pio,
     for (int i = 0; i < pio.numPolys; i++) {
         Triangle *t;
         if (pio.normType == PER_VERTEX_NORMAL) {
+            m.perVertexNormal(true);
             t = RaySceneFactory::CreateTriangleWithBindings(pio.poly[i]);
         } else {
             t = RaySceneFactory::CreateTriangle(pio.poly[i]);
         }
         
         if (pio.materialBinding == PER_VERTEX_MATERIAL) {
+            m.perVertexMaterial(true);
             t->setMaterial(mats[t->getA().getMaterialIndex()], 'a');
             t->setMaterial(mats[t->getB().getMaterialIndex()], 'b');
             t->setMaterial(mats[t->getC().getMaterialIndex()], 'c');

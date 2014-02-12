@@ -45,7 +45,8 @@ Vertex& Vertex::operator=(const Vect &other) {
 }
 
 Triangle::Triangle() {
-    // mat = NULL;
+    hasPerVertexNormal = false;
+    hasPerVertexMaterial = false;
 }
 
 Triangle::~Triangle() {
@@ -61,9 +62,19 @@ void Triangle::setMaterial(Material *m, char v) {
         c.setMaterial(m);
 }
 
+void Triangle::setPerVertexNormal(bool perVertexNormal) {
+    hasPerVertexNormal = perVertexNormal;
+}
+
+void Triangle::setPerVertexMaterial(bool perVertexMaterial) {
+    hasPerVertexMaterial = perVertexMaterial;
+}
+
+
 // Deprecated
 Material * Triangle::getMaterial() {
-    return a.getMaterial();//materials[0];
+    // if (!hasPerVertexMaterial)
+    return a.getMaterial();
 }
 
 Material * Triangle::getMaterial(char v) {
@@ -135,16 +146,19 @@ Vect Triangle::normal() {
 }
 
 Vect Triangle::surfaceNormal(Vect dir, Vect pt) {
-    (void) pt;
-
-    Vect v = getB() - getA();
-    Vect w = getC() - getA();
-    Vect N = v.crossProduct(w);
-    N.normalize();
+    Vect N;
+    if (hasPerVertexNormal) {
+        // TODO: Har direction noe å si?
+        N = interPolatedNormal(pt);
+    } else {
+        Vect v = getB() - getA();
+        Vect w = getC() - getA();
+        N = v.crossProduct(w);
+        N.normalize();
+    }
 
     if (N.dotProduct(dir) > 0)
-        N = N.linearMult(-1);
-    
+        N = N.invert();
     return N;
 }
 

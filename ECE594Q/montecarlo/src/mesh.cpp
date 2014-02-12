@@ -17,6 +17,8 @@ Material * Mesh::getMaterial() {
 }
 
 void Mesh::addTriangle(Triangle *t) {
+    t->setPerVertexNormal(hasPerSurfaceNormal);
+    t->setPerVertexMaterial(objectMaterial);
     triangles.push_back(t);
 }
 

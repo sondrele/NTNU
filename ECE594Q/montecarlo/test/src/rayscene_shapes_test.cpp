@@ -92,6 +92,7 @@ TEST(RaySceneShapesTest, can_get_interpolation_of_triangle_surface) {
     Intersection in = t->intersects(r);
     CHECK(in.hasIntersected());
 
+    t->setPerVertexNormal(true);
     Vect n = t->interPolatedNormal(Vect(0, 0, -1));
     CHECK_EQUAL(0, n.getX());
     CHECK_EQUAL(0, n.getY());
@@ -102,7 +103,7 @@ TEST(RaySceneShapesTest, can_get_interpolation_of_triangle_surface) {
     CHECK_EQUAL(1, n.getY());
     CHECK_EQUAL(0, n.getZ());
 
-    n = t->interPolatedNormal(Vect(0, 0, -0.5f));
+    n = t->surfaceNormal(Vect(0, -1, 0), Vect(0, 0, -0.5f));
     CHECK_EQUAL(0, n.getX());
     DOUBLES_EQUAL(0.707101f, n.getY(), 0.00001);
     DOUBLES_EQUAL(-0.707101f, n.getZ(), 0.00001);
