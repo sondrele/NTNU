@@ -15,6 +15,7 @@ class Intersection {
 private:
     Ray ray;
     Shape *shape;
+    // Point_2D coord;
     float pt;
     bool intersected;
 
@@ -28,10 +29,12 @@ public:
     void setIntersectionPoint(float);
     float getIntersectionPoint() {return pt; }
     bool hasIntersected() { return intersected; }
+
     Vect calculateIntersectionPoint();
     Vect calculateSurfaceNormal();
     Ray calculateReflection();
     Ray calculateRefraction();
+    // Point_2D calculateUVCoords();
 
     void setShape(Shape *s) { shape = s; }
     Shape * getShape() { return shape; }

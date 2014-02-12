@@ -70,3 +70,29 @@ Intersection Sphere::intersects(Ray ray) {
         return is;
     }
 }
+
+Point_2D Sphere::getLongAndLat(Vect pt) {
+    Vect p = pt - origin;
+    // x y z r
+    float phi = asin(p.getY() / radius);
+    float theta = acos(p.getX() / (radius * cos(phi)));
+    // float theta2 = asin(p.getZ() / (radius * cos(phi)));
+    float u = theta / (2 * (float) M_PI);
+    float v = 1 - ((phi / (float) M_PI) + 0.5f);
+    Point_2D point = {u, v};
+    return point;
+}
+
+// SColor Sphere::getColor(Vect &pt) {
+//     Material *m = getMaterial();
+//     Color c;
+//     if (!m->hasTexture()) {
+//         c = m->getDiffColor();
+//     } else {
+//         Vect vp = (pt - origin)
+//         vp.linearMult(radius);
+//         float phi = acosf(-vp.dotProduct(pt - origin));
+//         float u = phi 
+//     }
+//     return c;
+// }

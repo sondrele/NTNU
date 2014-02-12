@@ -58,6 +58,7 @@ public:
     void setTransparency(float c) { transparency = c; }
     float getTransparency() { return transparency; }
 
+    bool hasTexture();
     bool isReflective();
     bool isRefractive();
 };
@@ -117,9 +118,22 @@ public:
     float getZlen() { return zlength;}
     void setZ(float zlen, Vect z) { zlength = zlen; zaxis = z;}
 
+    Point_2D getLongAndLat(Vect);
+
     virtual Material * getMaterial();
     virtual Intersection intersects(Ray);
     virtual Vect surfaceNormal(Vect, Vect);
+};
+
+class Plane {
+private:
+    Vect normal;
+    Vect point;
+
+public:
+    Plane() {}
+    Plane(Vect n, Vect p) : normal(n), point(p) {}
+    Intersection intersects(Ray);
 };
 
 class Vertex : public Vect {
@@ -166,6 +180,11 @@ public:
     Material * getMaterial(uint);
     virtual Intersection intersects(Ray);
     virtual Vect surfaceNormal(Vect, Vect);
+    Vect normal();
+    Vect interPolatedNormal(Vect);
+
+    float getArea();
+    static float getArea(Vect, Vect, Vect);
 };
 
 class Mesh : public Shape {

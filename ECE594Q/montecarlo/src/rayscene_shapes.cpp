@@ -61,6 +61,10 @@ Material::Material() {
     transparency = 0;
 }
 
+bool Material::hasTexture() {
+    return false; // TODO: Fiske
+}
+
 bool Material::isReflective() {
     return specColor.length() > 0;
 }
@@ -70,7 +74,7 @@ bool Material::isRefractive() {
 }
 
 /*********************************
-* Sphere
+* Shape
 *********************************/
 Shape::Shape() {
 

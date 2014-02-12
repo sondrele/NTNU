@@ -110,6 +110,14 @@ Intersection Triangle::intersects(Ray ray) {
          return is;
 }
 
+Vect Triangle::normal() {
+    Vect v = getB() - getA();
+    Vect w = getC() - getA();
+    Vect N = v.crossProduct(w);
+    N.normalize();
+    return N;
+}
+
 Vect Triangle::surfaceNormal(Vect dir, Vect pt) {
     (void) pt;
 
@@ -122,4 +130,29 @@ Vect Triangle::surfaceNormal(Vect dir, Vect pt) {
         N = N.linearMult(-1);
     
     return N;
+}
+
+float Triangle::getArea() {
+    return Triangle::getArea((Vect) a, (Vect) b, (Vect) c);
+}
+
+float Triangle::getArea(Vect A, Vect B, Vect C) {
+    Vect AB = B - A;
+    Vect AC = C - A;
+    return AB.crossProduct(AC).length() * 0.5f;
+}
+
+Vect Triangle::interPolatedNormal(Vect pt) {
+    float A = getArea();
+    float A0 = getArea((Vect) a, (Vect) b, pt) / A;
+    float A1 = getArea((Vect) c, (Vect) a, pt) / A;
+    float A2 = getArea((Vect) b, (Vect) c, pt) / A;
+    if (A0 > A || A1 > A || A2 > A) 
+        throw "Point is outside triangle";
+
+    Vect interpolated = a.getSurfaceNormal().linearMult(A2)
+        + b.getSurfaceNormal().linearMult(A1)
+        + c.getSurfaceNormal().linearMult(A0);
+    interpolated.normalize();
+    return interpolated;
 }
