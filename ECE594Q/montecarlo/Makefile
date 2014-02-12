@@ -3,7 +3,8 @@ INCLUDEPATH=\
     -Iinc
 CC=clang++
 CC=g++
-CFLAGS = $(INCLUDEPATH) -Wall -g -std=c++11 -O3 
+CFLAGS = $(INCLUDEPATH) -Wall -g -std=c++11
+# -O3 
 #-lm -fopenmp
 CIMGFLAGS = $(CFLAGS) -L/usr/X11R6/lib -lm -lpthread -lX11
 LDFLAGS=
@@ -19,6 +20,9 @@ SRCS = src/ray.cpp\
     src/rayscene.cpp\
     src/rayscene_factory.cpp\
     src/rayscene_shapes.cpp\
+    src/sphere.cpp\
+    src/mesh.cpp\
+    src/triangle.cpp\
     src/whitted.cpp\
     src/raytracer.cpp
 OBJS = $(SRCS:.cpp=.o) $(LIBS:.cpp=.o) 
@@ -26,9 +30,9 @@ OBJS = $(SRCS:.cpp=.o) $(LIBS:.cpp=.o)
 %.o: %.cpp
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-all: raytracer
+all: montecarlo
 
-raytracer: raytracer.o $(OBJS)
+montecarlo: montecarlo.o $(OBJS)
 	$(CC) -o $@ $^ $(CIMGFLAGS)
 
 test1: all

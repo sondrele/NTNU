@@ -84,12 +84,16 @@ Ray Intersection::calculateRefraction() {
 }
 
 Material * Intersection::getMaterial() {
-    if (shape != NULL && shape->getNumMaterials() > 0) {
+    if (shape != NULL) { // && shape->getNumMaterials() > 0) {
         return shape->getMaterial();
     } else {
         return NULL;
     }
 }
+
+// Point_2D Intersection::calculateUVCoords() {
+//     return Point_2D();
+// }
 
 std::string Intersection::toString() {
     stringstream s;

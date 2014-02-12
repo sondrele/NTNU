@@ -1,10 +1,12 @@
 #include "rayscene_shapes.h"
 
 Vertex::Vertex() {
+    mat = NULL;
     hasNormal = false;
 }
 
 Vertex::Vertex(float a, float b, float c) {
+    mat = NULL;
     hasNormal = false;
 
     setX(a);
@@ -50,13 +52,27 @@ Triangle::~Triangle() {
     // delete mat;
 }
 
-Material * Triangle::getMaterial() {
-    return materials[0];
+void Triangle::setMaterial(Material *m, char v) {
+    if (v == 'a')
+        a.setMaterial(m);
+    else if (v == 'b')
+        b.setMaterial(m);
+    else if (v == 'c')
+        c.setMaterial(m);
 }
 
-Material * Triangle::getMaterial(uint i) {
-    if (i < 3) {
-        return materials[i];
+// Deprecated
+Material * Triangle::getMaterial() {
+    return a.getMaterial();//materials[0];
+}
+
+Material * Triangle::getMaterial(char v) {
+    if (v == 'a') {
+        return a.getMaterial();
+    } else if(v == 'b') {
+        return b.getMaterial();
+    } else if (v == 'c') {
+        return c.getMaterial();
     } else {
         throw "MaterialIndex out of bounds";
     }
@@ -147,7 +163,7 @@ Vect Triangle::interPolatedNormal(Vect pt) {
     float A0 = getArea((Vect) a, (Vect) b, pt) / A;
     float A1 = getArea((Vect) c, (Vect) a, pt) / A;
     float A2 = getArea((Vect) b, (Vect) c, pt) / A;
-    if (A0 > A || A1 > A || A2 > A) 
+    if (A0 > 1 || A1 > 1 || A2 > 1) 
         throw "Point is outside triangle";
 
     Vect interpolated = a.getSurfaceNormal().linearMult(A2)

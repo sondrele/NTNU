@@ -142,12 +142,15 @@ private:
     Point_2D coords;
     bool hasNormal;
     Vect normal;
+    Material *mat;
 
 public:
     Vertex();
     Vertex(float, float, float);
     void setMaterialIndex(uint i) { matIndex = i; }
     uint getMaterialIndex() { return matIndex; }
+    void setMaterial(Material *m) { mat = m; }
+    Material * getMaterial() { return mat; } 
     void setSurfaceNormal(Vect n);
     Vect getSurfaceNormal();
     void setTextureCoords(float, float);
@@ -161,7 +164,6 @@ private:
     Vertex a;
     Vertex b;
     Vertex c;
-    // Material *mat;
 
 public:
     Triangle();
@@ -174,10 +176,10 @@ public:
     void setB(Vertex y) { b = y;}
     Vertex getC() { return c;}
     void setC(Vertex z) { c = z;}
-    void setMaterial(Material m);
+    void setMaterial(Material *m, char);
 
     virtual Material * getMaterial();
-    Material * getMaterial(uint);
+    Material * getMaterial(char);
     virtual Intersection intersects(Ray);
     virtual Vect surfaceNormal(Vect, Vect);
     Vect normal();

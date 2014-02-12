@@ -199,7 +199,7 @@ TEST(RaySceneFactory, can_init_mesh) {
     DOUBLES_EQUAL(0.5, b.getY(), 0.00001);
     DOUBLES_EQUAL(0.6, b.getZ(), 0.00001);
     mat = t0->getMaterial();
-    CHECK(ms != mat);
+    CHECK(ms == mat);
     DOUBLES_EQUAL(1, mat->getShininess(), 0.00001);
     DOUBLES_EQUAL(0.5f, mat->getTransparency(), 0.00001);
 
@@ -225,9 +225,9 @@ TEST(RaySceneFactory, mesh_with_per_surface_material) {
     RaySceneFactory::AddMaterials(&m, v);
     RaySceneFactory::CreateMesh(m, trimesh, v);
     Triangle *t = m.getTriangle(0);
-    Material *m0 = t->getMaterial(0);
-    Material *m1 = t->getMaterial(1);
-    Material *m2 = t->getMaterial(2);
+    Material *m0 = t->getMaterial('a');
+    Material *m1 = t->getMaterial('b');
+    Material *m2 = t->getMaterial('c');
 
     CHECK(m0 != m1);
     CHECK(m0 != m2);

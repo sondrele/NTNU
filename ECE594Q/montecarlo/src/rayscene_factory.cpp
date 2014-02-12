@@ -115,21 +115,12 @@ void RaySceneFactory::CreateMesh(Mesh &m, PolySetIO &pio,
             t = RaySceneFactory::CreateTriangle(pio.poly[i]);
         }
         
-        Material *mat;
         if (pio.materialBinding == PER_VERTEX_MATERIAL) {
-            mat = new Material();
-            *mat = *(mats[t->getA().getMaterialIndex()]);
-            t->addMaterial(mat);
-            mat = new Material();
-            *mat = *(mats[t->getB().getMaterialIndex()]);
-            t->addMaterial(mat);
-            mat = new Material();
-            *mat = *(mats[t->getC().getMaterialIndex()]);
-            t->addMaterial(mat);
+            t->setMaterial(mats[t->getA().getMaterialIndex()], 'a');
+            t->setMaterial(mats[t->getB().getMaterialIndex()], 'b');
+            t->setMaterial(mats[t->getC().getMaterialIndex()], 'c');
         } else {
-            mat = new Material();
-            *mat = *(mats[t->getA().getMaterialIndex()]);
-            t->addMaterial(mat);
+            t->setMaterial(mats[t->getA().getMaterialIndex()], 'a');
         }
         m.addTriangle(t);
     }
