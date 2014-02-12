@@ -51,7 +51,7 @@ TEST_GROUP(RaySceneFactory) {
         triangle0.vert[1].norm[2] = 0;
         triangle0.vert[0].materialIndex = 0;
         triangle0.vert[1].materialIndex = 1;
-        triangle0.vert[2].materialIndex = 2;
+        triangle0.vert[2].materialIndex = 1;
 
 
         triangle1.numVertices = 3;
@@ -213,9 +213,9 @@ TEST(RaySceneFactory, can_init_mesh) {
 TEST(RaySceneFactory, mesh_with_per_surface_material) {
     std::vector<Material *> v;
     v.push_back(RaySceneFactory::CreateMaterial(material));
-    v.push_back(RaySceneFactory::CreateMaterial(material));
     material.diffColor[0] = 10;
     material.diffColor[1] = 0.1f;
+    v.push_back(RaySceneFactory::CreateMaterial(material));
     v.push_back(RaySceneFactory::CreateMaterial(material));
 
     trimesh.materialBinding = PER_VERTEX_MATERIAL;
@@ -231,7 +231,7 @@ TEST(RaySceneFactory, mesh_with_per_surface_material) {
 
     CHECK(m0 != m1);
     CHECK(m0 != m2);
-    CHECK(m2 != m1);
+    CHECK(m2 == m1);
     
     DOUBLES_EQUAL(1, m2->getDiffColor().R(), 0.00001);
     DOUBLES_EQUAL(0.1, m2->getDiffColor().G(), 0.00001);
