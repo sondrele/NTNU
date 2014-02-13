@@ -31,7 +31,7 @@ OBJS = $(SRCS:.cpp=.o) $(LIBS:.cpp=.o)
 %.o: %.cpp
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-all: montecarlo
+all: montecarlo texture
 
 montecarlo: montecarlo.o $(OBJS)
 	$(CC) -o $@ $^ $(CIMGFLAGS)

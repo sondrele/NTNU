@@ -187,7 +187,7 @@ Vect Triangle::interpolatedNormal(Vect pt) {
     return interpolated;
 }
 
-SColor Triangle::interpolatedColor(Vect pt) {
+SColor Triangle::getColor(Vect pt) {
     if (hasPerVertexMaterial) {
         SColor color;
         float A = getArea();

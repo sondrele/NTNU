@@ -38,6 +38,7 @@ public:
     virtual Intersection intersects(Ray) = 0;
     virtual Vect surfaceNormal(Vect, Vect) = 0;
     virtual Material * getMaterial() = 0;
+    virtual SColor getColor(Vect) = 0;
 
     uint64_t getNumMaterials() { return materials.size(); }
     void addMaterial(Material *m) { materials.push_back(m); }
@@ -83,11 +84,11 @@ public:
 
     Point_2D getLongAndLat(Vect);
     Point_2D getUV(Vect);
-    SColor getColor(Vect);
 
     virtual Material * getMaterial();
     virtual Intersection intersects(Ray);
     virtual Vect surfaceNormal(Vect, Vect);
+    virtual SColor getColor(Vect);
 };
 
 class Plane {
@@ -147,13 +148,15 @@ public:
     void setPerVertexNormal(bool);
     void setPerVertexMaterial(bool);
 
-    virtual Material * getMaterial();
     Material * getMaterial(char);
+    virtual Material * getMaterial();
     virtual Intersection intersects(Ray);
     virtual Vect surfaceNormal(Vect, Vect);
+    virtual SColor getColor(Vect);
+
     Vect normal();
     Vect interpolatedNormal(Vect);
-    SColor interpolatedColor(Vect);
+    // SColor interpolatedColor(Vect);
 
     float getArea();
     static float getArea(Vect, Vect, Vect);
@@ -184,6 +187,7 @@ public:
     virtual Material * getMaterial();
     virtual Intersection intersects(Ray);
     virtual Vect surfaceNormal(Vect, Vect);
+    virtual SColor getColor(Vect);
 };
 
 #endif // _RAYSCENE_SHAPES_H_

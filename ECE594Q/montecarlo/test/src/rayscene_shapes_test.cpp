@@ -128,12 +128,12 @@ TEST(RaySceneShapesTest, can_get_interpolation_of_triangle_surface) {
 TEST(RaySceneShapesTest, can_get_interpolated_color) {
     t->setPerVertexMaterial(true);
 
-    SColor color = t->interpolatedColor(Vect(0, 0, -1));
+    SColor color = t->getColor(Vect(0, 0, -1));
     CHECK_EQUAL(1, color.R());
     CHECK_EQUAL(1, color.G());
     CHECK_EQUAL(1, color.B());
 
-    color = t->interpolatedColor(Vect(0, 0, -0.5f));
+    color = t->getColor(Vect(0, 0, -0.5f));
     CHECK_EQUAL(0.5f, color.R());
     CHECK_EQUAL(0.5f, color.G());
     CHECK_EQUAL(0.5f, color.B());

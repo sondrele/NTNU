@@ -43,3 +43,8 @@ Vect Mesh::surfaceNormal(Vect o, Vect pt) {
     throw "Mesh has no surface normal";
     return pt;
 }
+
+SColor Mesh::getColor(Vect pt) {
+    (void) pt;
+    throw "Mesh has no color";
+}

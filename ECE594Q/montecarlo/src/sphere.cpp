@@ -109,17 +109,3 @@ SColor Sphere::getColor(Vect pt) {
         return texture->getTexel(uv.x, uv.y);
     }
 }
-
-// SColor Sphere::getColor(Vect &pt) {
-//     Material *m = getMaterial();
-//     Color c;
-//     if (!m->hasTexture()) {
-//         c = m->getDiffColor();
-//     } else {
-//         Vect vp = (pt - origin)
-//         vp.linearMult(radius);
-//         float phi = acosf(-vp.dotProduct(pt - origin));
-//         float u = phi 
-//     }
-//     return c;
-// }

@@ -22,12 +22,11 @@ std::string in;
 std::string out;
 
 static void loadTextures(RayScene *rayScene) {
-    std::string t = std::string("earth.bmp");
+    std::string t = std::string("jupiter.bmp");
     Texture *text = new Texture();
     text->loadTexture(t);
     Sphere *s = (Sphere *) rayScene->getShape(0);
     s->setTexture(text);
-    cout << s->hasTexture() << s->getOrigin() << endl;
 }
 
 static void loadScene(const char *name, RayTracer &rayTracer) {

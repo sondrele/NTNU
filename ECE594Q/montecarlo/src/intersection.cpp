@@ -84,16 +84,11 @@ Ray Intersection::calculateRefraction() {
 }
 
 SColor Intersection::getColor() {
-    if (shape->getType() == TRIANGLE) {
-        return ((Triangle *) shape)->
-            interpolatedColor(calculateIntersectionPoint());
-    } else {
-        return ((Sphere *) shape)->getColor(calculateIntersectionPoint());
-    }
+    return shape->getColor(calculateIntersectionPoint());
 }
 
 Material * Intersection::getMaterial() {
-    if (shape != NULL) { // && shape->getNumMaterials() > 0) {
+    if (shape != NULL) {
         return shape->getMaterial();
     } else {
         return NULL;
