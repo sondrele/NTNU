@@ -1,7 +1,7 @@
 #include "rayimage.h"
 
 int RayImage::width() {
-    return img.widht();
+    return img.width();
 }
 
 int RayImage::height() {
@@ -13,6 +13,7 @@ void RayImage::loadTexture(std::string name) {
 }
 
 PX_Color RayImage::getSample(int x, int y) {
+    y = height() - y;
     PX_Color c;
     c.R = img(x, y, 0, 0);
     c.G = img(x, y, 0, 1);

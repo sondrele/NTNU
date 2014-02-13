@@ -144,11 +144,11 @@ TEST(RaySceneShapesTest, can_get_long_and_lat_from_sphere) {
     s.setOrigin(Vect(0, -1, -1));
     s.setRadius(1);
 
-    // Point_2D pt = s.getLongAndLat(Vect(0, 0, -1));
-    // CHECK_EQUAL(0.25, pt.x);
-    // CHECK_EQUAL(1, pt.y);
-    // TODO: fiks
-    // pt = s.getLongAndLat(Vect(0, -0.5f, 0));
-    // DOUBLES_EQUAL(0, pt.x, 0.00001);
-    // DOUBLES_EQUAL(0.5f, pt.y, 0.00001);
+    Point_2D pt = s.getUV(Vect(0, 0, -1));
+    DOUBLES_EQUAL(0.5, pt.x, 0.00001);
+    CHECK_EQUAL(1, pt.y);
+
+    pt = s.getUV(Vect(0, -2, -1));
+    DOUBLES_EQUAL(0.5, pt.x, 0.00001);
+    DOUBLES_EQUAL(0, pt.y, 0.00001);
 }

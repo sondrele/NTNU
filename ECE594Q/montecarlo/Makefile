@@ -1,5 +1,6 @@
 INCLUDEPATH=\
     -I../matrix/inc\
+    -Ilib\
     -Iinc
 CC=clang++
 CC=g++
@@ -36,7 +37,7 @@ montecarlo: montecarlo.o $(OBJS)
 	$(CC) -o $@ $^ $(CIMGFLAGS)
 
 texture: texture.o $(OBJS)
-	$(CC) -o $@ $^ $(CIMGFLAGS)	
+	$(CC) -o $@ $^ $(CIMGFLAGS)
 
 test1: all
 	./raytracer test1 150 150 2

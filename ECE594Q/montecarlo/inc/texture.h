@@ -5,8 +5,9 @@
 #include <stdlib.h>
 #include <string>
 
+#include "material.h"
+#include "raybuffer.h"
 #include "rayimage.h"
-#include "rayscene_shapes.h"
 
 class Texture {
 private:

@@ -2,6 +2,15 @@
 
 Sphere::Sphere() {
     radius = 0;
+    texture = NULL;
+}
+
+void Sphere::setTexture(Texture *t) {
+    texture = t;
+}
+
+Texture * Sphere::getTexture() {
+    return texture;
 }
 
 Vect Sphere::surfaceNormal(Vect o, Vect pt) {
@@ -81,6 +90,24 @@ Point_2D Sphere::getLongAndLat(Vect pt) {
     float v = 1 - ((phi / (float) M_PI) + 0.5f);
     Point_2D point = {u, v};
     return point;
+}
+
+Point_2D Sphere::getUV(Vect pt) {
+    Vect d = origin - pt;
+    float u = (float) (0.5 + atan2(d.getZ(), d.getX()) / (2 * M_PI));
+    float v = (float) (0.5 - asin(d.getY()) / M_PI);
+    // v = (v + 1) / 2.0f;
+    Point_2D point = {u, v};
+    return point;
+}
+
+SColor Sphere::getColor(Vect pt) {
+    if (texture == NULL) {
+        return getMaterial()->getDiffColor();
+    } else {
+        Point_2D uv = getUV(pt);
+        return texture->getTexel(uv.x, uv.y);
+    }
 }
 
 // SColor Sphere::getColor(Vect &pt) {

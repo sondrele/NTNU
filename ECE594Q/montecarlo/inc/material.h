@@ -1,19 +1,52 @@
 #ifndef _MATERIAL_H_
 #define _MATERIAL_H_
 
-class Texture {
+#include "Matrix.h"
+#include "scene_io.h"
+
+class SColor : public Vect {
+public:
+    SColor() {}
+    SColor(Vect);
+    SColor(Color);
+    SColor(float, float, float);
+    float R() { return getX(); }
+    void R(float);
+    float G() { return getY(); }
+    void G(float);
+    float B() { return getZ(); }
+    void B(float);
+
+    SColor& operator=(const Vect&);
+};
+
+class Material {
 private:
-    uint width;
-    uint height;
-    
+    SColor diffColor;
+    SColor ambColor;
+    SColor specColor;
+    // SColor emissColor;
+    float shininess;
+    float transparency;
 
 public:
-    Texture();
-    Texture(uint, uint);
+    Material();
+    // void setEmissColor(SColor c) { emissColor = c; }
+    // SColor getEmissColor() { return emissColor; }
+    void setDiffColor(SColor c) { diffColor = c; }
+    SColor getDiffColor() { return diffColor; }
+    void setAmbColor(SColor c) { ambColor = c; }
+    SColor getAmbColor() { return ambColor; }
+    void setSpecColor(SColor c) { specColor = c; }
+    SColor getSpecColor() { return specColor; }
+    void setShininess(float c) { shininess = c; }
+    float getShininess() { return shininess; }
+    void setTransparency(float c) { transparency = c; }
+    float getTransparency() { return transparency; }
 
-    void getTexel(uint, uint);
-    void setTexture(std::string);
-
+    bool hasTexture();
+    bool isReflective();
+    bool isRefractive();
 };
 
 #endif // _MATERIAL_H_

@@ -10,7 +10,6 @@ point_light {
   position -10 0 -3
   color 1 1 1
 }
-
 directional_light {
   direction 0.580339 -0.523277 -0.62401
   color 1 1 1
@@ -24,7 +23,7 @@ sphere {
     specColor 0.1 0.1 0.1
     emisColor 0 0 0
     shininess 0.2
-    ktran 0.9
+    ktran 0.7
   }
   origin 0 0 -5
   radius 1.33453
@@ -44,7 +43,7 @@ sphere {
     specColor 0.1 0.1 0.1
     emisColor 0 0 0
     shininess 0.2
-    ktran 0.9
+    ktran 0.0
   }
   origin -2 0 -8
   radius 1.33453

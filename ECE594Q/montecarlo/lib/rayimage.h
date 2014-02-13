@@ -10,7 +10,7 @@
 
 class RayImage {
 public:
-    CImg<unsigned char> img;    
+    cimg_library::CImg<unsigned char> img;    
 
 public:
     int width();

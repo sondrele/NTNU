@@ -88,7 +88,7 @@ SColor Intersection::getColor() {
         return ((Triangle *) shape)->
             interpolatedColor(calculateIntersectionPoint());
     } else {
-        return getMaterial()->getDiffColor();
+        return ((Sphere *) shape)->getColor(calculateIntersectionPoint());
     }
 }
 
