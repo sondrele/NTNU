@@ -3,13 +3,19 @@
 #include "rayscene_shapes.h"
 
 Triangle *t;
+Material *mat0;
+Material *mat1;
+Material *mat2;
+
 
 TEST_GROUP(RaySceneShapesTest) {
     void setup() {
+        mat0 = new Material(); mat0->setDiffColor(SColor(0, 0, 0));
+        mat1 = new Material(); mat1->setDiffColor(SColor(0, 0, 0));
+        mat2 = new Material(); mat2->setDiffColor(SColor(1, 1, 1));
         t = new Triangle();
-        Vertex v0(-1, 0, 0);
-        Vertex v1(1, 0, 0);
-        Vertex v2(0, 0, -1);
+        Vertex v0(-1, 0, 0); Vertex v1(1, 0, 0); Vertex v2(0, 0, -1);
+        v0.setMaterial(mat0); v1.setMaterial(mat1); v2.setMaterial(mat2);
         v0.setSurfaceNormal(Vect(0, 1, 0));
         v1.setSurfaceNormal(Vect(0, 1, 0));
         v2.setSurfaceNormal(Vect(0, 0, -1));
@@ -17,6 +23,7 @@ TEST_GROUP(RaySceneShapesTest) {
     }
     void teardown() {
         delete t;
+        delete mat0; delete mat1; delete mat2;
     }
 };
 
@@ -87,18 +94,27 @@ TEST(RaySceneShapesTest, triangle_has_per_vertex_normals) {
     CHECK_EQUAL(-1, n2.getZ());
 }
 
+TEST(RaySceneShapesTest, triangle_has_area) {
+    Triangle t0;
+    t0.setA(Vertex(0, 0, -4));
+    t0.setB(Vertex(2, 2, -4));
+    t0.setC(Vertex(2, 0, -4));
+    float area = t0.getArea();
+    DOUBLES_EQUAL(2, area, 0.00001);
+}
+
 TEST(RaySceneShapesTest, can_get_interpolation_of_triangle_surface) {
     Ray r(Vect(0, 1, -1), Vect(0, -1, 0));
     Intersection in = t->intersects(r);
     CHECK(in.hasIntersected());
 
     t->setPerVertexNormal(true);
-    Vect n = t->interPolatedNormal(Vect(0, 0, -1));
+    Vect n = t->interpolatedNormal(Vect(0, 0, -1));
     CHECK_EQUAL(0, n.getX());
     CHECK_EQUAL(0, n.getY());
     CHECK_EQUAL(-1, n.getZ());
 
-    n = t->interPolatedNormal(Vect(-1, 0, 0));
+    n = t->interpolatedNormal(Vect(-1, 0, 0));
     CHECK_EQUAL(0, n.getX());
     CHECK_EQUAL(1, n.getY());
     CHECK_EQUAL(0, n.getZ());
@@ -109,13 +125,18 @@ TEST(RaySceneShapesTest, can_get_interpolation_of_triangle_surface) {
     DOUBLES_EQUAL(-0.707101f, n.getZ(), 0.00001);
 }
 
-TEST(RaySceneShapesTest, triangle_has_area) {
-    Triangle t0;
-    t0.setA(Vertex(0, 0, -4));
-    t0.setB(Vertex(2, 2, -4));
-    t0.setC(Vertex(2, 0, -4));
-    float area = t0.getArea();
-    DOUBLES_EQUAL(2, area, 0.00001);
+TEST(RaySceneShapesTest, can_get_interpolated_color) {
+    t->setPerVertexMaterial(true);
+
+    SColor color = t->interpolatedColor(Vect(0, 0, -1));
+    CHECK_EQUAL(1, color.R());
+    CHECK_EQUAL(1, color.G());
+    CHECK_EQUAL(1, color.B());
+
+    color = t->interpolatedColor(Vect(0, 0, -0.5f));
+    CHECK_EQUAL(0.5f, color.R());
+    CHECK_EQUAL(0.5f, color.G());
+    CHECK_EQUAL(0.5f, color.B());
 }
 
 TEST(RaySceneShapesTest, can_get_long_and_lat_from_sphere) {

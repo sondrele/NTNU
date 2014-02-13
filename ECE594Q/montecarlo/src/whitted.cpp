@@ -23,7 +23,8 @@ SColor Whitted::Illumination(Light *lt, Intersection in, SColor Sj) {
     Material *mat = in.getMaterial();
     float kt = mat->getTransparency();
     SColor ks = mat->getSpecColor();
-    SColor Cd = mat->getDiffColor();
+    // SColor Cd = mat->getDiffColor();
+    SColor Cd = in.getColor();
     float q = mat->getShininess() * 128;
     float Fattj = Whitted::CalculateFattj(Pt, lt);
     SColor Ij = lt->getIntensity();

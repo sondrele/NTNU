@@ -171,7 +171,8 @@ SColor RayTracer::calculateShadowScalar(Light &lt, Intersection &in) {
     } else { // The shape is transparent
         // Normalize the color for this material, and recursively trace for other
         // transparent objects
-        SColor Cd = mat->getDiffColor();
+        // SColor Cd = mat->getDiffColor();
+        SColor Cd = ins.getColor();
         float m = max(Cd.R(), max(Cd.G(), Cd.B()));
         Cd.R(Cd.R()/m); Cd.G(Cd.G()/m); Cd.B(Cd.B()/m);
         SColor Si = Cd.linearMult(mat->getTransparency());
@@ -180,7 +181,7 @@ SColor RayTracer::calculateShadowScalar(Light &lt, Intersection &in) {
 }
 
 SColor RayTracer::shadeIntersection(Intersection in, uint d) {
-    if (d <= 0 || in.hasIntersected() == false) {
+    if (d <= 0 || !in.hasIntersected()) {
         // terminate recursion
         return SColor(0, 0, 0);
     }
@@ -191,14 +192,14 @@ SColor RayTracer::shadeIntersection(Intersection in, uint d) {
     float kt = mat->getTransparency();
     SColor ks = mat->getSpecColor();
     SColor ka = mat->getAmbColor();
-    SColor Cd = mat->getDiffColor();
+    // SColor Cd = mat->getDiffColor();
+    SColor Cd = in.getColor();
 
     SColor ambLight = Whitted::AmbientLightning(kt, ka, Cd);
 
     std::vector<Light *> lts = scene->getLights();
     for (uint i = 0; i < lts.size(); i++) {
         Light *l = lts.at(i);
-
         SColor Sj = calculateShadowScalar(*l, in);
         shade = shade + Whitted::Illumination(l, in, Sj);
     }

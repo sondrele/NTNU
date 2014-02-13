@@ -149,7 +149,7 @@ Vect Triangle::surfaceNormal(Vect dir, Vect pt) {
     Vect N;
     if (hasPerVertexNormal) {
         // TODO: Har direction noe å si?
-        N = interPolatedNormal(pt);
+        N = interpolatedNormal(pt);
     } else {
         Vect v = getB() - getA();
         Vect w = getC() - getA();
@@ -172,7 +172,7 @@ float Triangle::getArea(Vect A, Vect B, Vect C) {
     return AB.crossProduct(AC).length() * 0.5f;
 }
 
-Vect Triangle::interPolatedNormal(Vect pt) {
+Vect Triangle::interpolatedNormal(Vect pt) {
     float A = getArea();
     float A0 = getArea((Vect) a, (Vect) b, pt) / A;
     float A1 = getArea((Vect) c, (Vect) a, pt) / A;
@@ -185,4 +185,25 @@ Vect Triangle::interPolatedNormal(Vect pt) {
         + c.getSurfaceNormal().linearMult(A0);
     interpolated.normalize();
     return interpolated;
+}
+
+SColor Triangle::interpolatedColor(Vect pt) {
+    if (hasPerVertexMaterial) {
+        SColor color;
+        float A = getArea();
+        float A0 = getArea((Vect) a, (Vect) b, pt) / A;
+        float A1 = getArea((Vect) c, (Vect) a, pt) / A;
+        float A2 = getArea((Vect) b, (Vect) c, pt) / A;
+        if (A0 > 1 || A1 > 1 || A2 > 1) 
+            throw "Point is outside triangle";
+
+        color = a.getMaterial()->getDiffColor().linearMult(A2)
+            + b.getMaterial()->getDiffColor().linearMult(A1)
+            + c.getMaterial()->getDiffColor().linearMult(A0);
+        // cout << "i: " << color << " c: " << getMaterial()->getDiffColor() << endl;
+        // interpolated.normalize();
+        return color;
+    } else {
+        return getMaterial()->getDiffColor();
+    }
 }

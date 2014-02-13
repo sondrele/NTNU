@@ -6,11 +6,12 @@
 #include "rayscene_factory.h"
 #include "rayimage.h"
 
-#define PATH            "./scenes-whitted/"
+#define WHITTED         "./scenes-whitted/"
+#define MONTE           "./scenes-montecarlo/"
 #define ASCII           ".ascii"
 #define IMG             ".bmp"
-#define IMAGE_WIDTH     220
-#define IMAGE_HEIGHT    220
+#define IMAGE_WIDTH     100
+#define IMAGE_HEIGHT    100
 
 typedef unsigned char u08;
 
@@ -40,18 +41,19 @@ static void render(RayTracer &rayTracer) {
 }
 
 static void parse_input(int argc, char *argv[]) {
-    if (argc == 5) {
-        in = std::string(PATH) + std::string(argv[1]) + std::string(ASCII);
+    if (argc == 6) {
+        in = (*argv[5] == 'm') ? std::string(MONTE) : std::string(WHITTED);
+        in += std::string(argv[1]) + std::string(ASCII);
         out = std::string(argv[1]) + std::string(IMG);
         w = atoi(argv[2]);
         h = atoi(argv[3]);
         d = atoi(argv[4]);
     } else {
-        cout << "usage: ./montecarlo test1.ascii w h d" << endl;
+        cout << "usage: ./montecarlo flaot:w/m name:test1.ascii width:100 height:100 depth:10" << endl;
         w = IMAGE_WIDTH;
         h = IMAGE_HEIGHT;
         d = 2;
-        in = std::string(PATH) + std::string("test1.ascii");
+        in = std::string(MONTE) + std::string("test1.ascii");
         out = std::string("test1.bmp");
     }
 }

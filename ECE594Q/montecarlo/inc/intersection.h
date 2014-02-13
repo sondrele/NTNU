@@ -39,6 +39,7 @@ public:
     void setShape(Shape *s) { shape = s; }
     Shape * getShape() { return shape; }
     Material *getMaterial();
+    SColor getColor();
 
     std::string toString();
 };

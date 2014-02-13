@@ -45,10 +45,10 @@ private:
 
 public:
     Material();
-    void setDiffColor(SColor c) { diffColor = c; }
-    SColor getDiffColor() { return diffColor; }
     // void setEmissColor(SColor c) { emissColor = c; }
     // SColor getEmissColor() { return emissColor; }
+    void setDiffColor(SColor c) { diffColor = c; }
+    SColor getDiffColor() { return diffColor; }
     void setAmbColor(SColor c) { ambColor = c; }
     SColor getAmbColor() { return ambColor; }
     void setSpecColor(SColor c) { specColor = c; }
@@ -187,7 +187,8 @@ public:
     virtual Intersection intersects(Ray);
     virtual Vect surfaceNormal(Vect, Vect);
     Vect normal();
-    Vect interPolatedNormal(Vect);
+    Vect interpolatedNormal(Vect);
+    SColor interpolatedColor(Vect);
 
     float getArea();
     static float getArea(Vect, Vect, Vect);
