@@ -200,8 +200,6 @@ SColor Triangle::interpolatedColor(Vect pt) {
         color = a.getMaterial()->getDiffColor().linearMult(A2)
             + b.getMaterial()->getDiffColor().linearMult(A1)
             + c.getMaterial()->getDiffColor().linearMult(A0);
-        // cout << "i: " << color << " c: " << getMaterial()->getDiffColor() << endl;
-        // interpolated.normalize();
         return color;
     } else {
         return getMaterial()->getDiffColor();

@@ -23,6 +23,7 @@ SRCS = src/ray.cpp\
     src/mesh.cpp\
     src/triangle.cpp\
     src/whitted.cpp\
+    src/texture.cpp\
     src/raytracer.cpp
 OBJS = $(SRCS:.cpp=.o) $(LIBS:.cpp=.o) 
 
@@ -33,6 +34,9 @@ all: montecarlo
 
 montecarlo: montecarlo.o $(OBJS)
 	$(CC) -o $@ $^ $(CIMGFLAGS)
+
+texture: texture.o $(OBJS)
+	$(CC) -o $@ $^ $(CIMGFLAGS)	
 
 test1: all
 	./raytracer test1 150 150 2

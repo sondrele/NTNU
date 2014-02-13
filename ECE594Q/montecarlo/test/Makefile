@@ -18,6 +18,7 @@ LD_LIBRARIES = -lm -L$(CPPUTEST_HOME)/lib -lCppUTest -lCppUTestExt
 
 INCLUDE_DIRS=\
   $(CPPUTEST_HOME)/include\
+  ./lib\
   ../inc\
   ../../matrix/inc
 
