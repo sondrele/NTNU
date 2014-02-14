@@ -78,6 +78,7 @@ Intersection Sphere::intersects(Ray ray) {
 
 Point_2D Sphere::getUV(Vect pt) {
     Vect d = origin - pt;
+    d.normalize();
     float u = (float) (0.5 + atan2(d.getZ(), d.getX()) / (2 * M_PI));
     float v = (float) (0.5 - asin(d.getY()) / M_PI);
     Point_2D point = {u, v};
@@ -93,5 +94,5 @@ SColor Sphere::getColor(Vect pt) {
         return texture->getTexel(uv.x, uv.y);
     } else {
         return getMaterial()->getDiffColor();
-    } 
+    }
 }

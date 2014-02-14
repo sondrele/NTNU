@@ -52,9 +52,8 @@ bool CheckIShader::hasIntersected(Point_2D pt) {
     // int x = (int) (8 * pt.x);
     // int y = (int) (8 * pt.y);
     // x = x % 2; y = y % 2;
-    
-    if (pt.x < 0.5) {
-        cout << "no" << endl;
+    // TODO: Fiks
+    if (pt.y < 0.5) {
         return false;
     } else {
         return true;

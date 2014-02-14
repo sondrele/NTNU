@@ -22,17 +22,12 @@ std::string in;
 std::string out;
 
 static void loadTextures(RayScene *rayScene) {
-    std::string t = std::string("jupiter.bmp");
+    std::string t = std::string("earth.bmp");
     Texture *text = new Texture();
     text->loadTexture(t);
-    Sphere *s = (Sphere *) rayScene->getShape(0);
-    CShader *shader = new CheckCShader();
-    s->setCShader(shader);
-
-    // IShader *iShader = new CheckIShader();
-    // s->setIShader(iShader);
-
-    Sphere *s0 = (Sphere *) rayScene->getShape(1);
+    // Sphere *s = (Sphere *) rayScene->getShape(0);
+    Sphere *s0 = (Sphere *) rayScene->getShape(0);
+    s0->setIShader(new CheckIShader());
     s0->setTexture(text);
     s0->setCShader(new CheckCShader());
 }
