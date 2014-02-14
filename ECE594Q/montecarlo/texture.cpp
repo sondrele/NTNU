@@ -26,7 +26,15 @@ static void loadTextures(RayScene *rayScene) {
     Texture *text = new Texture();
     text->loadTexture(t);
     Sphere *s = (Sphere *) rayScene->getShape(0);
-    s->setTexture(text);
+    CShader *shader = new CheckCShader();
+    s->setCShader(shader);
+
+    // IShader *iShader = new CheckIShader();
+    // s->setIShader(iShader);
+
+    Sphere *s0 = (Sphere *) rayScene->getShape(1);
+    s0->setTexture(text);
+    s0->setCShader(new CheckCShader());
 }
 
 static void loadScene(const char *name, RayTracer &rayTracer) {

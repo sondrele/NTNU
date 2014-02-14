@@ -4,6 +4,11 @@
 #include "Matrix.h"
 #include "scene_io.h"
 
+typedef struct {
+    float x;
+    float y;
+} Point_2D;
+
 class SColor : public Vect {
 public:
     SColor() {}
@@ -44,7 +49,6 @@ public:
     void setTransparency(float c) { transparency = c; }
     float getTransparency() { return transparency; }
 
-    bool hasTexture();
     bool isReflective();
     bool isRefractive();
 };

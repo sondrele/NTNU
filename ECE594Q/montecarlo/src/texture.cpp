@@ -4,6 +4,10 @@ Texture::Texture() {
 
 }
 
+Texture::~Texture() {
+    
+}
+
 void Texture::loadTexture(std::string imgName) {
     img.loadTexture(imgName);   
 }

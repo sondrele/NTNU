@@ -24,6 +24,8 @@ SRCS = src/ray.cpp\
     src/mesh.cpp\
     src/triangle.cpp\
     src/whitted.cpp\
+    src/material.cpp\
+    src/shader.cpp\
     src/texture.cpp\
     src/raytracer.cpp
 OBJS = $(SRCS:.cpp=.o) $(LIBS:.cpp=.o) 

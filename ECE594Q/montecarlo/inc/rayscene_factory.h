@@ -8,6 +8,7 @@
 #include "ray.h"
 #include "camera.h"
 #include "rayscene.h"
+#include "material.h"
 #include "rayscene_shapes.h"
 
 class RaySceneFactory {

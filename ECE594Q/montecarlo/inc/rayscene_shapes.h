@@ -12,13 +12,9 @@
 #include "ray.h"
 #include "material.h"
 #include "texture.h"
+#include "shader.h"
 #include "intersection.h"
 #include "raybuffer.h"
-
-typedef struct {
-    float x;
-    float y;
-} Point_2D;
 
 enum ShapeType {
     SPHERE, MESH, TRIANGLE
@@ -29,6 +25,9 @@ class Intersection;
 class Shape {
 protected:
     std::vector<Material *> materials;
+    Texture *texture;
+    CShader *cShader;
+    IShader *iShader;
 
 public:
     Shape();
@@ -40,8 +39,17 @@ public:
     virtual Material * getMaterial() = 0;
     virtual SColor getColor(Vect) = 0;
 
+    void setTexture(Texture *);
+    Texture * getTexture();
+    bool hasTexture() { return texture != NULL; }
+
+    void setCShader(CShader *);
+    CShader * getCShader();
+    void setIShader(IShader *s);
+    IShader * getIShader();
+
     uint64_t getNumMaterials() { return materials.size(); }
-    void addMaterial(Material *m) { materials.push_back(m); }
+    void addMaterial(Material *m);
 };
 
 
@@ -57,11 +65,9 @@ private:
     float ylength;
     float zlength;
 
-    Texture *texture;
-
 public:
     Sphere();
-    virtual ~Sphere() {}
+    virtual ~Sphere();
     virtual ShapeType getType() { return SPHERE; }
 
     Vect getOrigin() { return origin;}
@@ -78,28 +84,12 @@ public:
     float getZlen() { return zlength;}
     void setZ(float zlen, Vect z) { zlength = zlen; zaxis = z;}
 
-    void setTexture(Texture *);
-    Texture * getTexture();
-    bool hasTexture() { return texture != NULL; }
-
-    Point_2D getLongAndLat(Vect);
     Point_2D getUV(Vect);
 
     virtual Material * getMaterial();
     virtual Intersection intersects(Ray);
     virtual Vect surfaceNormal(Vect, Vect);
     virtual SColor getColor(Vect);
-};
-
-class Plane {
-private:
-    Vect normal;
-    Vect point;
-
-public:
-    Plane() {}
-    Plane(Vect n, Vect p) : normal(n), point(p) {}
-    Intersection intersects(Ray);
 };
 
 class Vertex : public Vect {
@@ -156,7 +146,6 @@ public:
 
     Vect normal();
     Vect interpolatedNormal(Vect);
-    // SColor interpolatedColor(Vect);
 
     float getArea();
     static float getArea(Vect, Vect, Vect);

@@ -54,38 +54,68 @@ void SColor::B(float b) {
 }
 
 /*********************************
-* Material
-*********************************/
-Material::Material() {
-    shininess = 1;
-    transparency = 0;
-}
-
-bool Material::hasTexture() {
-    return false; // TODO: Fiske
-}
-
-bool Material::isReflective() {
-    return specColor.length() > 0;
-}
-
-bool Material::isRefractive() {
-    return transparency > 0;
-}
-
-/*********************************
 * Shape
 *********************************/
 Shape::Shape() {
-
+    texture = NULL;
+    cShader = NULL;
+    iShader = new IShader();
 }
 
 Shape::~Shape() {
     for (uint i = 0; i < materials.size(); i++) {
         delete materials[i];
     }
+
+    if (texture != NULL) {
+        delete texture;
+    }
+
+    if (cShader != NULL) {
+        delete cShader;
+    }
+
+    if (iShader != NULL) {
+        delete iShader;
+    }
+}
+
+void Shape::addMaterial(Material *m) {
+    materials.push_back(m);
 }
 
 Material * Shape::getMaterial() {
     return materials[0];
+}
+
+void Shape::setTexture(Texture *t) {
+    texture = t;
+}
+
+Texture * Shape::getTexture() {
+    return texture;
+}
+
+void Shape::setCShader(CShader *s) {
+    if (cShader != NULL) {
+        delete  cShader;
+    }
+    cShader = s;
+    cShader->setTexture(texture);
+    cShader->setMaterial(materials[0]);
+}
+
+CShader * Shape::getCShader() {
+    return cShader;
+}
+
+void Shape::setIShader(IShader *s) {
+    if (iShader != NULL) {
+        delete iShader;
+    }
+    iShader = s;
+}
+
+IShader * Shape::getIShader() {
+    return iShader;
 }

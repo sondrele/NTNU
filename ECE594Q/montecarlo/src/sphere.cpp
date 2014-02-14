@@ -2,15 +2,9 @@
 
 Sphere::Sphere() {
     radius = 0;
-    texture = NULL;
 }
 
-void Sphere::setTexture(Texture *t) {
-    texture = t;
-}
-
-Texture * Sphere::getTexture() {
-    return texture;
+Sphere::~Sphere() {
 }
 
 Vect Sphere::surfaceNormal(Vect o, Vect pt) {
@@ -70,42 +64,34 @@ Intersection Sphere::intersects(Ray ray) {
 
     // if t0 is less than zero, the intersection point is at t1
     if (t0 < 0) {
-        is.setIntersectionPoint(t1);
+        if (iShader->hasIntersected(getUV(ray.getOrigin().linearMult(t1))))
+            is.setIntersectionPoint(t1);
         return is;
     }
     // else the intersection point is at t0
     else {
-        is.setIntersectionPoint(t0);
+        if (iShader->hasIntersected(getUV(ray.getOrigin().linearMult(t0))))
+            is.setIntersectionPoint(t0);
         return is;
     }
-}
-
-Point_2D Sphere::getLongAndLat(Vect pt) {
-    Vect p = pt - origin;
-    // x y z r
-    float phi = asin(p.getY() / radius);
-    float theta = acos(p.getX() / (radius * cos(phi)));
-    // float theta2 = asin(p.getZ() / (radius * cos(phi)));
-    float u = theta / (2 * (float) M_PI);
-    float v = 1 - ((phi / (float) M_PI) + 0.5f);
-    Point_2D point = {u, v};
-    return point;
 }
 
 Point_2D Sphere::getUV(Vect pt) {
     Vect d = origin - pt;
     float u = (float) (0.5 + atan2(d.getZ(), d.getX()) / (2 * M_PI));
     float v = (float) (0.5 - asin(d.getY()) / M_PI);
-    // v = (v + 1) / 2.0f;
     Point_2D point = {u, v};
     return point;
 }
 
 SColor Sphere::getColor(Vect pt) {
-    if (texture == NULL) {
-        return getMaterial()->getDiffColor();
-    } else {
+    if (cShader != NULL) {
+        Point_2D uv = getUV(pt);
+        return cShader->getColor(uv);
+    } else if (texture != NULL) {
         Point_2D uv = getUV(pt);
         return texture->getTexel(uv.x, uv.y);
-    }
+    } else {
+        return getMaterial()->getDiffColor();
+    } 
 }
