@@ -8,7 +8,9 @@
                 "*.d",
                 "cpputest",
                 "raytracer",
-                "REYES"
+                "REYES",
+                "TDT4200",
+                "TDT4205"
             ],
             "path": "."
         }
@@ -16,7 +18,7 @@
     "settings":
     {
         "sublimegdb_commandline": "gdb -interpreter=mi montecarlo",
-        "sublimegdb_workingdir": "${folder:${project_path:ECE594Q/monetecarlo/montecarlo.cpp}}/",
+        "sublimegdb_workingdir": "${folder:${project_path:ECE594Q/montecarlo/montecarlo.cpp}}/",
         "NTNU_options":
         [
             "-Wall", "-g"
