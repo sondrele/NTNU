@@ -99,9 +99,9 @@ SColor Sphere::getColor(Vect pt) {
 
 BBox Sphere::getBBox() {
     Vect lowerLeft(-1, -1, -1);
-    lowerLeft = lowerLeft.linearMult(radius);
+    lowerLeft = lowerLeft.linearMult(radius) + origin;
     Vect upperRight(1, 1, 1);
-    upperRight = upperRight.linearMult(radius);
+    upperRight = upperRight.linearMult(radius) + origin;
     BBox b;
     b.setLowerLeft(lowerLeft);
     b.setUpperRight(upperRight);

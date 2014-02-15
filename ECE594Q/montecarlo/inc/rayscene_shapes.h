@@ -67,6 +67,9 @@ public:
     void setIShader(IShader *s);
     IShader * getIShader();
 
+    static bool CompareX(Shape *, Shape *);
+    static bool CompareZ(Shape *, Shape *);
+    static bool CompareY(Shape *, Shape *);
 };
 
 bool operator < (Shape&, Shape&);

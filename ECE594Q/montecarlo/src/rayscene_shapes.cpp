@@ -96,6 +96,18 @@ IShader * Shape::getIShader() {
     return iShader;
 }
 
+bool Shape::CompareX(Shape *a, Shape *b) {
+    return (a->getBBox().getLowerLeft()).getX() < (b->getBBox().getLowerLeft()).getX();
+}
+
+bool Shape::CompareY(Shape *a, Shape *b) {
+    return (a->getBBox().getLowerLeft()).getY() < (b->getBBox().getLowerLeft()).getY();
+}
+
+bool Shape::CompareZ(Shape *a, Shape *b) {
+    return (a->getBBox().getLowerLeft()).getZ() < (b->getBBox().getLowerLeft()).getZ();
+}
+
 bool operator < (Shape &a, Shape &b) {
     return a.getBBox() < b.getBBox();
 }
