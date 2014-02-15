@@ -205,3 +205,18 @@ SColor Triangle::getColor(Vect pt) {
         return getMaterial()->getDiffColor();
     }
 }
+
+BBox Triangle::getBBox() {
+    Vect lowerLeft;
+    lowerLeft.setX(min(a.getX(), min(b.getX(), c.getX())));
+    lowerLeft.setY(min(a.getY(), min(b.getY(), c.getY())));
+    lowerLeft.setZ(min(a.getZ(), min(b.getZ(), c.getZ())));
+    Vect upperRight;
+    upperRight.setX(max(a.getX(), max(b.getX(), c.getX())));
+    upperRight.setY(max(a.getY(), max(b.getY(), c.getY())));
+    upperRight.setZ(max(a.getZ(), max(b.getZ(), c.getZ())));
+    BBox bb;
+    bb.setLowerLeft(lowerLeft);
+    bb.setUpperRight(upperRight);
+    return bb;
+}

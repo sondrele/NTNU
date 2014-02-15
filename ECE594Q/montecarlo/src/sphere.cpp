@@ -96,3 +96,14 @@ SColor Sphere::getColor(Vect pt) {
         return getMaterial()->getDiffColor();
     }
 }
+
+BBox Sphere::getBBox() {
+    Vect lowerLeft(-1, -1, -1);
+    lowerLeft = lowerLeft.linearMult(radius);
+    Vect upperRight(1, 1, 1);
+    upperRight = upperRight.linearMult(radius);
+    BBox b;
+    b.setLowerLeft(lowerLeft);
+    b.setUpperRight(upperRight);
+    return b;
+}

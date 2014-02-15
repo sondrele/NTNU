@@ -1,56 +1,32 @@
 #include "rayscene.h"
 
 /*********************************
-* SColor
+* BBox
 *********************************/
-SColor::SColor(Color c) {
-    R(c[0]);
-    G(c[1]);
-    B(c[2]);
+BBox::BBox() {
+
 }
 
-SColor::SColor(Vect v) {
-    R(v.getX());
-    G(v.getY());
-    B(v.getZ());
+bool operator < (const BBox &a, const BBox &b) {
+    return a.getLowerLeft() < b.getLowerLeft();
 }
 
-SColor::SColor(float r, float g, float b) {
-    R(r);
-    G(g);
-    B(b);
-}
+bool BBox::intersects(Ray r) {
+    Vect invDir = r.getDirection().invert();
+    Vect origin = r.getOrigin();
+    double tx1 = (lowerLeft.getX() - origin.getX()) * invDir.getX();
+    double tx2 = (upperRight.getX() - origin.getX()) * invDir.getX();
 
-SColor& SColor::operator=(const Vect &other) {
-    R(other.getX());
-    G(other.getY());
-    B(other.getZ());
-    
-    return *this;
-}
+    double tmin = min(tx1, tx2);
+    double tmax = max(tx1, tx2);
 
-void SColor::R(float r) {
-    if (r > 1.0f)
-        r = 1;
-    if (r < 0)
-        r = 0;
-    setX(r);
-}
+    double ty1 = (lowerLeft.getY() - origin.getY()) * invDir.getY();
+    double ty2 = (upperRight.getY() - origin.getY()) * invDir.getY();
 
-void SColor::G(float g) {
-    if (g > 1.0f)
-        g = 1;
-    if (g < 0)
-        g = 0;
-    setY(g);
-}
+    tmin = max(tmin, min(ty1, ty2));
+    tmax = min(tmax, max(ty1, ty2));
 
-void SColor::B(float b) {
-    if (b > 1.0f)
-        b = 1;
-    if (b < 0)
-        b = 0;
-    setZ(b);
+    return tmax >= tmin && tmax >= 0;
 }
 
 /*********************************
@@ -118,4 +94,8 @@ void Shape::setIShader(IShader *s) {
 
 IShader * Shape::getIShader() {
     return iShader;
+}
+
+bool operator < (Shape &a, Shape &b) {
+    return a.getBBox() < b.getBBox();
 }

@@ -20,6 +20,22 @@ enum ShapeType {
     SPHERE, MESH, TRIANGLE
 };
 
+class BBox {
+private:
+    Vect lowerLeft;
+    Vect upperRight;
+
+public:
+    BBox();
+    void setLowerLeft(Vect ll) { lowerLeft = ll; }
+    Vect getLowerLeft() const { return lowerLeft; }
+    void setUpperRight(Vect ur) { upperRight = ur; }
+    Vect getUpperRight() const { return upperRight; }
+    bool intersects(Ray);
+};
+
+bool operator < (const BBox&, const BBox&);
+
 class Intersection;
 
 class Shape {
@@ -38,6 +54,9 @@ public:
     virtual Vect surfaceNormal(Vect, Vect) = 0;
     virtual Material * getMaterial() = 0;
     virtual SColor getColor(Vect) = 0;
+    virtual BBox getBBox() = 0;
+    uint64_t getNumMaterials() { return materials.size(); }
+    void addMaterial(Material *m);
 
     void setTexture(Texture *);
     Texture * getTexture();
@@ -48,10 +67,9 @@ public:
     void setIShader(IShader *s);
     IShader * getIShader();
 
-    uint64_t getNumMaterials() { return materials.size(); }
-    void addMaterial(Material *m);
 };
 
+bool operator < (Shape&, Shape&);
 
 class Sphere : public Shape {
 private:
@@ -90,6 +108,7 @@ public:
     virtual Intersection intersects(Ray);
     virtual Vect surfaceNormal(Vect, Vect);
     virtual SColor getColor(Vect);
+    virtual BBox getBBox();
 };
 
 class Vertex : public Vect {
@@ -143,6 +162,7 @@ public:
     virtual Intersection intersects(Ray);
     virtual Vect surfaceNormal(Vect, Vect);
     virtual SColor getColor(Vect);
+    virtual BBox getBBox();
 
     Vect normal();
     Vect interpolatedNormal(Vect);
@@ -177,6 +197,7 @@ public:
     virtual Intersection intersects(Ray);
     virtual Vect surfaceNormal(Vect, Vect);
     virtual SColor getColor(Vect);
+    virtual BBox getBBox();
 };
 
 #endif // _RAYSCENE_SHAPES_H_

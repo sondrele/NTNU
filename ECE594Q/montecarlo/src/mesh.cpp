@@ -48,3 +48,7 @@ SColor Mesh::getColor(Vect pt) {
     (void) pt;
     throw "Mesh has no color";
 }
+
+BBox Mesh::getBBox() {
+    return BBox();
+}

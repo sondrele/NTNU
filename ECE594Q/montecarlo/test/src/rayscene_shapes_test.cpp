@@ -152,3 +152,13 @@ TEST(RaySceneShapesTest, can_get_long_and_lat_from_sphere) {
     DOUBLES_EQUAL(0.5, pt.x, 0.00001);
     DOUBLES_EQUAL(0, pt.y, 0.00001);
 }
+
+TEST(RaySceneShapesTest, can_compare_shapes) {
+    Sphere s;
+    s.setOrigin(Vect(0, -1, -1));
+    s.setRadius(1);
+    CHECK(s < *t);
+
+    s.setRadius(0.1f);
+    CHECK(*t < s);
+}

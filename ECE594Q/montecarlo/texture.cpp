@@ -27,7 +27,7 @@ static void loadTextures(RayScene *rayScene) {
     text->loadTexture(t);
     // Sphere *s = (Sphere *) rayScene->getShape(0);
     Sphere *s0 = (Sphere *) rayScene->getShape(0);
-    s0->setIShader(new CheckIShader());
+    // s0->setIShader(new CheckIShader());
     s0->setTexture(text);
     s0->setCShader(new CheckCShader());
 }
