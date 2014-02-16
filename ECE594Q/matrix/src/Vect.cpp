@@ -90,3 +90,15 @@ float Vect::radians(Vect other) {
     other.normalize();
     return acos(v.dotProduct(other));
 }
+
+bool operator < (const Vect &a, const Vect &b) {
+    if (a.getX() > b.getX())
+        return false;
+    if (a.getX() < b.getX())
+        return true;
+    else if (a.getY() < b.getY())
+        return true;
+    else if (a.getY() == b.getY() && a.getZ() < b.getZ())
+        return true;
+    return false;
+}

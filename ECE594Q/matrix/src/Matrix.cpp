@@ -78,7 +78,7 @@ float* Matrix::getCol(int col) {
 }
 
 void Matrix::setCell(int row, int col, float val) {
-    if (row >= 0 and row < ROWS and col >= 0 and col < COLS)
+    if (row >= 0 && row < ROWS && col >= 0 && col < COLS)
         mat[row * COLS + col] = val;
     else
         throw "SetCellException: Out of bounds";
@@ -86,7 +86,7 @@ void Matrix::setCell(int row, int col, float val) {
 
 
 float Matrix::getCell(int row, int col) const {
-    if (row >= 0 and row < ROWS and col >= 0 and col < COLS)
+    if (row >= 0 && row < ROWS && col >= 0 && col < COLS)
         return mat[row * COLS + col];
 
     throw "GetCellException: Out of bounds" ;
@@ -108,7 +108,7 @@ Matrix &Matrix::operator = (const Matrix &other) {
 }
 
 const Matrix operator +(const Matrix &a, const Matrix &b) {
-    if (a.ROWS == b.ROWS and a.COLS == b.COLS) {
+    if (a.ROWS == b.ROWS && a.COLS == b.COLS) {
         Matrix m(a.ROWS, a.COLS);
 
         for (int i = 0; i < a.ROWS * a.COLS; i++) {
@@ -120,7 +120,7 @@ const Matrix operator +(const Matrix &a, const Matrix &b) {
 }
 
 const Matrix operator -(const Matrix &a, const Matrix &b) {
-    if (a.ROWS == b.ROWS and a.COLS == b.COLS) {
+    if (a.ROWS == b.ROWS && a.COLS == b.COLS) {
         Matrix m(a.ROWS, a.COLS);
 
         for (int i = 0; i < a.ROWS * a.COLS; i++) {

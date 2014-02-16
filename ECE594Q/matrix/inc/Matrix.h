@@ -29,12 +29,12 @@ public:
     void setCell(int, int, float);
     float getCell(int, int) const;
     
-    float getX() const { return getCell(0, 0); }
-    float getY() const { return getCell(1, 0); }
-    float getZ() const { return getCell(2, 0); }
-    void setX(float val) { setCell(0, 0, val); }
-    void setY(float val) { setCell(1, 0, val); }
-    void setZ(float val) { setCell(2, 0, val); }
+    float getX() const { return mat[0]; }
+    float getY() const { return mat[1]; }
+    float getZ() const { return mat[2]; }
+    void setX(float val) { mat[0] = val; }
+    void setY(float val) { mat[1] = val; }
+    void setZ(float val) { mat[2] = val; }
 
     string toString() const;
     friend ostream& operator <<(ostream&, const Matrix&);
@@ -64,6 +64,8 @@ public:
     float euclideanDistance(Vect);
     float radians(Vect);
 };
+
+bool operator < (const Vect&, const Vect&);
 
 class Vect_h : public Matrix {
 public:

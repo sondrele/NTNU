@@ -8,9 +8,9 @@ cpputest
 #Ignore Cpputest
 cpputest/
 *.o
-matrix
 raytracer
 main
 *.TODO
 *.jpg
 *.scene
+montecarlo/matrix
