@@ -16,7 +16,7 @@ class Node {
 friend class KDTree;
 private:
     bool leaf;
-    int depth;
+    int axis;
     Vect point;
     Node *left;
     Node *right;
@@ -53,7 +53,7 @@ public:
     void setShapesPerLeaf(int);
     Node * buildTree(std::vector<Shape *>);
     Node * buildSubTree(std::vector<Shape *>, int);
-    Intersection intersects(Ray);
+    Intersection searchTree(Node *n, Ray r);
     Node * getRoot();
 };
 

@@ -80,19 +80,20 @@ Node * KDTree::buildTree(std::vector<Shape *> shapes) {
 
 Node * KDTree::buildSubTree(std::vector<Shape *> shapes, int depth) {
     int size = (int) shapes.size();
+    int axis = depth % dims; // 0-2
+
     // Construct leaf node containing shapes
     if (size <= shapesPerLeaf) {
         Node *leaf = new Node();
         leaf->shapes = shapes;
         leaf->leaf = true;
-        leaf->depth = depth;
+        leaf->axis = axis;
         return leaf;
     }
     // Otherwise split the shapes into two subsets, and divide them amongst
     // the left and right child nodes
 
     // Sort shapes based on the current axis
-    int axis = depth % dims; // 0-2
     std::sort(shapes.begin(), shapes.end(), comparators[axis]);
 
     // Find the median 
@@ -101,9 +102,10 @@ Node * KDTree::buildSubTree(std::vector<Shape *> shapes, int depth) {
 
     // Construct tree node
     Node *treeNode = new Node();
-    Sphere *s = (Sphere *) *mid;
-    treeNode->depth = depth;
+    Shape *s = *mid;
+    treeNode->axis = axis;
     treeNode->point = s->getBBox().getLowerLeft();
+
     // Construct left child node
     std::vector<Shape *> lShapes(shapes.begin(), mid);
     treeNode->left = buildSubTree(lShapes, depth + 1);
@@ -115,9 +117,27 @@ Node * KDTree::buildSubTree(std::vector<Shape *> shapes, int depth) {
     return treeNode;
 }
 
-Intersection KDTree::intersects(Ray r) {
-    (void) r;
-    return Intersection();
+Intersection KDTree::searchTree(Node *n, Ray r) {
+    if (n->leaf) {
+        Intersection ins;
+
+        for (std::vector<Shape *>::iterator i = n->shapes.begin(); i != n->shapes.end(); ++i)
+        {
+            Intersection in = (*i)->intersects(r);
+            if (in.hasIntersected()) {
+                ins = in;
+            }
+        }
+        return ins;
+    } else {
+        /* 
+        Hvis axis er X, så har alle shapes blitt sortert mhp x,
+        dvs at de i venstre node er de med minst x-verdier, hvis man da
+        sjekker om ray går gjennom X-planet dannet fra punktet i noden
+        */
+
+        return Intersection();
+    }
 }
 
 Node * KDTree::getRoot() {
