@@ -8,43 +8,19 @@ BBox::BBox() {
 }
 
 bool operator < (const BBox &a, const BBox &b) {
-    return a.getLowerLeft() < b.getLowerLeft();
+    return a.getMin() < b.getMin();
 }
-
-// bool BBox::intersects(Ray r) {
-//     Vect invDir = r.getDirection().invert();
-//     Vect origin = r.getOrigin();
-//     double tx1 = (lowerLeft.getX() - origin.getX()) * invDir.getX();
-//     double tx2 = (upperRight.getX() - origin.getX()) * invDir.getX();
-
-//     double txmin = min(tx1, tx2);
-//     double txmax = max(tx1, tx2);
-
-//     double ty1 = (lowerLeft.getY() - origin.getY()) * invDir.getY();
-//     double ty2 = (upperRight.getY() - origin.getY()) * invDir.getY();
-
-//     double tymin = min(txmin, min(ty1, ty2));
-//     double tymax = max(txmax, max(ty1, ty2));
-
-//     double tz1 = (lowerLeft.getZ() - origin.getZ()) * invDir.getZ();
-//     double tz2 = (upperRight.getZ() - origin.getZ()) * invDir.getZ();
-
-//     double tzmin = min(tymin, min(tz1, tz2));
-//     double tzmax = max(tymax, max(tz1, tz2));
-
-//     return tzmax >= tzmin && tzmax >= 0;
-// }
 
 bool BBox::intersects(Ray r) {
     Vect orig = r.getOrigin();
     Vect dir = r.getDirection();
 
-    float tmin = (lowerLeft.getX() - orig.getX()) / dir.getX();
-    float tmax = (upperRight.getX() - orig.getX()) / dir.getX();
+    float tmin = (min.getX() - orig.getX()) / dir.getX();
+    float tmax = (max.getX() - orig.getX()) / dir.getX();
     if (tmin > tmax) swap(tmin, tmax);
 
-    float tymin = (lowerLeft.getY() - orig.getY()) / dir.getY();
-    float tymax = (upperRight.getY() - orig.getY()) / dir.getY();
+    float tymin = (min.getY() - orig.getY()) / dir.getY();
+    float tymax = (max.getY() - orig.getY()) / dir.getY();
     if (tymin > tymax) swap(tymin, tymax);
 
     if ((tmin > tymax) || (tymin > tmax))
@@ -55,21 +31,18 @@ bool BBox::intersects(Ray r) {
     if (tymax < tmax)
         tmax = tymax;
 
-    float tzmin = (lowerLeft.getZ() - orig.getZ()) / dir.getZ();
-    float tzmax = (upperRight.getZ() - orig.getZ()) / dir.getZ();
+    float tzmin = (min.getZ() - orig.getZ()) / dir.getZ();
+    float tzmax = (max.getZ() - orig.getZ()) / dir.getZ();
     if (tzmin > tzmax) swap(tzmin, tzmax);
     
     if ((tmin > tzmax) || (tzmin > tmax))
         return false;
-    
-    // if (tzmin > tmin)
-    //     tmin = tzmin;
-    // if (tzmax < tmax)
-    //     tmax = tzmax;
-    // if ((tmin > r.tmax) || (tmax < r.tmin)) return false;
-    // if (r.tmin < tmin) r.tmin = tmin;
-    // if (r.tmax > tmax) r.tmax = tmax;
+
     return true;
+}
+
+Vect BBox::getCentroid() {
+    return min.linearMult(0.5f) + max.linearMult(0.5f);
 }
 
 /*********************************
@@ -140,15 +113,15 @@ IShader * Shape::getIShader() {
 }
 
 bool Shape::CompareX(Shape *a, Shape *b) {
-    return (a->getBBox().getLowerLeft()).getX() < (b->getBBox().getLowerLeft()).getX();
+    return (a->getBBox().getMin()).getX() < (b->getBBox().getMin()).getX();
 }
 
 bool Shape::CompareY(Shape *a, Shape *b) {
-    return (a->getBBox().getLowerLeft()).getY() < (b->getBBox().getLowerLeft()).getY();
+    return (a->getBBox().getMin()).getY() < (b->getBBox().getMin()).getY();
 }
 
 bool Shape::CompareZ(Shape *a, Shape *b) {
-    return (a->getBBox().getLowerLeft()).getZ() < (b->getBBox().getLowerLeft()).getZ();
+    return (a->getBBox().getMin()).getZ() < (b->getBBox().getMin()).getZ();
 }
 
 bool operator < (Shape &a, Shape &b) {

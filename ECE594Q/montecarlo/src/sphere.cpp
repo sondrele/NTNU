@@ -103,7 +103,7 @@ BBox Sphere::getBBox() {
     Vect upperRight(1, 1, 1);
     upperRight = upperRight.linearMult(radius) + origin;
     BBox b;
-    b.setLowerLeft(lowerLeft);
-    b.setUpperRight(upperRight);
+    b.setMin(lowerLeft);
+    b.setMax(upperRight);
     return b;
 }

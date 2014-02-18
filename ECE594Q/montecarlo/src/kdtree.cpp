@@ -104,7 +104,7 @@ Node * KDTree::buildSubTree(std::vector<Shape *> shapes, int depth) {
     Node *treeNode = new Node();
     Shape *s = *mid;
     treeNode->axis = axis;
-    treeNode->point = s->getBBox().getLowerLeft();
+    treeNode->point = s->getBBox().getMin();
 
     // Construct left child node
     std::vector<Shape *> lShapes(shapes.begin(), mid);

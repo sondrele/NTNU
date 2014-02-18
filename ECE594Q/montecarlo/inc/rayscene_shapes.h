@@ -22,16 +22,17 @@ enum ShapeType {
 
 class BBox {
 private:
-    Vect lowerLeft;
-    Vect upperRight;
+    Vect min;
+    Vect max;
 
 public:
     BBox();
-    void setLowerLeft(Vect ll) { lowerLeft = ll; }
-    Vect getLowerLeft() const { return lowerLeft; }
-    void setUpperRight(Vect ur) { upperRight = ur; }
-    Vect getUpperRight() const { return upperRight; }
+    void setMin(Vect ll) { min = ll; }
+    Vect getMin() const { return min; }
+    void setMax(Vect ur) { max = ur; }
+    Vect getMax() const { return max; }
     bool intersects(Ray);
+    Vect getCentroid();
 };
 
 bool operator < (const BBox&, const BBox&);

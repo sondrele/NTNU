@@ -166,8 +166,8 @@ TEST(RaySceneShapesTest, can_compare_shapes) {
 
 TEST(RaySceneShapesTest, ray_can_intersect_with_boundingBox) {
     BBox box;
-    box.setLowerLeft(Vect(0, 0, 0));
-    box.setUpperRight(Vect(1, 1, 1));
+    box.setMin(Vect(0, 0, 0));
+    box.setMax(Vect(1, 1, 1));
 
     Ray r(Vect(0, 0, 2), Vect(0, 0, -1));
     CHECK(box.intersects(r));
@@ -194,29 +194,39 @@ TEST(RaySceneShapesTest, mesh_boundingbox_updates_for_every_triangle) {
     Triangle *t2 = new Triangle(); t2->setA(c0); t2->setB(c1); t2->setC(c2);
     Mesh m; m.addTriangle(t0);
     BBox box = m.getBBox();
-    CHECK_EQUAL(0, box.getLowerLeft().getX());
-    CHECK_EQUAL(0, box.getLowerLeft().getY());
-    CHECK_EQUAL(-1, box.getLowerLeft().getZ());
-    CHECK_EQUAL(1, box.getUpperRight().getX());
-    CHECK_EQUAL(0, box.getUpperRight().getY());
-    CHECK_EQUAL(0, box.getUpperRight().getZ());
+    CHECK_EQUAL(0, box.getMin().getX());
+    CHECK_EQUAL(0, box.getMin().getY());
+    CHECK_EQUAL(-1, box.getMin().getZ());
+    CHECK_EQUAL(1, box.getMax().getX());
+    CHECK_EQUAL(0, box.getMax().getY());
+    CHECK_EQUAL(0, box.getMax().getZ());
 
     m.addTriangle(t1);
     box = m.getBBox();
-    CHECK_EQUAL(0, box.getLowerLeft().getX());
-    CHECK_EQUAL(0, box.getLowerLeft().getY());
-    CHECK_EQUAL(-1, box.getLowerLeft().getZ());
-    CHECK_EQUAL(1, box.getUpperRight().getX());
-    CHECK_EQUAL(1, box.getUpperRight().getY());
-    CHECK_EQUAL(0, box.getUpperRight().getZ());
+    CHECK_EQUAL(0, box.getMin().getX());
+    CHECK_EQUAL(0, box.getMin().getY());
+    CHECK_EQUAL(-1, box.getMin().getZ());
+    CHECK_EQUAL(1, box.getMax().getX());
+    CHECK_EQUAL(1, box.getMax().getY());
+    CHECK_EQUAL(0, box.getMax().getZ());
 
     m.addTriangle(t2);
     box = m.getBBox();
-    CHECK_EQUAL(-2, box.getLowerLeft().getX());
-    CHECK_EQUAL(-2, box.getLowerLeft().getY());
-    CHECK_EQUAL(-3, box.getLowerLeft().getZ());
-    CHECK_EQUAL(3, box.getUpperRight().getX());
-    CHECK_EQUAL(3, box.getUpperRight().getY());
-    DOUBLES_EQUAL(1.5f, box.getUpperRight().getZ(), 0.000001);
+    CHECK_EQUAL(-2, box.getMin().getX());
+    CHECK_EQUAL(-2, box.getMin().getY());
+    CHECK_EQUAL(-3, box.getMin().getZ());
+    CHECK_EQUAL(3, box.getMax().getX());
+    CHECK_EQUAL(3, box.getMax().getY());
+    DOUBLES_EQUAL(1.5f, box.getMax().getZ(), 0.000001);
 
+}
+
+TEST(RaySceneShapesTest, can_get_bbox_centroid) {
+    BBox x;
+    x.setMin(Vect(-2, -2, -2));
+    x.setMax(Vect(1, 1, 1));
+    Vect centroid = x.getCentroid();
+    CHECK_EQUAL(-0.5f, centroid.getX());
+    CHECK_EQUAL(-0.5f, centroid.getY());
+    CHECK_EQUAL(-0.5f, centroid.getZ());
 }

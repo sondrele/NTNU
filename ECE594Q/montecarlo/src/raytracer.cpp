@@ -226,9 +226,13 @@ SColor RayTracer::shadeIntersection(Intersection in, int d) {
 }
 
 RayBuffer RayTracer::traceRays() {
+    #ifndef CPPUTEST
+    #endif
     // #pragma omp parallel for
     for (uint y = 0; y < HEIGHT; y++) {
-        // #pragma omp parallel for
+        #ifndef CPPUTEST
+        #endif
+        // #pragma omp parallel for schedule(dynamic,1)
         for (uint x = 0; x < WIDTH; x++) {
             Ray r = computeRay(x, y);
             Intersection in = scene->calculateRayIntersection(r);

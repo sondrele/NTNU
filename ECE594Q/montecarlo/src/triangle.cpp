@@ -216,7 +216,7 @@ BBox Triangle::getBBox() {
     upperRight.setY(max(a.getY(), max(b.getY(), c.getY())));
     upperRight.setZ(max(a.getZ(), max(b.getZ(), c.getZ())));
     BBox bb;
-    bb.setLowerLeft(lowerLeft);
-    bb.setUpperRight(upperRight);
+    bb.setMin(lowerLeft);
+    bb.setMax(upperRight);
     return bb;
 }
