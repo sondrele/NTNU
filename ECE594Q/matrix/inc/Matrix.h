@@ -45,12 +45,23 @@ public:
     const friend Matrix operator *(const Matrix &, const Matrix &);
 };
 
-class Vect : public Matrix {
+class Vect {
+protected:
+    float x;
+    float y;
+    float z;
+
 public:
     Vect();
     Vect(float, float, float);
-    Vect(const Matrix);
     Vect(const Vect &);
+
+    float getX() const { return x; }
+    float getY() const { return y; }
+    float getZ() const { return z; }
+    void setX(float val) { x = val; }
+    void setY(float val) { y = val; }
+    void setZ(float val) { z = val; }
 
     bool equal(Vect other);
 
@@ -63,6 +74,14 @@ public:
     Vect invert();
     float euclideanDistance(Vect);
     float radians(Vect);
+
+    string toString() const;
+    friend ostream& operator <<(ostream&, const Vect&);
+
+    Vect &operator = (const Vect &);
+    const friend Vect operator +(const Vect &, const Vect &);
+    const friend Vect operator -(const Vect &, const Vect &);
+    const friend Vect operator *(const Vect &, const Vect &);
 };
 
 bool operator < (const Vect&, const Vect&);
