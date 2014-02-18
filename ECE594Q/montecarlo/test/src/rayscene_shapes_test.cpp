@@ -161,6 +161,9 @@ TEST(RaySceneShapesTest, can_compare_shapes) {
     CHECK(Shape::CompareX(&s, t));
     
     s.setRadius(0.1f);
+    CHECK(s < *t);
+    
+    s.setOrigin(Vect(1, 1, 1));
     CHECK(*t < s);
 }
 
@@ -229,4 +232,24 @@ TEST(RaySceneShapesTest, can_get_bbox_centroid) {
     CHECK_EQUAL(-0.5f, centroid.getX());
     CHECK_EQUAL(-0.5f, centroid.getY());
     CHECK_EQUAL(-0.5f, centroid.getZ());
+}
+
+TEST(RaySceneShapesTest, can_sum_bboxes) {
+    BBox x;
+    x.setMin(Vect(-2, -2, -2));
+    x.setMax(Vect(1, 1, 1));
+
+    BBox y;
+    y.setMin(Vect(-5, 2, 1));
+    y.setMax(Vect(-4, 3, 1.5));
+
+    BBox z = x + y;
+    Vect pmin = z.getMin();
+    CHECK_EQUAL(-5, pmin.getX());
+    CHECK_EQUAL(-2, pmin.getY());
+    CHECK_EQUAL(-2, pmin.getZ());
+    Vect pmax = z.getMax();
+    CHECK_EQUAL(1, pmax.getX());
+    CHECK_EQUAL(3, pmax.getY());
+    CHECK_EQUAL(1.5f, pmax.getZ());
 }

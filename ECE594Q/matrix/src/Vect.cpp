@@ -49,7 +49,7 @@ float Vect::dotProduct(Vect other) {
     return f;
 }
 
-Vect Vect::linearMult(float f) {
+Vect Vect::linearMult(float f) const{
     Vect v;
     v.x = x * f;
     v.y = y * f;

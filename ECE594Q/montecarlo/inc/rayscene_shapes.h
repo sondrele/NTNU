@@ -21,18 +21,20 @@ enum ShapeType {
 };
 
 class BBox {
-private:
-    Vect min;
-    Vect max;
+protected:
+    Vect pmin;
+    Vect pmax;
 
 public:
     BBox();
-    void setMin(Vect ll) { min = ll; }
-    Vect getMin() const { return min; }
-    void setMax(Vect ur) { max = ur; }
-    Vect getMax() const { return max; }
+    void setMin(Vect ll) { pmin = ll; }
+    Vect getMin() const { return pmin; }
+    void setMax(Vect ur) { pmax = ur; }
+    Vect getMax() const { return pmax; }
     bool intersects(Ray);
-    Vect getCentroid();
+    Vect getCentroid() const;
+
+    const friend BBox operator +(const BBox &, const BBox &);
 };
 
 bool operator < (const BBox&, const BBox&);

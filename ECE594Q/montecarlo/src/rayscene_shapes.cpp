@@ -8,19 +8,36 @@ BBox::BBox() {
 }
 
 bool operator < (const BBox &a, const BBox &b) {
-    return a.getMin() < b.getMin();
+    return a.getCentroid() < b.getCentroid();
+}
+
+const BBox operator +(const BBox &a, const BBox &b) {
+    Vect pmin;
+    pmin.setX(min(a.pmin.getX(), b.pmin.getX()));
+    pmin.setY(min(a.pmin.getY(), b.pmin.getY()));
+    pmin.setZ(min(a.pmin.getZ(), b.pmin.getZ()));
+
+    Vect pmax;
+    pmax.setX(max(a.pmax.getX(), b.pmax.getX()));
+    pmax.setY(max(a.pmax.getY(), b.pmax.getY()));
+    pmax.setZ(max(a.pmax.getZ(), b.pmax.getZ()));
+
+    BBox box;
+    box.setMin(pmin); box.setMax(pmax);
+
+    return box;
 }
 
 bool BBox::intersects(Ray r) {
     Vect orig = r.getOrigin();
     Vect dir = r.getDirection();
 
-    float tmin = (min.getX() - orig.getX()) / dir.getX();
-    float tmax = (max.getX() - orig.getX()) / dir.getX();
+    float tmin = (pmin.getX() - orig.getX()) / dir.getX();
+    float tmax = (pmax.getX() - orig.getX()) / dir.getX();
     if (tmin > tmax) swap(tmin, tmax);
 
-    float tymin = (min.getY() - orig.getY()) / dir.getY();
-    float tymax = (max.getY() - orig.getY()) / dir.getY();
+    float tymin = (pmin.getY() - orig.getY()) / dir.getY();
+    float tymax = (pmax.getY() - orig.getY()) / dir.getY();
     if (tymin > tymax) swap(tymin, tymax);
 
     if ((tmin > tymax) || (tymin > tmax))
@@ -31,8 +48,8 @@ bool BBox::intersects(Ray r) {
     if (tymax < tmax)
         tmax = tymax;
 
-    float tzmin = (min.getZ() - orig.getZ()) / dir.getZ();
-    float tzmax = (max.getZ() - orig.getZ()) / dir.getZ();
+    float tzmin = (pmin.getZ() - orig.getZ()) / dir.getZ();
+    float tzmax = (pmax.getZ() - orig.getZ()) / dir.getZ();
     if (tzmin > tzmax) swap(tzmin, tzmax);
     
     if ((tmin > tzmax) || (tzmin > tmax))
@@ -41,8 +58,8 @@ bool BBox::intersects(Ray r) {
     return true;
 }
 
-Vect BBox::getCentroid() {
-    return min.linearMult(0.5f) + max.linearMult(0.5f);
+Vect BBox::getCentroid() const {
+    return pmin.linearMult(0.5f) + pmax.linearMult(0.5f);
 }
 
 /*********************************

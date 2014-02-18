@@ -69,7 +69,7 @@ public:
     void normalize();
     Vect crossProduct(Vect v);
     float dotProduct(Vect v);
-    Vect linearMult(float);
+    Vect linearMult(float) const;
     Vect linearMult(Vect);
     Vect invert();
     float euclideanDistance(Vect);
