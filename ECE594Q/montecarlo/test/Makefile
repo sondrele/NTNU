@@ -11,7 +11,7 @@ CPPUTEST_USE_EXTENSIONS = Y
 CPP_PLATFORM = GCC
 # CXX = clang
 CPPFLAGS += -include $(CPPUTEST_HOME)/include/CppUTest/MemoryLeakDetectorNewMacros.h
-CPPUTEST_CPPFLAGS = -x c++ -g
+CPPUTEST_CPPFLAGS = -x c++ -g -DCPPUTEST
 CFLAGS += -std=c++11 -include $(CPPUTEST_HOME)/include/CppUTest/MemoryLeakDetectorMallocMacros.h
 LD_LIBRARIES = -lm -L$(CPPUTEST_HOME)/lib -lCppUTest -lCppUTestExt
 #-L/lib/x86_64-linux-gnu/libm.so.6 

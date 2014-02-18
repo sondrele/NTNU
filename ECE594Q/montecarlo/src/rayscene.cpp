@@ -52,8 +52,8 @@ Intersection RayScene::calculateRayIntersection(Ray ray) {
     Intersection ins;
     for (uint i = 0; i < shapes.size(); i++) {
         Shape *s = shapes.at(i);
-        // BBox bbox = s->getBBox();
-        // if (bbox.intersects(ray)) {
+        BBox bbox = s->getBBox();
+        if (bbox.intersects(ray)) {
             Intersection j = s->intersects(ray);
             if (j.hasIntersected()) {
                 if (!ins.hasIntersected()) {
@@ -65,7 +65,7 @@ Intersection RayScene::calculateRayIntersection(Ray ray) {
                     ins = j;
                 }
             }
-        // }
+        }
     }
     return ins;
 }
