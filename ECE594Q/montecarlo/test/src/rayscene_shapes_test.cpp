@@ -163,3 +163,60 @@ TEST(RaySceneShapesTest, can_compare_shapes) {
     s.setRadius(0.1f);
     CHECK(*t < s);
 }
+
+TEST(RaySceneShapesTest, ray_can_intersect_with_boundingBox) {
+    BBox box;
+    box.setLowerLeft(Vect(0, 0, 0));
+    box.setUpperRight(Vect(1, 1, 1));
+
+    Ray r(Vect(0, 0, 2), Vect(0, 0, -1));
+    CHECK(box.intersects(r));
+
+    r = Ray(Vect(0, 0, 2), Vect(0, -1, -1));
+    CHECK_FALSE(box.intersects(r));
+
+    r = Ray(Vect(2, 2, 2), Vect(-1, -1, -1));
+    CHECK(box.intersects(r));
+
+    r = Ray(Vect(2, 0, 2), Vect(-2, 1, -2));
+    CHECK(box.intersects(r));
+
+    r = Ray(Vect(2, 0, 2), Vect(-2, -1, -2));
+    CHECK_FALSE(box.intersects(r));
+}
+
+TEST(RaySceneShapesTest, mesh_boundingbox_updates_for_every_triangle) {
+    Vertex a0(0, 0, 0); Vertex a1(1, 0, 0); Vertex a2(0, 0, -1);
+    Vertex b0(0, 1, 0);
+    Vertex c0(-2, -2, -3); Vertex c1(-2, 3, 1.5f); Vertex c2(3, 1.5f, -1);
+    Triangle *t0 = new Triangle(); t0->setA(a0); t0->setB(a1); t0->setC(a2);
+    Triangle *t1 = new Triangle(); t1->setA(a0); t1->setB(b0); t1->setC(a2);
+    Triangle *t2 = new Triangle(); t2->setA(c0); t2->setB(c1); t2->setC(c2);
+    Mesh m; m.addTriangle(t0);
+    BBox box = m.getBBox();
+    CHECK_EQUAL(0, box.getLowerLeft().getX());
+    CHECK_EQUAL(0, box.getLowerLeft().getY());
+    CHECK_EQUAL(-1, box.getLowerLeft().getZ());
+    CHECK_EQUAL(1, box.getUpperRight().getX());
+    CHECK_EQUAL(0, box.getUpperRight().getY());
+    CHECK_EQUAL(0, box.getUpperRight().getZ());
+
+    m.addTriangle(t1);
+    box = m.getBBox();
+    CHECK_EQUAL(0, box.getLowerLeft().getX());
+    CHECK_EQUAL(0, box.getLowerLeft().getY());
+    CHECK_EQUAL(-1, box.getLowerLeft().getZ());
+    CHECK_EQUAL(1, box.getUpperRight().getX());
+    CHECK_EQUAL(1, box.getUpperRight().getY());
+    CHECK_EQUAL(0, box.getUpperRight().getZ());
+
+    m.addTriangle(t2);
+    box = m.getBBox();
+    CHECK_EQUAL(-2, box.getLowerLeft().getX());
+    CHECK_EQUAL(-2, box.getLowerLeft().getY());
+    CHECK_EQUAL(-3, box.getLowerLeft().getZ());
+    CHECK_EQUAL(3, box.getUpperRight().getX());
+    CHECK_EQUAL(3, box.getUpperRight().getY());
+    DOUBLES_EQUAL(1.5f, box.getUpperRight().getZ(), 0.000001);
+
+}

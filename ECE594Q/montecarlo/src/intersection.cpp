@@ -71,12 +71,29 @@ Ray Intersection::calculateRefraction() {
         // r.setDirection(T);
         // return r;
 
+        // Vect N = calculateSurfaceNormal();
+        // Vect d0 = getDirection();
+        // Ray r;
+        // r.switchMedium();
+        // r.setOrigin(calculateIntersectionPoint() + d0.linearMult(0.001f));
+        // r.setDirection(d0);
+
+
         Vect N = calculateSurfaceNormal();
-        Vect d0 = getDirection();
+        Vect I = getDirection();
+        float n = NV1 / NV2;
+        float cosI = N.dotProduct(I);
+        float sinT2 = n * n * (1 - cosI * cosI);
+
+        if (sinT2 > 1) {
+            cout << "total internal refraction" << endl;
+        }
+        Vect d0 = I.linearMult(n) - N.linearMult((n + sqrt(1 - sinT2)));
         Ray r;
         r.switchMedium();
-        r.setOrigin(calculateIntersectionPoint() + d0.linearMult(0.001f));
+        r.setOrigin(calculateIntersectionPoint() + d0.linearMult(0.01f));
         r.setDirection(d0);
+
         return r;
     } else {
         throw "Cannot calculate refraction when no intersection has occured";
@@ -94,10 +111,6 @@ Material * Intersection::getMaterial() {
         return NULL;
     }
 }
-
-// Point_2D Intersection::calculateUVCoords() {
-//     return Point_2D();
-// }
 
 std::string Intersection::toString() {
     stringstream s;

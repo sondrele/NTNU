@@ -13,7 +13,7 @@ CPP_PLATFORM = GCC
 CPPFLAGS += -include $(CPPUTEST_HOME)/include/CppUTest/MemoryLeakDetectorNewMacros.h
 CPPUTEST_CPPFLAGS = -x c++ -g
 CFLAGS += -std=c++11 -include $(CPPUTEST_HOME)/include/CppUTest/MemoryLeakDetectorMallocMacros.h
-LD_LIBRARIES = -lm -L$(CPPUTEST_HOME)/lib -lCppUTest -lCppUTestExt 
+LD_LIBRARIES = -lm -L$(CPPUTEST_HOME)/lib -lCppUTest -lCppUTestExt
 #-L/lib/x86_64-linux-gnu/libm.so.6 
 
 INCLUDE_DIRS=\

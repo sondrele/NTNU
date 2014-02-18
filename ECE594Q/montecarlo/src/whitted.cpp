@@ -79,11 +79,16 @@ SColor Whitted::SpecularLightning(float q, SColor ks, Vect N, Vect Dj, Vect V) {
 //     return Ls.linearMult(ks);
 // }
 
-// SColor Whitted::Refraction(float kt, SColor Lt) {
-//     return Lt.linearMult(kt);
+// SColor Whitted::Refraction(Vect incident, Vect normal, float n1, float n2) {
+//     float n = n1 / n2;
+//     float cosI = normal.dotProduct(incident);
+//     float sinT2 = n * n * (1 - cosI * cosI);
+//     if (sinT2 > 1) {
+//         return Vect();
+//     }
+//     return incident.linearMult(n) - normal.linearMult((n + sqrt(1 - sinT2)));
 // }
 
 float Whitted::GetOutgoingRads(float t0, float n1, float n2) {
     return asin(sin(t0) * n1 / n2);
 }
-

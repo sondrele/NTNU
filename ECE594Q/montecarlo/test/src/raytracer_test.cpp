@@ -112,15 +112,6 @@ TEST(RayTracer, has_horizontal_vector) {
     CHECK_EQUAL(0, h.getZ());
 }
 
-TEST(RayTracer, x_and_y_both_works) {
-    RayTracer r(2, 2, Vect(0, 0, -1), Vect(0, 1, 0));
-
-    Vect v = r.vertical();
-    Vect h = r.horizontal();
-
-    CHECK_EQUAL(0, 0);
-}
-
 TEST(RayTracer, can_compute_point) {
     RayTracer r(30, 20, Vect(0, 0, -1), Vect(0, 1, 0));
 

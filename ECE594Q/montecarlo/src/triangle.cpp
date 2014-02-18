@@ -27,9 +27,9 @@ Vect Vertex::getSurfaceNormal() {
         throw "Vertex has no normal";
 }
 
-void Vertex::setTextureCoords(float x, float y) {
-    coords.x = x;
-    coords.y = y;
+void Vertex::setTextureCoords(float u, float v) {
+    coords.x = u;
+    coords.y = v;
 }
 
 Point_2D Vertex::getTextureCoords() {

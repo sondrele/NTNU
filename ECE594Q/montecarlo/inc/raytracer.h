@@ -60,8 +60,8 @@ public:
     Vect computeDirection(uint, uint);
 
     Ray computeRay(uint, uint);
-    SColor calculateShadowScalar(Light &, Intersection &);
-    SColor shadeIntersection(Intersection, uint);
+    SColor calculateShadowScalar(Light &, Intersection &, int);
+    SColor shadeIntersection(Intersection, int);
     RayBuffer traceRays();
 };
 

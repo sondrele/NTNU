@@ -159,8 +159,8 @@ public:
     void setMaterial(Material *m, char);
     void setPerVertexNormal(bool);
     void setPerVertexMaterial(bool);
-
     Material * getMaterial(char);
+
     virtual Material * getMaterial();
     virtual Intersection intersects(Ray);
     virtual Vect surfaceNormal(Vect, Vect);
@@ -180,6 +180,7 @@ private:
     bool textureCoords;
     bool hasPerSurfaceNormal;
     bool objectMaterial;
+    BBox bbox;
 
 public:
     Mesh();

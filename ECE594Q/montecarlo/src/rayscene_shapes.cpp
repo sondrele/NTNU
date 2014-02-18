@@ -11,22 +11,65 @@ bool operator < (const BBox &a, const BBox &b) {
     return a.getLowerLeft() < b.getLowerLeft();
 }
 
+// bool BBox::intersects(Ray r) {
+//     Vect invDir = r.getDirection().invert();
+//     Vect origin = r.getOrigin();
+//     double tx1 = (lowerLeft.getX() - origin.getX()) * invDir.getX();
+//     double tx2 = (upperRight.getX() - origin.getX()) * invDir.getX();
+
+//     double txmin = min(tx1, tx2);
+//     double txmax = max(tx1, tx2);
+
+//     double ty1 = (lowerLeft.getY() - origin.getY()) * invDir.getY();
+//     double ty2 = (upperRight.getY() - origin.getY()) * invDir.getY();
+
+//     double tymin = min(txmin, min(ty1, ty2));
+//     double tymax = max(txmax, max(ty1, ty2));
+
+//     double tz1 = (lowerLeft.getZ() - origin.getZ()) * invDir.getZ();
+//     double tz2 = (upperRight.getZ() - origin.getZ()) * invDir.getZ();
+
+//     double tzmin = min(tymin, min(tz1, tz2));
+//     double tzmax = max(tymax, max(tz1, tz2));
+
+//     return tzmax >= tzmin && tzmax >= 0;
+// }
+
 bool BBox::intersects(Ray r) {
-    Vect invDir = r.getDirection().invert();
-    Vect origin = r.getOrigin();
-    double tx1 = (lowerLeft.getX() - origin.getX()) * invDir.getX();
-    double tx2 = (upperRight.getX() - origin.getX()) * invDir.getX();
+    Vect orig = r.getOrigin();
+    Vect dir = r.getDirection();
 
-    double tmin = min(tx1, tx2);
-    double tmax = max(tx1, tx2);
+    float tmin = (lowerLeft.getX() - orig.getX()) / dir.getX();
+    float tmax = (upperRight.getX() - orig.getX()) / dir.getX();
+    if (tmin > tmax) swap(tmin, tmax);
 
-    double ty1 = (lowerLeft.getY() - origin.getY()) * invDir.getY();
-    double ty2 = (upperRight.getY() - origin.getY()) * invDir.getY();
+    float tymin = (lowerLeft.getY() - orig.getY()) / dir.getY();
+    float tymax = (upperRight.getY() - orig.getY()) / dir.getY();
+    if (tymin > tymax) swap(tymin, tymax);
 
-    tmin = max(tmin, min(ty1, ty2));
-    tmax = min(tmax, max(ty1, ty2));
+    if ((tmin > tymax) || (tymin > tmax))
+        return false;
 
-    return tmax >= tmin && tmax >= 0;
+    if (tymin > tmin)
+        tmin = tymin;
+    if (tymax < tmax)
+        tmax = tymax;
+
+    float tzmin = (lowerLeft.getZ() - orig.getZ()) / dir.getZ();
+    float tzmax = (upperRight.getZ() - orig.getZ()) / dir.getZ();
+    if (tzmin > tzmax) swap(tzmin, tzmax);
+    
+    if ((tmin > tzmax) || (tzmin > tmax))
+        return false;
+    
+    // if (tzmin > tmin)
+    //     tmin = tzmin;
+    // if (tzmax < tmax)
+    //     tmax = tzmax;
+    // if ((tmin > r.tmax) || (tmax < r.tmin)) return false;
+    // if (r.tmin < tmin) r.tmin = tmin;
+    // if (r.tmax > tmax) r.tmax = tmax;
+    return true;
 }
 
 /*********************************

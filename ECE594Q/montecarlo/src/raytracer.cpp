@@ -136,7 +136,9 @@ Ray RayTracer::computeRay(uint x, uint y) {
     return r;
 }
 
-SColor RayTracer::calculateShadowScalar(Light &lt, Intersection &in) {
+SColor RayTracer::calculateShadowScalar(Light &lt, Intersection &in, int d) {
+    if (d < 0)
+        return SColor(0, 0, 0);
     // cout << in.toString() << endl;
     Vect p = lt.getPos();
     Vect ori = in.calculateIntersectionPoint();// + in.calculateSurfaceNormal().linearMult(0.0001f);
@@ -176,11 +178,11 @@ SColor RayTracer::calculateShadowScalar(Light &lt, Intersection &in) {
         float m = max(Cd.R(), max(Cd.G(), Cd.B()));
         Cd.R(Cd.R()/m); Cd.G(Cd.G()/m); Cd.B(Cd.B()/m);
         SColor Si = Cd.linearMult(mat->getTransparency());
-        return Si.linearMult(calculateShadowScalar(lt, ins));
+        return Si.linearMult(calculateShadowScalar(lt, ins, d - 1));
     }
 }
 
-SColor RayTracer::shadeIntersection(Intersection in, uint d) {
+SColor RayTracer::shadeIntersection(Intersection in, int d) {
     if (d <= 0 || !in.hasIntersected()) {
         // terminate recursion
         return SColor(0, 0, 0);
@@ -200,7 +202,7 @@ SColor RayTracer::shadeIntersection(Intersection in, uint d) {
     std::vector<Light *> lts = scene->getLights();
     for (uint i = 0; i < lts.size(); i++) {
         Light *l = lts.at(i);
-        SColor Sj = calculateShadowScalar(*l, in);
+        SColor Sj = calculateShadowScalar(*l, in, (int) depth);
         shade = shade + Whitted::Illumination(l, in, Sj);
     }
     
@@ -208,14 +210,14 @@ SColor RayTracer::shadeIntersection(Intersection in, uint d) {
     if (ks.length() > 0) {
         Ray r = in.calculateReflection();
         Intersection rin = scene->calculateRayIntersection(r);
-        reflection = shadeIntersection(rin, d-1).linearMult(ks);
+        reflection = shadeIntersection(rin, d - 1).linearMult(ks);
     }
 
     SColor refraction;
     if (kt > 0) {
         Ray r = in.calculateRefraction();
         Intersection rin = scene->calculateRayIntersection(r);
-        refraction = shadeIntersection(rin, d-1).linearMult(kt);
+        refraction = shadeIntersection(rin, d - 1).linearMult(kt);
     }
 
     shade = ambLight + shade + reflection + refraction;
@@ -230,7 +232,7 @@ RayBuffer RayTracer::traceRays() {
         for (uint x = 0; x < WIDTH; x++) {
             Ray r = computeRay(x, y);
             Intersection in = scene->calculateRayIntersection(r);
-            SColor c = shadeIntersection(in, depth);
+            SColor c = shadeIntersection(in, (int) depth);
             PX_Color color;
             color.R = (uint8_t) (255 * c.R());
             color.G = (uint8_t) (255 * c.G());
