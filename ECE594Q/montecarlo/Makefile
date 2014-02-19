@@ -28,6 +28,7 @@ SRCS = src/ray.cpp\
     src/material.cpp\
     src/shader.cpp\
     src/texture.cpp\
+    src/bvhtree.cpp\
     src/raytracer.cpp
 OBJS = $(SRCS:.cpp=.o) $(LIBS:.cpp=.o) 
 

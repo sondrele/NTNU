@@ -192,6 +192,7 @@ public:
 
     void addTriangle(Triangle *t);
     Triangle * getTriangle(uint64_t i) { return triangles.at(i);}
+    std::vector<Triangle *> getTriangles() { return triangles; }
     uint64_t size() { return triangles.size();}
     void hasTextureCoords(bool coords) { textureCoords = coords; }
     bool hasTextureCoords() { return textureCoords; }

@@ -1,4 +1,5 @@
 #include "raytracer.h"
+#include "omp.h"
 
 RayTracer::RayTracer(uint width, uint height) {
     WIDTH = width;
@@ -152,7 +153,7 @@ SColor RayTracer::calculateShadowScalar(Light &lt, Intersection &in, int d) {
     ori = ori + dir.linearMult(0.001f);
     Ray shdw(ori, dir);
 
-    Intersection ins = scene->calculateRayIntersection(shdw);
+    Intersection ins = scene->intersectsWithBVHTree(shdw);
     Material *mat = ins.getMaterial();
     
     if (!ins.hasIntersected()) {
@@ -209,14 +210,14 @@ SColor RayTracer::shadeIntersection(Intersection in, int d) {
     SColor reflection;
     if (ks.length() > 0) {
         Ray r = in.calculateReflection();
-        Intersection rin = scene->calculateRayIntersection(r);
+        Intersection rin = scene->intersectsWithBVHTree(r);
         reflection = shadeIntersection(rin, d - 1).linearMult(ks);
     }
 
     SColor refraction;
     if (kt > 0) {
         Ray r = in.calculateRefraction();
-        Intersection rin = scene->calculateRayIntersection(r);
+        Intersection rin = scene->intersectsWithBVHTree(r);
         refraction = shadeIntersection(rin, d - 1).linearMult(kt);
     }
 
@@ -226,16 +227,12 @@ SColor RayTracer::shadeIntersection(Intersection in, int d) {
 }
 
 RayBuffer RayTracer::traceRays() {
-    #ifndef CPPUTEST
-    #endif
-    // #pragma omp parallel for
     for (uint y = 0; y < HEIGHT; y++) {
-        #ifndef CPPUTEST
-        #endif
-        // #pragma omp parallel for schedule(dynamic,1)
+        // omp_set_num_threads(16);
+        // #pragma omp parallel for
         for (uint x = 0; x < WIDTH; x++) {
             Ray r = computeRay(x, y);
-            Intersection in = scene->calculateRayIntersection(r);
+            Intersection in = scene->intersectsWithBVHTree(r);
             SColor c = shadeIntersection(in, (int) depth);
             PX_Color color;
             color.R = (uint8_t) (255 * c.R());

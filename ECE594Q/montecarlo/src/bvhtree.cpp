@@ -79,6 +79,10 @@ void BVHTree::setShapesPerLeaf(int s) {
 }
 
 BVHNode * BVHTree::buildTree(std::vector<Shape *> shapes) {
+    if (root != NULL) {
+        delete root;
+    }
+
     int depth = 0;
     root = buildSubTree(shapes, depth);
     return root;
@@ -129,7 +133,7 @@ Intersection BVHTree::intersects(Ray r) {
 
 Intersection BVHTree::searchTree(BVHNode *n, Ray r) {
     if (n->leaf) {
-        return n->shape->intersects(r);;
+        return n->shape->intersects(r);
     } else {
         if (n->bbox.intersects(r)) {
             Intersection i = searchTree(n->left, r);

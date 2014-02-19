@@ -53,3 +53,20 @@ TEST(RaySceneTest, ray_intersects_with_shape) {
     CHECK(is.hasIntersected());
     DOUBLES_EQUAL(2.0, is.getIntersectionPoint(), 0.000001);
 }
+
+TEST(RaySceneTest, ray_intersects_with_scenes_searchtree) {
+    RayScene s;
+    s.addShape(sphere0);
+    s.addShape(sphere1);
+    Ray r(Vect(0, 0, 0), Vect(0, 0, -1));
+
+    Intersection is = s.intersectsWithBVHTree(r);
+    CHECK(is.hasIntersected());
+    DOUBLES_EQUAL(1.0, is.getIntersectionPoint(), 0.000001);
+    POINTERS_EQUAL(sphere0, is.getShape());
+
+    Ray r0(Vect(0, 0, 0), Vect(0, -1, 0));
+    is = s.intersectsWithBVHTree(r0);
+    CHECK(is.hasIntersected());
+    DOUBLES_EQUAL(2.0, is.getIntersectionPoint(), 0.000001);
+}

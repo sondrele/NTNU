@@ -11,6 +11,7 @@
 #include "intersection.h"
 #include "raybuffer.h"
 #include "rayscene_shapes.h"
+#include "bvhtree.h"
 
 class Light {
 private:
@@ -26,14 +27,15 @@ public:
     void setPos(Vect p) { pos = p;}
     Vect getDir() { return dir;}
     void setDir(Vect d) { dir = d;}
-    void setIntensity(SColor);
-    SColor getIntensity();
+    SColor getIntensity() { return intensity; }
+    void setIntensity(SColor i) { intensity = i; }
 };
 
 class RayScene {
 private:
     std::vector<Light *> lights;
     std::vector<Shape *> shapes;
+    BVHTree searchTree;
 
 public:
     RayScene();
@@ -48,6 +50,7 @@ public:
     void addShape(Shape *);
     Shape * getShape(uint);
     Intersection calculateRayIntersection(Ray);
+    Intersection intersectsWithBVHTree(Ray);
 
     std::string toString() const;
     friend ostream& operator <<(ostream&, const RayScene&);

@@ -1,16 +1,6 @@
 #include "rayscene.h"
 
-SColor Light::getIntensity() {
-    return intensity;
-}
-
-void Light::setIntensity(SColor i) {
-    intensity = i;
-}
-
-
 RayScene::RayScene() {
-
 }
 
 RayScene::~RayScene() {
@@ -30,6 +20,7 @@ void RayScene::setLights(std::vector<Light *> ls) {
 
 void RayScene::addLight(Light *l) {
     lights.push_back(l);
+    searchTree.buildTree(shapes);
 }
 
 Light * RayScene::getLight(uint pos) {
@@ -38,10 +29,24 @@ Light * RayScene::getLight(uint pos) {
 
 void RayScene::setShapes(std::vector<Shape *> ss) {
     shapes = ss;
+
+    std::vector<Shape *> shps;
+    for (uint i = 0; i < shapes.size(); i++) {
+        Shape *s0 = shapes[i];
+        if (s0->getType() == MESH) {
+            std::vector<Triangle *> ts = ((Mesh *) s0)->getTriangles();
+            shps.insert(shps.end(), ts.begin(), ts.end());
+        } else
+            shps.push_back(s0);
+    }
+    cout << shps.size() << endl;
+    searchTree.buildTree(shps);
+    // searchTree.buildTree(shapes);
 }
 
 void RayScene::addShape(Shape *s) {
     shapes.push_back(s);
+    searchTree.buildTree(shapes);
 }
 
 Shape * RayScene::getShape(uint pos) {
@@ -68,6 +73,10 @@ Intersection RayScene::calculateRayIntersection(Ray ray) {
         }
     }
     return ins;
+}
+
+Intersection RayScene::intersectsWithBVHTree(Ray ray) {
+    return searchTree.intersects(ray);
 }
 
 std::string RayScene::toString() const {
