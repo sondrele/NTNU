@@ -17,8 +17,8 @@ class RayTracer {
 private:
     uint WIDTH;
     uint HEIGHT;
-    uint m;
-    uint n;
+    float M;
+    float N;
     uint depth;
     float scaleConst;   // c
 
@@ -39,6 +39,8 @@ public:
     ~RayTracer();
     uint getWidth() { return WIDTH;}
     uint getHeight() { return HEIGHT;}
+    void setM(float m) { M = m; }
+    void setN(float n) { N = n; }
 
     void setScene(RayScene *s) { scene = s; }
     void setCamera(Camera c);
@@ -62,9 +64,11 @@ public:
     Vect computeDirection(uint, uint);
 
     Ray computeRay(uint, uint);
+    Ray computeMonteCarloRay(float, float);
     SColor calculateShadowScalar(Light &, Intersection &, int);
     SColor shadeIntersection(Intersection, int);
     RayBuffer traceRays();
+    RayBuffer traceRaysWithAntiAliasing();
 };
 
 #endif // _RAYTRACER_H_
