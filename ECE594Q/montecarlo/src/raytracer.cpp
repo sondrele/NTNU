@@ -1,5 +1,8 @@
 #include "raytracer.h"
+
+#ifndef _WINDOWS
 #include "omp.h"
+#endif  // _WINDOWS
 
 RayTracer::RayTracer(uint width, uint height) {
     WIDTH = width;

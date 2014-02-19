@@ -1,7 +1,8 @@
 #ifndef _RAYBUFFER_H_
 #define _RAYBUFFER_H_
 
-#include <stdint.h>
+#include <cstdint>
+#include "uint.h"
 #include <stdlib.h>
 #include <vector>
 

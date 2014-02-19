@@ -4,3 +4,13 @@ gmon.out
 no_optimization.txt
 profile2.txt
 profile.txt
+CImg.h
+Debug/
+ipch/
+raytracer.opensdf
+raytracer.sdf
+raytracer.sln
+raytracer.suo
+raytracer.vcxproj
+raytracer.vcxproj.filters
+raytracer.vcxproj.user
