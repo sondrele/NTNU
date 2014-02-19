@@ -17,13 +17,13 @@ TEST_GROUP(RayTracer) {
 };
 
 TEST(RayTracer, should_init) {
-    RayTracer rt(20, 10);
+    RayTracer rt(20, 10, 2);
     CHECK_EQUAL(20, rt.getWidth());
     CHECK_EQUAL(10, rt.getHeight());
 }
 
 TEST(RayTracer, has_camera) {
-    RayTracer rt(10, 10);
+    RayTracer rt(10, 10, 2);
     Camera camera = rt.getCamera();
     CHECK_EQUAL(0, camera.getX());
     CHECK_EQUAL(0, camera.getY());
@@ -37,7 +37,7 @@ TEST(RayTracer, can_add_camera) {
     cam.setOrthoUp(Vect(1, 1, 0));
     cam.setVerticalFOV((float)M_PI / 2.0f);
 
-    RayTracer rt(50, 50);
+    RayTracer rt(50, 50, 2);
     rt.setCamera(cam);
     Camera c0 = rt.getCamera();
     CHECK_EQUAL(10, c0.getX());
@@ -48,7 +48,7 @@ TEST(RayTracer, can_add_camera) {
 }
 
 TEST(RayTracer, has_normalized_vectors) {
-    RayTracer rt(10, 10);
+    RayTracer rt(10, 10, 2);
     rt.setViewDirection(Vect(3, 4, 5));
     Vect viewDir = rt.getViewDirection();
     DOUBLES_EQUAL(0.424264, viewDir.getX(), 0.0001);
@@ -57,7 +57,7 @@ TEST(RayTracer, has_normalized_vectors) {
 }
 
 TEST(RayTracer, can_calculate_image_plane) {
-    RayTracer rt(20, 10);
+    RayTracer rt(20, 10, 2);
 
     Vect viewDir = rt.getViewDirection();
     CHECK_EQUAL(0, viewDir.getX());
@@ -86,7 +86,7 @@ TEST(RayTracer, can_calculate_image_plane) {
 }
 
 TEST(RayTracer, has_vertical_vector) {
-    RayTracer r(20, 10);
+    RayTracer r(20, 10, 2);
     r.setViewDirection(Vect(0, 0, -1));
     r.setOrthogonalUp(Vect(0, 1, 0));
 
@@ -97,7 +97,7 @@ TEST(RayTracer, has_vertical_vector) {
 }
 
 TEST(RayTracer, has_horizontal_fov) {
-    RayTracer rt(30, 20);
+    RayTracer rt(30, 20, 2);
     DOUBLES_EQUAL(2.35619449, rt.getHorizontalFOV(), 0.000001);
 }
 
@@ -113,7 +113,9 @@ TEST(RayTracer, has_horizontal_fov) {
 // }
 
 TEST(RayTracer, can_compute_point) {
-    RayTracer r(30, 20, Vect(0, 0, -1), Vect(0, 1, 0));
+    RayTracer r(30, 20, 2);
+    r.setViewDirection(Vect(0, 0, -1));
+    r.setOrthogonalUp(Vect(0, 1, 0));
 
     Point_2D pt = r.computePoint(10, 5);
     DOUBLES_EQUAL(0.35, pt.x, 0.00001);
@@ -121,7 +123,9 @@ TEST(RayTracer, can_compute_point) {
 }
 
 TEST(RayTracer, can_compute_multiple_points_on_viewplane) {
-    RayTracer r(2, 2, Vect(0, 0, -1), Vect(0, 1, 0));
+    RayTracer r(2, 2, 2);
+    r.setViewDirection(Vect(0, 0, -1));
+    r.setOrthogonalUp(Vect(0, 1, 0));
 
     Point_2D p0 = r.computePoint(0, 0);
     DOUBLES_EQUAL(0.25, p0.x, 0.00001);
@@ -163,8 +167,9 @@ TEST(RayTracer, ray_inits) {
 }
 
 TEST(RayTracer, can_compute_ray) {
-    RayTracer r(2, 2, Vect(0, 0, -1), Vect(0, 1, 0));
-
+    RayTracer r(2, 2, 2);
+    r.setViewDirection(Vect(0, 0, -1));
+    r.setOrthogonalUp(Vect(0, 1, 0));
     Ray r0 = r.computeRay(0, 0);
     Vect ctr = r0.getOrigin();
     CHECK_EQUAL(0, ctr.getX());

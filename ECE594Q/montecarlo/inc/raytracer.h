@@ -17,6 +17,8 @@ class RayTracer {
 private:
     uint WIDTH;
     uint HEIGHT;
+    uint m;
+    uint n;
     uint depth;
     float scaleConst;   // c
 
@@ -31,9 +33,9 @@ private:
     void calculateImagePlane();
 
 public:
-    RayTracer(uint, uint);
+    // RayTracer(uint, uint);
     RayTracer(uint, uint, uint);
-    RayTracer(uint, uint, Vect, Vect);
+    // RayTracer(uint, uint, Vect, Vect);
     ~RayTracer();
     uint getWidth() { return WIDTH;}
     uint getHeight() { return HEIGHT;}

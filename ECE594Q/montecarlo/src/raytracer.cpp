@@ -1,22 +1,6 @@
 #include "raytracer.h"
 #include "omp.h"
 
-RayTracer::RayTracer(uint width, uint height) {
-    WIDTH = width;
-    HEIGHT = height;
-    depth = 1;
-    scaleConst = 10000;
-    buffer = RayBuffer(WIDTH, HEIGHT);
-    scene = NULL;
-
-    camera.setPos(Vect(0, 0, 0));
-    camera.setVerticalFOV((float)M_PI / 2.0f);
-    camera.setViewDir(Vect(0, 0, -1));
-    camera.setOrthoUp(Vect(0, 1, 0));
-
-    calculateImagePlane();
-}
-
 RayTracer::RayTracer(uint width, uint height, uint d) {
     WIDTH = width;
     HEIGHT = height;
@@ -29,22 +13,6 @@ RayTracer::RayTracer(uint width, uint height, uint d) {
     camera.setVerticalFOV((float)M_PI / 2.0f);
     camera.setViewDir(Vect(0, 0, -1));
     camera.setOrthoUp(Vect(0, 1, 0));
-
-    calculateImagePlane();
-}
-
-RayTracer::RayTracer(uint width, uint height, Vect viewDir, Vect orthoUp) {
-    WIDTH = width;
-    HEIGHT = height;
-    depth = 1;
-    scaleConst = 10000;
-    buffer = RayBuffer(WIDTH, HEIGHT);
-    scene = NULL;
-
-    camera.setPos(Vect(0, 0, 0));
-    camera.setVerticalFOV((float)M_PI / 2.0f);
-    camera.setViewDir(viewDir);
-    camera.setOrthoUp(orthoUp);
 
     calculateImagePlane();
 }
@@ -176,8 +144,8 @@ SColor RayTracer::calculateShadowScalar(Light &lt, Intersection &in, int d) {
         // transparent objects
         // SColor Cd = mat->getDiffColor();
         SColor Cd = ins.getColor();
-        float m = max(Cd.R(), max(Cd.G(), Cd.B()));
-        Cd.R(Cd.R()/m); Cd.G(Cd.G()/m); Cd.B(Cd.B()/m);
+        float maxval = max(Cd.R(), max(Cd.G(), Cd.B()));
+        Cd.R(Cd.R() / maxval); Cd.G(Cd.G() / maxval); Cd.B(Cd.B() / maxval);
         SColor Si = Cd.linearMult(mat->getTransparency());
         return Si.linearMult(calculateShadowScalar(lt, ins, d - 1));
     }
