@@ -13,6 +13,8 @@ private:
     float verticalFOV;
 
 public:
+    Camera();
+    
     Vect getPos() const { return pos;}
     void setPos(Vect d);
     float getX() { return pos.getX(); }

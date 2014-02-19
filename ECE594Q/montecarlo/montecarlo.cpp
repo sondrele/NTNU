@@ -35,7 +35,8 @@ static void loadScene(const char *name, RayTracer &rayTracer) {
 }
 
 static void render(RayTracer &rayTracer) {
-    RayBuffer rayBuffer = rayTracer.traceRays();
+    // RayBuffer rayBuffer = rayTracer.traceRays();
+    RayBuffer rayBuffer = rayTracer.traceRaysWithAntiAliasing();
     RayImage img;
     img.createImage(rayBuffer, out.c_str());
 }

@@ -20,7 +20,7 @@ void RayScene::setLights(std::vector<Light *> ls) {
 
 void RayScene::addLight(Light *l) {
     lights.push_back(l);
-    searchTree.buildTree(shapes);
+
 }
 
 Light * RayScene::getLight(uint pos) {
@@ -39,9 +39,7 @@ void RayScene::setShapes(std::vector<Shape *> ss) {
         } else
             shps.push_back(s0);
     }
-    cout << shps.size() << endl;
     searchTree.buildTree(shps);
-    // searchTree.buildTree(shapes);
 }
 
 void RayScene::addShape(Shape *s) {

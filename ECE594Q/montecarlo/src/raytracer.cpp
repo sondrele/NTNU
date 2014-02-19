@@ -4,50 +4,20 @@
 #include "omp.h"
 #endif  // _WINDOWS
 
-RayTracer::RayTracer(uint width, uint height) {
-    WIDTH = width;
-    HEIGHT = height;
-    depth = 1;
-    scaleConst = 100;
-    buffer = RayBuffer(WIDTH, HEIGHT);
-    scene = NULL;
-
-    camera.setPos(Vect(0, 0, 0));
-    camera.setVerticalFOV((float)M_PI / 2.0f);
-    camera.setViewDir(Vect(0, 0, -1));
-    camera.setOrthoUp(Vect(0, 1, 0));
-
-    calculateImagePlane();
-}
-
 RayTracer::RayTracer(uint width, uint height, uint d) {
     WIDTH = width;
     HEIGHT = height;
     depth = d;
-    scaleConst = 100;
+    scaleConst = 10000;
     buffer = RayBuffer(WIDTH, HEIGHT);
     scene = NULL;
+    M = N = 4;
 
+    // Set standard camera properties
     camera.setPos(Vect(0, 0, 0));
     camera.setVerticalFOV((float)M_PI / 2.0f);
     camera.setViewDir(Vect(0, 0, -1));
     camera.setOrthoUp(Vect(0, 1, 0));
-
-    calculateImagePlane();
-}
-
-RayTracer::RayTracer(uint width, uint height, Vect viewDir, Vect orthoUp) {
-    WIDTH = width;
-    HEIGHT = height;
-    depth = 1;
-    scaleConst = 100;
-    buffer = RayBuffer(WIDTH, HEIGHT);
-    scene = NULL;
-
-    camera.setPos(Vect(0, 0, 0));
-    camera.setVerticalFOV((float)M_PI / 2.0f);
-    camera.setViewDir(viewDir);
-    camera.setOrthoUp(orthoUp);
 
     calculateImagePlane();
 }
@@ -115,9 +85,6 @@ Vect RayTracer::horizontal() {
 }
 
 Point_2D RayTracer::computePoint(uint x, uint y) {
-    if (!(x < WIDTH && y < HEIGHT))
-        throw "Coords out of bounds";
-
     Point_2D pt;
     pt.x = (float)(x + 0.5) * (1 / (float) WIDTH);
     pt.y = (float)(y + 0.5) * (1 / (float) HEIGHT);
@@ -130,12 +97,28 @@ Vect RayTracer::computeDirection(uint x, uint y) {
     Vect dy = (vertical()).linearMult(2 * p.y - 1);
 
     Vect dir = imageCenter + dx + dy;
-    // dir.normalize(); TODO: fix tests
+    dir.normalize();
     return dir;
 }
 
 Ray RayTracer::computeRay(uint x, uint y) {
     Vect dir = computeDirection(x, y);
+    Ray r(getCameraPos(), dir);
+    return r;
+}
+
+Ray RayTracer::computeMonteCarloRay(float x, float y) {
+    Point_2D pt;
+    pt.x = x * (1 / (float) WIDTH);
+    pt.y = y * (1 / (float) HEIGHT);
+
+    Vect dx = (horizontal()).linearMult(2 * pt.x - 1);
+    Vect dy = (vertical()).linearMult(2 * pt.y - 1);
+
+    Vect dir = imageCenter + dx + dy;
+    dir.normalize();
+
+    // Vect dir = computeDirection(x, y);
     Ray r(getCameraPos(), dir);
     return r;
 }
@@ -179,8 +162,8 @@ SColor RayTracer::calculateShadowScalar(Light &lt, Intersection &in, int d) {
         // transparent objects
         // SColor Cd = mat->getDiffColor();
         SColor Cd = ins.getColor();
-        float m = max(Cd.R(), max(Cd.G(), Cd.B()));
-        Cd.R(Cd.R()/m); Cd.G(Cd.G()/m); Cd.B(Cd.B()/m);
+        float maxval = max(Cd.R(), max(Cd.G(), Cd.B()));
+        Cd.R(Cd.R() / maxval); Cd.G(Cd.G() / maxval); Cd.B(Cd.B() / maxval);
         SColor Si = Cd.linearMult(mat->getTransparency());
         return Si.linearMult(calculateShadowScalar(lt, ins, d - 1));
     }
@@ -199,6 +182,7 @@ SColor RayTracer::shadeIntersection(Intersection in, int d) {
     SColor ks = mat->getSpecColor();
     SColor ka = mat->getAmbColor();
     // SColor Cd = mat->getDiffColor();
+    Vect Pt = in.calculateIntersectionPoint();
     SColor Cd = in.getColor();
 
     SColor ambLight = Whitted::AmbientLightning(kt, ka, Cd);
@@ -206,8 +190,11 @@ SColor RayTracer::shadeIntersection(Intersection in, int d) {
     std::vector<Light *> lts = scene->getLights();
     for (uint i = 0; i < lts.size(); i++) {
         Light *l = lts.at(i);
-        SColor Sj = calculateShadowScalar(*l, in, (int) depth);
-        shade = shade + Whitted::Illumination(l, in, Sj);
+        float Fattj = Whitted::CalculateFattj(Pt, l);
+        if (Fattj > 0) {
+            SColor Sj = calculateShadowScalar(*l, in, (int) depth);
+            shade = shade + Whitted::Illumination(l, in, Sj, Fattj);
+        }
     }
     
     SColor reflection;
@@ -241,6 +228,34 @@ RayBuffer RayTracer::traceRays() {
             color.R = (uint8_t) (255 * c.R());
             color.G = (uint8_t) (255 * c.G());
             color.B = (uint8_t) (255 * c.B());
+            buffer.setPixel(x, y, color);
+        }
+    }
+    return buffer;
+}
+
+RayBuffer RayTracer::traceRaysWithAntiAliasing() {
+    for (uint y = 0; y < HEIGHT; y++) {
+        // omp_set_num_threads(16);
+        // #pragma omp parallel for
+        for (uint x = 0; x < WIDTH; x++) {
+            // Loop over samples to get the right color
+            float R = 0, G = 0, B = 0;
+            for (float dn = 0; dn < N; dn += 1) {
+                for (float dm = 0; dm < M; dm += 1) {
+                    float dx = dm / M;
+                    float dy = dn / N;
+                    Ray r = computeMonteCarloRay((float) x + dx, (float) y + dy);
+                    Intersection in = scene->intersectsWithBVHTree(r);
+                    SColor c = shadeIntersection(in, (int) depth);
+                    R += c.R(); G += c.G(); B += c.B();
+                }
+            }
+            R /= M * N; G /= M * N; B /= M * N;
+            PX_Color color;
+            color.R = (uint8_t) (255 * R);
+            color.G = (uint8_t) (255 * G);
+            color.B = (uint8_t) (255 * B);
             buffer.setPixel(x, y, color);
         }
     }
