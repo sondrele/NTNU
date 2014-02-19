@@ -14,3 +14,4 @@ raytracer.suo
 raytracer.vcxproj
 raytracer.vcxproj.filters
 raytracer.vcxproj.user
+*.txt
