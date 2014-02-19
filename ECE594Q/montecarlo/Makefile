@@ -4,9 +4,7 @@ INCLUDEPATH=\
     -I./inc
 CC=clang++
 CC=g++
-CFLAGS = $(INCLUDEPATH) -Wall -g -std=c++11 -lm -O3 -fopenmp
-#-ffast-math 
-# -pg
+CFLAGS = $(INCLUDEPATH) -Wall -g -std=c++11 -lm -O3 -fopenmp -ffast-math -pg
 CIMGFLAGS = $(CFLAGS) -L/usr/X11R6/lib -lm -lpthread -lX11
 LDFLAGS=
 LIBS = \

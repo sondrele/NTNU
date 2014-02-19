@@ -5,7 +5,7 @@ RayTracer::RayTracer(uint width, uint height) {
     WIDTH = width;
     HEIGHT = height;
     depth = 1;
-    scaleConst = 100;
+    scaleConst = 10000;
     buffer = RayBuffer(WIDTH, HEIGHT);
     scene = NULL;
 
@@ -21,7 +21,7 @@ RayTracer::RayTracer(uint width, uint height, uint d) {
     WIDTH = width;
     HEIGHT = height;
     depth = d;
-    scaleConst = 100;
+    scaleConst = 10000;
     buffer = RayBuffer(WIDTH, HEIGHT);
     scene = NULL;
 
@@ -37,7 +37,7 @@ RayTracer::RayTracer(uint width, uint height, Vect viewDir, Vect orthoUp) {
     WIDTH = width;
     HEIGHT = height;
     depth = 1;
-    scaleConst = 100;
+    scaleConst = 10000;
     buffer = RayBuffer(WIDTH, HEIGHT);
     scene = NULL;
 
@@ -127,7 +127,7 @@ Vect RayTracer::computeDirection(uint x, uint y) {
     Vect dy = (vertical()).linearMult(2 * p.y - 1);
 
     Vect dir = imageCenter + dx + dy;
-    // dir.normalize(); TODO: fix tests
+    dir.normalize(); // TODO: fix tests
     return dir;
 }
 
@@ -196,6 +196,7 @@ SColor RayTracer::shadeIntersection(Intersection in, int d) {
     SColor ks = mat->getSpecColor();
     SColor ka = mat->getAmbColor();
     // SColor Cd = mat->getDiffColor();
+    Vect Pt = in.calculateIntersectionPoint();
     SColor Cd = in.getColor();
 
     SColor ambLight = Whitted::AmbientLightning(kt, ka, Cd);
@@ -203,8 +204,11 @@ SColor RayTracer::shadeIntersection(Intersection in, int d) {
     std::vector<Light *> lts = scene->getLights();
     for (uint i = 0; i < lts.size(); i++) {
         Light *l = lts.at(i);
-        SColor Sj = calculateShadowScalar(*l, in, (int) depth);
-        shade = shade + Whitted::Illumination(l, in, Sj);
+        float Fattj = Whitted::CalculateFattj(Pt, l);
+        if (Fattj > 0) {
+            SColor Sj = calculateShadowScalar(*l, in, (int) depth);
+            shade = shade + Whitted::Illumination(l, in, Sj, Fattj);
+        }
     }
     
     SColor reflection;

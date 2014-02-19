@@ -141,10 +141,8 @@ Intersection BVHTree::searchTree(BVHNode *n, Ray r) {
 
             if (i.hasIntersected() && j.hasIntersected()) {
                 return i.getIntersectionPoint() < j.getIntersectionPoint() ? i : j;
-            } else if (i.hasIntersected()) {
-                return i;
-            } else if (j.hasIntersected()) {
-                return j;
+            } else {
+                return i.hasIntersected() ? i : j;
             }
         }
         return Intersection();
