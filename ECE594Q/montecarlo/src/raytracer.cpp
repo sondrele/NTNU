@@ -11,7 +11,7 @@ RayTracer::RayTracer(uint width, uint height, uint d) {
     scaleConst = 10000;
     buffer = RayBuffer(WIDTH, HEIGHT);
     scene = NULL;
-    M = N = 4;
+    M = N = 2;
 
     // Set standard camera properties
     camera.setPos(Vect(0, 0, 0));
@@ -236,8 +236,8 @@ RayBuffer RayTracer::traceRays() {
 
 RayBuffer RayTracer::traceRaysWithAntiAliasing() {
     for (uint y = 0; y < HEIGHT; y++) {
-        // omp_set_num_threads(16);
-        // #pragma omp parallel for
+        omp_set_num_threads(16);
+        #pragma omp parallel for
         for (uint x = 0; x < WIDTH; x++) {
             // Loop over samples to get the right color
             float R = 0, G = 0, B = 0;

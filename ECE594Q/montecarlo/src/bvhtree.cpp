@@ -39,7 +39,7 @@ void BVHNode::addShape(Shape *s) {
 }
 
 bool BVHNode::isLeaf() {
-    return leaf;
+    return left == NULL && right == NULL;
 }
 
 void BVHNode::setLeaf(bool l) {
@@ -69,13 +69,6 @@ BVHTree::~BVHTree() {
     if (root != NULL) {
         delete root;
     }
-}
-
-void BVHTree::setDims(int d) {
-    dims = d;
-}
-void BVHTree::setShapesPerLeaf(int s) {
-    shapesPerLeaf = s;
 }
 
 BVHNode * BVHTree::buildTree(std::vector<Shape *> shapes) {

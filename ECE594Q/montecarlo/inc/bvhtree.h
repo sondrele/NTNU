@@ -49,9 +49,7 @@ private:
 public:
     BVHTree();
     ~BVHTree();
-
-    void setDims(int);
-    void setShapesPerLeaf(int);
+    
     BVHNode * buildTree(std::vector<Shape *>);
     BVHNode * buildSubTree(std::vector<Shape *>, int);
     Intersection intersects(Ray);
