@@ -29,6 +29,12 @@ public:
     virtual SColor getColor(Point_2D);
 };
 
+class FunCShader : public CShader {
+public:
+    virtual ~FunCShader() {}
+    virtual SColor getColor(Point_2D);
+};
+
 /**********************
 * Intersection Shaders
 **********************/

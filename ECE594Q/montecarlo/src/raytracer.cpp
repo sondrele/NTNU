@@ -11,7 +11,7 @@ RayTracer::RayTracer(uint width, uint height, uint d) {
     scaleConst = 10000;
     buffer = RayBuffer(WIDTH, HEIGHT);
     scene = NULL;
-    M = N = 2;
+    M = N = 1;
 
     // Set standard camera properties
     camera.setPos(Vect(0, 0, 0));
@@ -235,6 +235,9 @@ RayBuffer RayTracer::traceRays() {
 }
 
 RayBuffer RayTracer::traceRaysWithAntiAliasing() {
+    cout << "Tracing rays[" << WIDTH << "][" << HEIGHT << "]" << endl;
+    cout << "m = " << M << ", n = " << N << endl;
+    cout << "d = " << depth << endl;
     for (uint y = 0; y < HEIGHT; y++) {
         omp_set_num_threads(16);
         #pragma omp parallel for

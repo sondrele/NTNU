@@ -4,7 +4,8 @@ INCLUDEPATH=\
     -I./inc
 CC=clang++
 CC=g++
-CFLAGS = $(INCLUDEPATH) -Wall -g -std=c++11 -lm -O3 -fopenmp -ffast-math -pg
+CFLAGS = $(INCLUDEPATH) -Wall -g -std=c++11 -lm -O3 -fopenmp -ffast-math
+#-pg
 CIMGFLAGS = $(CFLAGS) -L/usr/X11R6/lib -lm -lpthread -lX11
 LDFLAGS=
 LIBS = \
@@ -33,16 +34,10 @@ OBJS = $(SRCS:.cpp=.o) $(LIBS:.cpp=.o)
 %.o: %.cpp
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-all: montecarlo texture
+all: montecarlo
 
 montecarlo: montecarlo.o $(OBJS)
 	$(CC) -o $@ $^ $(CIMGFLAGS)
-
-texture: texture.o $(OBJS)
-	$(CC) -o $@ $^ $(CIMGFLAGS)
-
-test1: all
-	./raytracer test1 150 150 2
 
 clean:
 	rm -f *.o

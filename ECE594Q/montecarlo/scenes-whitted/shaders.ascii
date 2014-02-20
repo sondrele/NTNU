@@ -1,7 +1,7 @@
 Composer format 2.1 ascii
 camera {
-  position 0 0 0
-  viewDirection 0 0 -1
+  position -3 5 15
+  viewDirection 0.1 -0.2 -1
   focalDistance 12.2118
   orthoUp 0 1 0
   verticalFOV 0.785398
@@ -15,7 +15,7 @@ directional_light {
   color 1 1 1
 }
 sphere {
-  name NULL
+  name Jupiter
   numMaterials 1
   material {
     diffColor 0.8 0.8 0.8
@@ -25,7 +25,27 @@ sphere {
     shininess 0.2
     ktran 0.0
   }
-  origin 0 0 -5
+  origin 3 0 -5
+  radius 3.5
+  xaxis 1 0 0
+  xlength 1.33453
+  yaxis 0 1 0
+  ylength 1.33453
+  zaxis 0 0 1
+  zlength 1.33453
+}
+sphere {
+  name Earth
+  numMaterials 1
+  material {
+    diffColor 0.8 0.8 0.8
+    ambColor 0.2 0.2 0.2
+    specColor 0.1 0.1 0.1
+    emisColor 0 0 0
+    shininess 0.2
+    ktran 0.0
+  }
+  origin 0 5 -5
   radius 1.33453
   xaxis 1 0 0
   xlength 1.33453
@@ -35,18 +55,38 @@ sphere {
   zlength 1.33453
 }
 sphere {
-  name NULL
+  name Check
   numMaterials 1
   material {
-    diffColor 0.56 0.35 0.14
+    diffColor 0.8 0.8 0.8
     ambColor 0.2 0.2 0.2
     specColor 0.1 0.1 0.1
     emisColor 0 0 0
     shininess 0.2
-    ktran 0.7
+    ktran 0.0
   }
-  origin -2 0 -8
-  radius 1.33453
+  origin -5.5 -2 -5
+  radius 1.5
+  xaxis 1 0 0
+  xlength 1.33453
+  yaxis 0 1 0
+  ylength 1.33453
+  zaxis 0 0 1
+  zlength 1.33453
+}
+sphere {
+  name Venus
+  numMaterials 1
+  material {
+    diffColor 0.201923 0.197083 0.200713
+    ambColor 0.2 0.2 0.2
+    specColor 0.721154 0.721154 0.721154
+    emisColor 0 0 0
+    shininess 0.8
+    ktran 0
+  }
+  origin -4 0 -12
+  radius 5.5
   xaxis 1 0 0
   xlength 1.33453
   yaxis 0 1 0
