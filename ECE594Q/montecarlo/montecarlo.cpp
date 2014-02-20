@@ -10,14 +10,15 @@
 #define MONTE           "./scenes-montecarlo/"
 #define ASCII           ".ascii"
 #define IMG             ".bmp"
-#define IMAGE_WIDTH     100
-#define IMAGE_HEIGHT    100
+#define IMAGE_WIDTH     400
+#define IMAGE_HEIGHT    400
 
 typedef unsigned char u08;
 
 SceneIO *scene = NULL;
 
 uint w, h, d;
+bool shaders = false;
 std::string in;
 std::string out;
 
@@ -34,6 +35,31 @@ static void loadScene(const char *name, RayTracer &rayTracer) {
     rayTracer.setScene(rayScene);
 }
 
+static void loadShaderScene(const char *name, RayTracer &rayTracer) {
+    /* load the scene into the SceneIO data structure using given parsing code */
+    scene = readScene(name);
+    RayScene *rayScene = new RayScene();
+    RaySceneFactory::CreateScene(*rayScene, *scene);
+    
+    // Load the textures and shaders for the demo scene
+    Texture *earthTexture = new Texture();
+    earthTexture->loadTexture(std::string("earth.bmp"));
+
+    Texture *jupterTexture = new Texture();
+    jupterTexture->loadTexture(std::string("jupiter.bmp"));
+
+    // Sphere *s = (Sphere *) rayScene->getShape(0);
+    Sphere *s0 = (Sphere *) rayScene->getShape(0);
+    s0->setIShader(new CheckIShader());
+    s0->setTexture(jupterTexture);
+    s0->setCShader(new CheckCShader());
+
+    Camera cam;
+    RaySceneFactory::CreateCamera(cam, *(scene->camera));
+    rayTracer.setCamera(cam);
+    rayTracer.setScene(rayScene);
+}
+
 static void render(RayTracer &rayTracer) {
     // RayBuffer rayBuffer = rayTracer.traceRays();
     RayBuffer rayBuffer = rayTracer.traceRaysWithAntiAliasing();
@@ -41,7 +67,11 @@ static void render(RayTracer &rayTracer) {
     img.createImage(rayBuffer, out.c_str());
 }
 
-static void parse_input(int argc, char *argv[]) {
+static void parseInput(int argc, char *argv[]) {
+    cout << "Normal usage: Run with 5 arguments: scene, width, height, depth, m || w" << endl;
+    cout << "Example:      ./montecarlo test1 100 100 10 w" << endl;
+    cout << "Shader demo:  ./montecarlo shaders" << endl;
+
     if (argc == 6) {
         in = (*argv[5] == 'm') ? std::string(MONTE) : std::string(WHITTED);
         in += std::string(argv[1]) + std::string(ASCII);
@@ -49,8 +79,14 @@ static void parse_input(int argc, char *argv[]) {
         w = atoi(argv[2]);
         h = atoi(argv[3]);
         d = atoi(argv[4]);
+    } else if (argc == 2) {
+        w = IMAGE_WIDTH;
+        h = IMAGE_HEIGHT;
+        d = 10;
+        in = std::string(WHITTED) + std::string("shaders.ascii");
+        out = std::string("shaders.bmp");
+        shaders = true;
     } else {
-        cout << "usage: ./montecarlo flaot:w/m name:test1.ascii width:100 height:100 depth:10" << endl;
         w = IMAGE_WIDTH;
         h = IMAGE_HEIGHT;
         d = 2;
@@ -60,14 +96,18 @@ static void parse_input(int argc, char *argv[]) {
 }
 
 int main(int argc, char *argv[]) {
-    parse_input(argc, argv);
+    parseInput(argc, argv);
 
     try {
-
         RayTracer rayTracer(w, h, d);
-        loadScene(in.c_str(), rayTracer);
+        // Load the scene
+        if (shaders) {
+            loadShaderScene(in.c_str(), rayTracer);
+        } else {
+            loadScene(in.c_str(), rayTracer);
+        }
 
-        /* write your ray tracer here */
+        // Render the scene
         render(rayTracer);
 
         /* cleanup */
@@ -78,5 +118,5 @@ int main(int argc, char *argv[]) {
         cout << str << endl;
     }
 
-    return 1;
+    return 0;
 }
