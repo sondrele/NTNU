@@ -69,6 +69,13 @@ public:
     SColor shadeIntersection(Intersection, int);
     RayBuffer traceRays();
     RayBuffer traceRaysWithAntiAliasing();
+
+    // Whitted illumination
+    float calculateFattj(Vect, Light *);
+    SColor ambientLightning(float, SColor, SColor);
+    SColor whittedIllumination(Light *, Intersection, SColor, float);
+    SColor diffuseLightning(float, SColor, Vect, Vect);
+    SColor specularLightning(float, SColor, Vect, Vect, Vect);
 };
 
 #endif // _RAYTRACER_H_

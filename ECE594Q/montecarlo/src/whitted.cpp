@@ -1,13 +1,5 @@
 #include "whitted.h"
 
-
-// Use ambColor given in the material paramter
-SColor Whitted::AmbientLightning(float kt, SColor ka, SColor Cd) {
-    assert(kt >= 0 && kt <= 1);
-
-    return Cd.linearMult(ka).linearMult((1.0f - kt));
-}
-
 float Whitted::CalculateFattj(Vect Pt, Light *l) {
     if (l->getType() == POINT_LIGHT) {
         float dist = Pt.euclideanDistance(l->getPos());
@@ -61,14 +53,12 @@ SColor Whitted::DiffuseLightning(float kt, SColor Cd, Vect N, Vect Dj) {
 }
 
 SColor Whitted::SpecularLightning(float q, SColor ks, Vect N, Vect Dj, Vect V) {
-    float t;
-    t = N.dotProduct(Dj); 
+    float t = N.dotProduct(Dj); 
     Vect Q = N.linearMult(t);
     Vect Rj = Q.linearMult(2);
     Rj = Rj - Dj;
     t = Rj.dotProduct(V);
     t = max(t, 0.0f);
-    assert(t >= 0);
 
     float f = pow(t, q);
     return ks.linearMult(f);

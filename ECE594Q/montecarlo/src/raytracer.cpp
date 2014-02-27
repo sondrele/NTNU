@@ -124,9 +124,10 @@ Ray RayTracer::computeMonteCarloRay(float x, float y) {
 }
 
 SColor RayTracer::calculateShadowScalar(Light &lt, Intersection &in, int d) {
-    if (d < 0)
-        return SColor(0, 0, 0);
-    // cout << in.toString() << endl;
+    if (d < 0) {
+        return SColor(0, 0, 0);   
+    }
+
     Vect p = lt.getPos();
     Vect ori = in.calculateIntersectionPoint();// + in.calculateSurfaceNormal().linearMult(0.0001f);
     Vect dir;
@@ -175,7 +176,7 @@ SColor RayTracer::shadeIntersection(Intersection in, int d) {
         return SColor(0, 0, 0);
     }
 
-    Vect shade(0, 0, 0);
+    SColor shade(0, 0, 0);
 
     Material *mat = in.getMaterial();
     float kt = mat->getTransparency();
@@ -185,15 +186,15 @@ SColor RayTracer::shadeIntersection(Intersection in, int d) {
     Vect Pt = in.calculateIntersectionPoint();
     SColor Cd = in.getColor();
 
-    SColor ambLight = Whitted::AmbientLightning(kt, ka, Cd);
+    SColor ambLight = ambientLightning(kt, ka, Cd);
 
     std::vector<Light *> lts = scene->getLights();
     for (uint i = 0; i < lts.size(); i++) {
         Light *l = lts.at(i);
-        float Fattj = Whitted::CalculateFattj(Pt, l);
+        float Fattj = calculateFattj(Pt, l);
         if (Fattj > 0) {
             SColor Sj = calculateShadowScalar(*l, in, (int) depth);
-            shade = shade + Whitted::Illumination(l, in, Sj, Fattj);
+            shade = shade + whittedIllumination(l, in, Sj, Fattj);
         }
     }
     
@@ -211,9 +212,82 @@ SColor RayTracer::shadeIntersection(Intersection in, int d) {
         refraction = shadeIntersection(rin, d - 1).linearMult(kt);
     }
 
+
+    // if (in.hasRefracted()) {
+    //     refraction = SColor(0, 0, 0);
+    // }
+
     shade = ambLight + shade + reflection + refraction;
 
     return shade;
+}
+
+float RayTracer::calculateFattj(Vect Pt, Light *l) {
+    if (l->getType() == POINT_LIGHT) {
+        float dist = Pt.euclideanDistance(l->getPos());
+        return (float) min(1.0, 1.0 / (0.25 + 0.1 * dist + 0.01 * dist * dist));
+    } else {
+        return 1.0;
+    }
+}
+
+SColor RayTracer::ambientLightning(float kt, SColor ka, SColor Cd) {
+    assert(kt >= 0 && kt <= 1);
+    return Cd.linearMult(ka).linearMult((1.0f - kt));
+}
+
+SColor RayTracer::whittedIllumination(Light *lt, Intersection in, SColor Sj, float Fattj) {
+    Vect Pt = in.calculateIntersectionPoint();
+    Vect pos = lt->getPos();
+    Material *mat = in.getMaterial();
+    float kt = mat->getTransparency();
+    SColor ks = mat->getSpecColor();
+    // SColor Cd = mat->getDiffColor();
+    SColor Cd = in.getColor();
+    float q = mat->getShininess() * 128;
+    SColor Ij = lt->getIntensity();
+    
+    SColor dirLight = Ij.linearMult(Sj).linearMult(Fattj);
+    
+    Vect Dj;
+    if (lt->getType() == DIRECTIONAL_LIGHT) {
+        Dj = lt->getDir().invert();
+    } else {
+        Dj = pos - Pt;
+        Dj.normalize();
+    }
+    Vect N = in.calculateSurfaceNormal();
+    SColor diffuseLight = diffuseLightning(kt, Cd, N, Dj);
+
+    Vect V = in.getDirection().linearMult(-1);
+    SColor specLight = specularLightning(q, ks, N, Dj, V);
+
+    dirLight = dirLight.linearMult(diffuseLight + specLight);
+    // dirLight = dirLight.linearMult(Cd);
+
+    // SColor Q = N * N.dotProduct(Dj);
+    // SColor Rj = Q.linearMult(2) - Dj;
+    return dirLight;
+}
+
+SColor RayTracer::diffuseLightning(float kt, SColor Cd, Vect N, Vect Dj) {
+    float a = (1.0f - kt);
+    float b = max(0.0f, N.dotProduct(Dj));
+
+    // TODO: Flip normal if the ray is inside a transparent object
+    return Cd.linearMult(a * b);
+}
+
+SColor RayTracer::specularLightning(float q, SColor ks, Vect N, Vect Dj, Vect V) {
+    float t = N.dotProduct(Dj); 
+    Vect Q = N.linearMult(t);
+    Vect Rj = Q.linearMult(2);
+    Rj = Rj - Dj;
+    t = Rj.dotProduct(V);
+    t = max(t, 0.0f);
+
+    float f = pow(t, q);
+    return ks.linearMult(f);
 }
 
 RayBuffer RayTracer::traceRays() {

@@ -53,6 +53,7 @@ Ray Intersection::calculateReflection() {
 
 Ray Intersection::calculateRefraction() {
     if (intersected) {
+
         // Vect N = calculateSurfaceNormal();
         // Vect d0 = getDirection();
         // Ray r;
@@ -60,15 +61,15 @@ Ray Intersection::calculateRefraction() {
         // r.setOrigin(calculateIntersectionPoint() + d0.linearMult(0.001f));
         // r.setDirection(d0);
 
-
         Vect N = calculateSurfaceNormal();
         Vect I = getDirection();
-        float n = NV1 / NV2;
+        // float n = NV1 / NV2;
+        float n = ray.inVacuum() ? NV1 / NV2 : NV2 / NV1;
         float cosI = N.dotProduct(I);
-        float sinT2 = n * n * (1 - cosI * cosI);
+        float sinT2 = n     * n * (1 - cosI * cosI);
 
         Vect d0 = I.linearMult(n) - N.linearMult((n + sqrt(1 - sinT2)));
-        Ray r;
+        Ray r = ray;
         r.switchMedium();
         r.setOrigin(calculateIntersectionPoint() + d0.linearMult(0.01f));
         r.setDirection(d0);

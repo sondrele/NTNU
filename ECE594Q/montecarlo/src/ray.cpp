@@ -5,6 +5,7 @@ Ray::Ray() {
 }
 
 Ray::Ray(Vect o, Vect d) {
+    vacuum = true;
     origin = o;
     direction = d;
     direction.normalize();

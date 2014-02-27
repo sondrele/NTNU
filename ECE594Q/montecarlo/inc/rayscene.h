@@ -51,9 +51,6 @@ public:
     Shape * getShape(uint);
     Intersection calculateRayIntersection(Ray);
     Intersection intersectsWithBVHTree(Ray);
-
-    std::string toString() const;
-    friend ostream& operator <<(ostream&, const RayScene&);
 };
 
 #endif

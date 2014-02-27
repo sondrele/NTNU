@@ -130,15 +130,18 @@ IShader * Shape::getIShader() {
 }
 
 bool Shape::CompareX(Shape *a, Shape *b) {
-    return (a->getBBox().getMin()).getX() < (b->getBBox().getMin()).getX();
+    // return (a->getBBox().getMin()).getX() < (b->getBBox().getMin()).getX();
+    return (a->getBBox().getCentroid()).getX() < (b->getBBox().getCentroid()).getX();
 }
 
 bool Shape::CompareY(Shape *a, Shape *b) {
-    return (a->getBBox().getMin()).getY() < (b->getBBox().getMin()).getY();
+    // return (a->getBBox().getMin()).getY() < (b->getBBox().getMin()).getY();
+    return (a->getBBox().getCentroid()).getY() < (b->getBBox().getCentroid()).getY();
 }
 
 bool Shape::CompareZ(Shape *a, Shape *b) {
-    return (a->getBBox().getMin()).getZ() < (b->getBBox().getMin()).getZ();
+    // return (a->getBBox().getMin()).getZ() < (b->getBBox().getMin()).getZ();
+    return (a->getBBox().getCentroid()).getZ() < (b->getBBox().getCentroid()).getZ();
 }
 
 bool operator < (Shape &a, Shape &b) {

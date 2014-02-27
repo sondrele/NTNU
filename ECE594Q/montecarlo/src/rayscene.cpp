@@ -29,7 +29,6 @@ Light * RayScene::getLight(uint pos) {
 
 void RayScene::setShapes(std::vector<Shape *> ss) {
     shapes = ss;
-
     std::vector<Shape *> shps;
     for (uint i = 0; i < shapes.size(); i++) {
         Shape *s0 = shapes[i];
@@ -39,6 +38,7 @@ void RayScene::setShapes(std::vector<Shape *> ss) {
         } else
             shps.push_back(s0);
     }
+    cout << shps.size() << endl;
     searchTree.buildTree(shps);
 }
 
@@ -75,27 +75,4 @@ Intersection RayScene::calculateRayIntersection(Ray ray) {
 
 Intersection RayScene::intersectsWithBVHTree(Ray ray) {
     return searchTree.intersects(ray);
-}
-
-std::string RayScene::toString() const {
-    stringstream s;
-    s << "RayScene" << endl;
-    s << "\tCamera: " << endl;
-    s << "\tLigts:" << endl;
-    for (uint i = 0; i < lights.size(); i++) {
-        Light *l = lights.at(i);
-        s << "\t\tL" << i << ": " << l->getPos() << endl;
-    }
-    s << "\tShapes:" << endl;
-    for (uint i = 0; i < shapes.size(); i++) {
-        Shape *sp = shapes.at(i);
-        ShapeType t = sp->getType();
-        s << "\t\tS: " << t << endl;
-    }
-    return s.str();
-}
-
-ostream& operator <<(ostream& stream, const RayScene &scene) {
-    stream << scene.toString();
-    return stream;
 }

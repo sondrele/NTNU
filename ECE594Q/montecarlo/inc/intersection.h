@@ -29,6 +29,7 @@ public:
     void setIntersectionPoint(float);
     float getIntersectionPoint() {return pt; }
     bool hasIntersected() { return intersected; }
+    bool hasRefracted() { return !ray.inVacuum(); }
 
     Vect calculateIntersectionPoint();
     Vect calculateSurfaceNormal();
