@@ -34,7 +34,7 @@ public:
     Vect calculateIntersectionPoint();
     Vect calculateSurfaceNormal();
     Ray calculateReflection();
-    Ray calculateRefraction();
+    bool calculateRefraction(Ray &);
     // Point_2D calculateUVCoords();
 
     void setShape(Shape *s) { shape = s; }

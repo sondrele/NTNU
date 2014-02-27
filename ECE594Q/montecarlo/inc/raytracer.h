@@ -17,7 +17,6 @@ private:
     uint WIDTH;
     uint HEIGHT;
     float M;
-    float N;
     uint depth;
     float scaleConst;   // c
 
@@ -39,7 +38,6 @@ public:
     uint getWidth() { return WIDTH;}
     uint getHeight() { return HEIGHT;}
     void setM(float m) { M = m; }
-    void setN(float n) { N = n; }
 
     void setScene(RayScene *s) { scene = s; }
     void setCamera(Camera c);

@@ -11,7 +11,7 @@ RayTracer::RayTracer(uint width, uint height, uint d) {
     scaleConst = 10000;
     buffer = RayBuffer(WIDTH, HEIGHT);
     scene = NULL;
-    M = N = 1;
+    M = 1;
 
     // Set standard camera properties
     camera.setPos(Vect(0, 0, 0));
@@ -207,9 +207,13 @@ SColor RayTracer::shadeIntersection(Intersection in, int d) {
 
     SColor refraction;
     if (kt > 0) {
-        Ray r = in.calculateRefraction();
-        Intersection rin = scene->intersectsWithBVHTree(r);
-        refraction = shadeIntersection(rin, d - 1).linearMult(kt);
+        Ray r;
+        if (in.calculateRefraction(r)) {
+            Intersection rin = scene->intersectsWithBVHTree(r);
+            refraction = shadeIntersection(rin, d - 1).linearMult(kt);
+        } else {
+            refraction =  SColor(0, 0, 0);
+        }
     }
 
 
@@ -310,7 +314,7 @@ RayBuffer RayTracer::traceRays() {
 
 RayBuffer RayTracer::traceRaysWithAntiAliasing() {
     cout << "Tracing rays[" << WIDTH << "][" << HEIGHT << "]" << endl;
-    cout << "m = " << M << ", n = " << N << endl;
+    cout << "m = " << M << ", n = " << M << endl;
     cout << "d = " << depth << endl;
     for (uint y = 0; y < HEIGHT; y++) {
         // omp_set_num_threads(16);
@@ -318,17 +322,17 @@ RayBuffer RayTracer::traceRaysWithAntiAliasing() {
         for (uint x = 0; x < WIDTH; x++) {
             // Loop over samples to get the right color
             float R = 0, G = 0, B = 0;
-            for (float dn = 0; dn < N; dn += 1) {
+            for (float dn = 0; dn < M; dn += 1) {
                 for (float dm = 0; dm < M; dm += 1) {
                     float dx = dm / M;
-                    float dy = dn / N;
+                    float dy = dn / M;
                     Ray r = computeMonteCarloRay((float) x + dx, (float) y + dy);
                     Intersection in = scene->intersectsWithBVHTree(r);
                     SColor c = shadeIntersection(in, (int) depth);
                     R += c.R(); G += c.G(); B += c.B();
                 }
             }
-            R /= M * N; G /= M * N; B /= M * N;
+            R /= M * M; G /= M * M; B /= M * M;
             PX_Color color;
             color.R = (uint8_t) (255 * R);
             color.G = (uint8_t) (255 * G);

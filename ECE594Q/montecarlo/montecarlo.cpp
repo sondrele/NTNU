@@ -77,7 +77,6 @@ static void loadShaderScene(const char *name, RayTracer &rayTracer) {
 
 static void render(RayTracer &rayTracer) {
     rayTracer.setM(m);
-    rayTracer.setN(m);
 
     // auto start = std::chrono::system_clock::now();
 
