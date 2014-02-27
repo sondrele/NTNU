@@ -27,6 +27,7 @@ SRCS = src/ray.cpp\
     src/shader.cpp\
     src/texture.cpp\
     src/bvhtree.cpp\
+    src/rand.cpp\
     src/raytracer.cpp
 OBJS = $(SRCS:.cpp=.o) $(LIBS:.cpp=.o) 
 INCS = $(wildcard ./inc/*.h)
@@ -42,3 +43,4 @@ montecarlo: montecarlo.o $(OBJS)
 clean:
 	rm -f *.o
 	rm -rf **/*.o
+

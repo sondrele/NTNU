@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "Matrix.h"
+#include "rand.h"
 #include "ray.h"
 #include "raybuffer.h"
 #include "camera.h"
@@ -70,9 +71,12 @@ public:
     // Whitted illumination
     float calculateFattj(Vect, Light *);
     SColor ambientLightning(float, SColor, SColor);
-    SColor whittedIllumination(Light *, Intersection, SColor, float);
+    SColor directIllumination(Light *, Intersection, SColor, float);
     SColor diffuseLightning(float, SColor, Vect, Vect);
     SColor specularLightning(float, SColor, Vect, Vect, Vect);
+
+    // Pathtracing
+    bool russianRoulette(SColor, float &);
 };
 
 #endif // _RAYTRACER_H_

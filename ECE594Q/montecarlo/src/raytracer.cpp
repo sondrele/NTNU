@@ -174,7 +174,7 @@ SColor RayTracer::shadeIntersection(Intersection in, int d) {
     if (d <= 0 || !in.hasIntersected()) {
         // terminate recursion
         return SColor(0, 0, 0);
-    }
+        }
 
     SColor shade(0, 0, 0);
 
@@ -194,7 +194,7 @@ SColor RayTracer::shadeIntersection(Intersection in, int d) {
         float Fattj = calculateFattj(Pt, l);
         if (Fattj > 0) {
             SColor Sj = calculateShadowScalar(*l, in, (int) depth);
-            shade = shade + whittedIllumination(l, in, Sj, Fattj);
+            shade = shade + directIllumination(l, in, Sj, Fattj);
         }
     }
     
@@ -216,11 +216,6 @@ SColor RayTracer::shadeIntersection(Intersection in, int d) {
         }
     }
 
-
-    // if (in.hasRefracted()) {
-    //     refraction = SColor(0, 0, 0);
-    // }
-
     shade = ambLight + shade + reflection + refraction;
 
     return shade;
@@ -240,7 +235,7 @@ SColor RayTracer::ambientLightning(float kt, SColor ka, SColor Cd) {
     return Cd.linearMult(ka).linearMult((1.0f - kt));
 }
 
-SColor RayTracer::whittedIllumination(Light *lt, Intersection in, SColor Sj, float Fattj) {
+SColor RayTracer::directIllumination(Light *lt, Intersection in, SColor Sj, float Fattj) {
     Vect Pt = in.calculateIntersectionPoint();
     Vect pos = lt->getPos();
     Material *mat = in.getMaterial();
@@ -293,6 +288,14 @@ SColor RayTracer::specularLightning(float q, SColor ks, Vect Norm, Vect Dj, Vect
     float f = pow(t, q);
     return ks.linearMult(f);
 }
+
+// bool RayTracer::russianRoulette(SColor refl, float &survivorMult) {
+//     double p = max(refl.R(), max(refl.G(), refl.B()));
+//     survivorMult = 1.0 / p;
+//     if (Rand::Random() > p) 
+//         return true;
+//     return false;
+// }
 
 RayBuffer RayTracer::traceRays() {
     for (uint y = 0; y < HEIGHT; y++) {

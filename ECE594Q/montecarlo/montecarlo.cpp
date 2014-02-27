@@ -2,6 +2,7 @@
 #include <stdlib.h>
 // #include <chrono>
 #include "scene_io.h"
+#include "rand.h"
 
 #include "raytracer.h"
 #include "rayscene_factory.h"

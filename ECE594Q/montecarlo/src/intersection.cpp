@@ -70,7 +70,7 @@ bool Intersection::calculateRefraction(Ray &r) {
         if(cosI  > 0) {
            N = N.linearMult(-1);
         }
-        
+
         double c = I.dotProduct(N);
         double cosPhi2 = (1 - ((n * n) * (1 - (c * c))));
         if (cosPhi2 < 0) 
@@ -79,11 +79,11 @@ bool Intersection::calculateRefraction(Ray &r) {
             double cosPhi = sqrt(cosPhi2);
             Vect term1 = (I - N.linearMult(c));
             term1.linearMult(n);
-            Vect refractDirection = term1 - N.linearMult(cosPhi);
+            Vect d0 = term1 - N.linearMult(cosPhi);
             r = ray;
             r.switchMedium();
-            r.setOrigin(calculateIntersectionPoint() + refractDirection.linearMult(0.01f));
-            r.setDirection(refractDirection);
+            r.setOrigin(calculateIntersectionPoint() + d0.linearMult(0.01f));
+            r.setDirection(d0);
             return true;
         }
 
