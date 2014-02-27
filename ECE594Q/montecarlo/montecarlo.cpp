@@ -8,8 +8,7 @@
 #include "rayscene_factory.h"
 #include "rayimage.h"
 
-#define WHITTED         "./scenes-whitted/"
-#define MONTE           "./scenes-montecarlo/"
+#define SCENES         "./scenes/"
 #define ASCII           ".ascii"
 #define IMG             ".bmp"
 #define IMAGE_WIDTH     500
@@ -21,6 +20,7 @@ SceneIO *scene = NULL;
 
 uint w, h, d, m = 1;
 bool shaders = false;
+bool pathTracing = false;
 std::string in;
 std::string out;
 
@@ -78,10 +78,16 @@ static void loadShaderScene(const char *name, RayTracer &rayTracer) {
 
 static void render(RayTracer &rayTracer) {
     rayTracer.setM(m);
+    rayTracer.setNumSamples(m);
 
     // auto start = std::chrono::system_clock::now();
 
-    RayBuffer rayBuffer = rayTracer.traceRaysWithAntiAliasing();
+    RayBuffer rayBuffer;
+    if (!pathTracing) {
+        rayBuffer = rayTracer.traceRays();
+    } else {
+        rayBuffer = rayTracer.tracePaths();
+    }
     
     // auto end = std::chrono::system_clock::now();
     // auto elapsed =
@@ -93,34 +99,37 @@ static void render(RayTracer &rayTracer) {
 }
 
 static void parseInput(int argc, char *argv[]) {
-    cout << "Normal usage: Run with 5 arguments: scene, width, height, depth, m || w" << endl;
-    cout << "Example:      ./montecarlo test1 100 100 10 w" << endl;
-    cout << "Shader demo:  ./montecarlo shaders" << endl;
+    cout << "Normal usage:\nRun with 5 arguments: scene, width, height, depth, numSamples" << endl;
+    cout << "Example (whitted illumination):  ./montecarlo test1 100 100 10" << endl;
+    cout << "Example (path tracing):          ./montecarlo test1 100 100 10 10" << endl;
+    cout << "Shader demo:  ./montecarlo shaders" << endl << endl;
 
-    if (argc >= 6) {
-        in = (*argv[5] == 'm') ? std::string(MONTE) : std::string(WHITTED);
-        in += std::string(argv[1]) + std::string(ASCII);
+    if (argc >= 5) {
+        in = std::string(SCENES) + std::string(argv[1]) + std::string(ASCII);
         out = std::string(argv[1]) + std::string(IMG);
         w = atoi(argv[2]);
         h = atoi(argv[3]);
         d = atoi(argv[4]);
+        if (argc == 6) {
+            m = atoi(argv[5]);
+            pathTracing = true;
+        }
     } else if (argc == 2) {
         w = IMAGE_WIDTH;
         h = IMAGE_HEIGHT;
         d = 10;
-        in = std::string(WHITTED) + std::string("shaders.ascii");
+        in = std::string(SCENES) + std::string("shaders.ascii");
         out = std::string("shaders.bmp");
         shaders = true;
     } else {
         w = IMAGE_WIDTH;
         h = IMAGE_HEIGHT;
         d = 2;
-        in = std::string(MONTE) + std::string("test1.ascii");
-        out = std::string("test1.bmp");
+        in = std::string(SCENES) + std::string("whitted1.ascii");
+        out = std::string("whitted1.bmp");
     }
 
-    if (argc == 7) {
-        m = 2;
+    if (argc == 6) {
     }
 }
 

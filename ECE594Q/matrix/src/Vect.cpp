@@ -124,6 +124,18 @@ const Vect operator *(const Vect &a, const Vect &b) {
     return v;
 }
 
+const Vect operator *(const Vect &a, const float f) {
+    Vect v;
+    v.x = a.x * f;
+    v.y = a.y * f;
+    v.z = a.z * f;
+    return v;
+}
+
+const Vect operator *(const float f, const Vect &a) {
+    return a * f;
+}
+
 string Vect::toString() const {
     stringstream s;
     s << '(' << x << ", " << y << ", " << z << ")";

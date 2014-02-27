@@ -38,7 +38,7 @@ void RayScene::setShapes(std::vector<Shape *> ss) {
         } else
             shps.push_back(s0);
     }
-    cout << shps.size() << endl;
+    cout << "Number of shapes: " << shps.size() << endl;
     searchTree.buildTree(shps);
 }
 

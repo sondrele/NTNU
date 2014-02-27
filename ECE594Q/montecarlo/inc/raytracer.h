@@ -5,6 +5,7 @@
 #include <cfloat>
 #include <iostream>
 
+#include "progress.h"
 #include "Matrix.h"
 #include "rand.h"
 #include "ray.h"
@@ -17,6 +18,7 @@ class RayTracer {
 private:
     uint WIDTH;
     uint HEIGHT;
+    int numSamples;
     float M;
     uint depth;
     float scaleConst;   // c
@@ -39,7 +41,7 @@ public:
     uint getWidth() { return WIDTH;}
     uint getHeight() { return HEIGHT;}
     void setM(float m) { M = m; }
-
+    void setNumSamples(int s) { numSamples = s; }
     void setScene(RayScene *s) { scene = s; }
     void setCamera(Camera c);
     Camera getCamera() { return camera; }
@@ -50,8 +52,8 @@ public:
     Vect getViewDirection() { return camera.getViewDir(); }
     void setOrthogonalUp(Vect);
     Vect getOrthogonalUp() { return camera.getOrthoUp(); }
-    Vect getParallelRight() { return parallelRight;}
-    Vect getParallelUp() { return parallelUp;}
+    Vect getParallelRight() { return parallelRight; }
+    Vect getParallelUp() { return parallelUp; }
     Vect getImageCenter();
 
     Vect vertical();
@@ -63,13 +65,14 @@ public:
 
     Ray computeRay(uint, uint);
     Ray computeMonteCarloRay(float, float);
-    SColor calculateShadowScalar(Light &, Intersection &, int);
+    SColor calculateShadowScalar(Light *, Intersection &, int);
     SColor shadeIntersection(Intersection, int);
+    SColor shadeIntersectionPath(Intersection in, int d);
     RayBuffer traceRays();
-    RayBuffer traceRaysWithAntiAliasing();
+    RayBuffer tracePaths();
 
     // Whitted illumination
-    float calculateFattj(Vect, Light *);
+    float calculateFattj(Vect, Light *);        
     SColor ambientLightning(float, SColor, SColor);
     SColor directIllumination(Light *, Intersection, SColor, float);
     SColor diffuseLightning(float, SColor, Vect, Vect);
@@ -77,6 +80,8 @@ public:
 
     // Pathtracing
     bool russianRoulette(SColor, float &);
+    SColor diffuseInterreflect(Intersection &, int);
+    Vect uniformSampleUpperHemisphere(Vect &);
 };
 
 #endif // _RAYTRACER_H_

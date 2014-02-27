@@ -12,6 +12,7 @@ RayTracer::RayTracer(uint width, uint height, uint d) {
     buffer = RayBuffer(WIDTH, HEIGHT);
     scene = NULL;
     M = 1;
+    numSamples = 1;
 
     // Set standard camera properties
     camera.setPos(Vect(0, 0, 0));
@@ -123,16 +124,16 @@ Ray RayTracer::computeMonteCarloRay(float x, float y) {
     return r;
 }
 
-SColor RayTracer::calculateShadowScalar(Light &lt, Intersection &in, int d) {
+SColor RayTracer::calculateShadowScalar(Light *lt, Intersection &in, int d) {
     if (d < 0) {
         return SColor(0, 0, 0);   
     }
 
-    Vect p = lt.getPos();
+    Vect p = lt->getPos();
     Vect ori = in.calculateIntersectionPoint();// + in.calculateSurfaceNormal().linearMult(0.0001f);
     Vect dir;
-    if (lt.getType() == DIRECTIONAL_LIGHT) {
-        dir = lt.getDir().invert();
+    if (lt->getType() == DIRECTIONAL_LIGHT) {
+        dir = lt->getDir().invert();
     } else {
         dir = p - ori;
         dir.normalize();
@@ -149,8 +150,8 @@ SColor RayTracer::calculateShadowScalar(Light &lt, Intersection &in, int d) {
     } else if (mat->getTransparency() <= 0.00000001) {
         // The material is fully opaque
         Vect pos = ins.calculateIntersectionPoint();
-        if (lt.getType() == DIRECTIONAL_LIGHT ||
-            ori.euclideanDistance(pos) < ori.euclideanDistance(lt.getPos())) {
+        if (lt->getType() == DIRECTIONAL_LIGHT ||
+            ori.euclideanDistance(pos) < ori.euclideanDistance(lt->getPos())) {
             // The ray intersects with an object before the light source
             return SColor(0, 0, 0);
         } else {
@@ -174,7 +175,7 @@ SColor RayTracer::shadeIntersection(Intersection in, int d) {
     if (d <= 0 || !in.hasIntersected()) {
         // terminate recursion
         return SColor(0, 0, 0);
-        }
+    }
 
     SColor shade(0, 0, 0);
 
@@ -193,8 +194,9 @@ SColor RayTracer::shadeIntersection(Intersection in, int d) {
         Light *l = lts.at(i);
         float Fattj = calculateFattj(Pt, l);
         if (Fattj > 0) {
-            SColor Sj = calculateShadowScalar(*l, in, (int) depth);
+            SColor Sj = calculateShadowScalar(l, in, (int) depth);
             shade = shade + directIllumination(l, in, Sj, Fattj);
+            shade = shade;// + diffRefl;
         }
     }
     
@@ -212,7 +214,7 @@ SColor RayTracer::shadeIntersection(Intersection in, int d) {
             Intersection rin = scene->intersectsWithBVHTree(r);
             refraction = shadeIntersection(rin, d - 1).linearMult(kt);
         } else {
-            refraction =  SColor(0, 0, 0);
+            refraction = SColor(0, 0, 0);
         }
     }
 
@@ -231,7 +233,6 @@ float RayTracer::calculateFattj(Vect Pt, Light *l) {
 }
 
 SColor RayTracer::ambientLightning(float kt, SColor ka, SColor Cd) {
-    // assert(kt >= 0 && kt <= 1);
     return Cd.linearMult(ka).linearMult((1.0f - kt));
 }
 
@@ -278,7 +279,7 @@ SColor RayTracer::diffuseLightning(float kt, SColor Cd, Vect Norm, Vect Dj) {
 }
 
 SColor RayTracer::specularLightning(float q, SColor ks, Vect Norm, Vect Dj, Vect V) {
-    float t = Norm.dotProduct(Dj); 
+    float t = Norm.dotProduct(Dj);
     Vect Q = Norm.linearMult(t);
     Vect Rj = Q.linearMult(2);
     Rj = Rj - Dj;
@@ -289,34 +290,8 @@ SColor RayTracer::specularLightning(float q, SColor ks, Vect Norm, Vect Dj, Vect
     return ks.linearMult(f);
 }
 
-// bool RayTracer::russianRoulette(SColor refl, float &survivorMult) {
-//     double p = max(refl.R(), max(refl.G(), refl.B()));
-//     survivorMult = 1.0 / p;
-//     if (Rand::Random() > p) 
-//         return true;
-//     return false;
-// }
-
 RayBuffer RayTracer::traceRays() {
-    for (uint y = 0; y < HEIGHT; y++) {
-        // omp_set_num_threads(16);
-        // #pragma omp parallel for
-        for (uint x = 0; x < WIDTH; x++) {
-            Ray r = computeRay(x, y);
-            Intersection in = scene->intersectsWithBVHTree(r);
-            SColor c = shadeIntersection(in, (int) depth);
-            PX_Color color;
-            color.R = (uint8_t) (255 * c.R());
-            color.G = (uint8_t) (255 * c.G());
-            color.B = (uint8_t) (255 * c.B());
-            buffer.setPixel(x, y, color);
-        }
-    }
-    return buffer;
-}
-
-RayBuffer RayTracer::traceRaysWithAntiAliasing() {
-    cout << "Tracing rays[" << WIDTH << "][" << HEIGHT << "]" << endl;
+    cout << "Tracing rays: " << WIDTH << "x" << HEIGHT << endl;
     cout << "m = " << M << ", n = " << M << endl;
     cout << "d = " << depth << endl;
     for (uint y = 0; y < HEIGHT; y++) {
@@ -344,4 +319,144 @@ RayBuffer RayTracer::traceRaysWithAntiAliasing() {
         }
     }
     return buffer;
+}
+
+RayBuffer RayTracer::tracePaths() {
+    cout << "Tracing paths: " << WIDTH << "x" << HEIGHT << endl;
+    cout << "s = " << numSamples << endl;
+    cout << "d = " << depth << endl;
+    Progress p;
+    p.setGoal(HEIGHT * WIDTH);
+
+    for (uint y = 0; y < HEIGHT; y++) {
+        omp_set_num_threads(16);
+        #pragma omp parallel for
+        for (uint x = 0; x < WIDTH; x++) {
+            // Loop over samples to get the right color
+            float R = 0, G = 0, B = 0;
+            for (int s = 0; s < numSamples; s++) {
+                Ray r = computeMonteCarloRay((float) x, (float) y);
+                Intersection in = scene->intersectsWithBVHTree(r);
+                SColor c = shadeIntersectionPath(in, (int) depth);
+                // c = c * scene->getLights().size();
+                R += c.R(); G += c.G(); B += c.B();
+            }
+            R /= numSamples; G /= numSamples; B /= numSamples;
+            PX_Color color;
+            color.R = (uint8_t) (255 * R);
+            color.G = (uint8_t) (255 * G);
+            color.B = (uint8_t) (255 * B);
+            buffer.setPixel(x, y, color);
+            #pragma omp critical
+            {
+                p.tick();
+            }
+        }
+    }
+    return buffer;
+}
+
+SColor RayTracer::shadeIntersectionPath(Intersection in, int d) {
+    if (d <= 0 || !in.hasIntersected()) {
+        // terminate recursion
+        return SColor(0, 0, 0);
+    }
+
+    SColor shade(0, 0, 0);
+
+    Material *mat = in.getMaterial();
+    float kt = mat->getTransparency();
+    SColor ks = mat->getSpecColor();
+    SColor ka = mat->getAmbColor();
+    // SColor Cd = mat->getDiffColor();
+    Vect Pt = in.calculateIntersectionPoint();
+    SColor Cd = in.getColor();
+
+    SColor ambLight = ambientLightning(kt, ka, Cd);
+
+    std::vector<Light *> lts = scene->getLights();
+    uint p = (uint) lts.size() * Rand::Random();
+    Light *l = lts.at(p);
+    float Fattj = calculateFattj(Pt, l);
+    if (Fattj > 0) {
+        SColor Sj = calculateShadowScalar(l, in, (int) depth);
+        shade = shade + directIllumination(l, in, Sj, Fattj);
+        SColor diffRefl = diffuseInterreflect(in, d - 1);
+        shade = shade + diffRefl * 0.2;
+    }
+    
+    SColor reflection;
+    if (ks.length() > 0) {
+        Ray r = in.calculateReflection();
+        Intersection rin = scene->intersectsWithBVHTree(r);
+        reflection = shadeIntersectionPath(rin, d - 1).linearMult(ks);
+    }
+
+    SColor refraction;
+    if (kt > 0) {
+        Ray r;
+        if (in.calculateRefraction(r)) {
+            Intersection rin = scene->intersectsWithBVHTree(r);
+            refraction = shadeIntersectionPath(rin, d - 1).linearMult(kt);
+        } else {
+            refraction = SColor(0, 0, 0);
+        }
+    }
+
+    shade = ambLight + shade + reflection + refraction;
+
+    return shade;
+}
+
+SColor RayTracer::diffuseInterreflect(Intersection &intersection, int depth) {
+    Vect norm = intersection.calculateSurfaceNormal();
+    Vect rayDir = uniformSampleUpperHemisphere(norm);
+    Ray diffuseRay(intersection.calculateIntersectionPoint() + rayDir.linearMult(0.00001), rayDir);
+    // cout << diffuseRay.getOrigin() << endl;
+    // cout << diffuseRay.getDirection() << endl;
+    intersection = scene->intersectsWithBVHTree(diffuseRay);
+    SColor albedo;
+    SColor diffColor;
+    if (intersection.hasIntersected()) {
+        albedo = intersection.getColor();
+        diffColor = shadeIntersection(intersection, depth);
+    }
+
+    // cout << diffColor << endl;
+    return albedo * diffColor;
+    // if (settings.sampljeType == UNIFORM) {
+    //     // Probablity: 1/(2PI) -- (1/probability)*cos(theta)*brdf*radiancealongray
+    // } else if (settings.sampleType == IMPORTANCE) {
+    //     // Probability: cos(theta)/PI -- (1/probability)*cos(theta)*brdf*radiancealongray
+    //     return albedo * diffColor;
+    // } else {
+    //     return SColor(0, 0, 0);
+    // }
+}
+
+Vect RayTracer::uniformSampleUpperHemisphere(Vect &sampleDir) {
+    double r1, r2, r3;
+    r1 = Rand::Random();
+    r2 = Rand::Random();
+    r3 = Rand::Random();
+
+    double x, y, z;
+    x = 1 - 2 * r1;
+    y = 1 - 2 * r2;
+    z = 1 - 2 * r3;
+
+    Vect sample(x, y, z);
+    if (sample.dotProduct(sampleDir) < 0)
+        sample = sample.invert();
+
+    sample.normalize();
+    return sample;
+}
+
+bool RayTracer::russianRoulette(SColor refl, float &survivorMult) {
+    double p = max(refl.R(), max(refl.G(), refl.B()));
+    survivorMult = 1.0 / p;
+    if (Rand::Random() > p) 
+        return true;
+    return false;
 }

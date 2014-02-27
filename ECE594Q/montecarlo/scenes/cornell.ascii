@@ -1,0 +1,371 @@
+Composer format 2.1 ascii
+camera {
+  position 5 5 -20
+  viewDirection -0.1 -0.2 0.8
+  focalDistance 6.37114
+  orthoUp 0 1 0
+  verticalFOV 0.785398
+}
+point_light {
+  position 3 5 0
+  color 1 1 1
+}
+point_light {
+  position -3 2 -3
+  color 1 1 1
+}
+poly_set {
+  name NULL
+  numMaterials 1
+  material {
+    diffColor 1 1 1
+    ambColor 0.2 0.2 0.2
+    specColor 0 0 0
+    emisColor 0 0 0
+    shininess 0.2
+    ktran 0
+  }
+  type POLYSET_TRI_MESH
+  normType PER_FACE_NORMAL
+  materialBinding PER_OBJECT_MATERIAL
+  hasTextureCoords FALSE
+  rowSize 0
+  numPolys 12
+  poly {
+    numVertices 3
+    pos 0 0 0
+    pos 2 0 0
+    pos 2 2 0
+  }
+  poly {
+    numVertices 3
+    pos 0 0 0
+    pos 0 2 0
+    pos 2 2 0
+  }
+  poly {
+    numVertices 3
+    pos 0 0 2
+    pos 2 0 2
+    pos 2 2 2
+  }
+  poly {
+    numVertices 3
+    pos 0 0 2
+    pos 0 2 2
+    pos 2 2 2
+  }
+  poly {
+    numVertices 3
+    pos 0 0 0
+    pos 0 2 0
+    pos 0 2 2
+  }
+  poly {
+    numVertices 3
+    pos 0 0 0
+    pos 0 0 2
+    pos 0 2 2
+  }
+  poly {
+    numVertices 3
+    pos 2 0 0
+    pos 2 2 0
+    pos 2 2 2
+  }
+  poly {
+    numVertices 3
+    pos 2 0 0
+    pos 2 0 2
+    pos 2 2 2
+  }
+  poly {
+    numVertices 3
+    pos 0 0 0
+    pos 2 0 0
+    pos 2 0 2
+  }
+  poly {
+    numVertices 3
+    pos 0 0 0
+    pos 0 0 2
+    pos 2 0 2
+  }
+  poly {
+    numVertices 3
+    pos 0 2 0
+    pos 2 2 0
+    pos 2 2 2
+  }
+  poly {
+    numVertices 3
+    pos 0 2 0
+    pos 0 2 2
+    pos 2 2 2
+  }
+}
+poly_set {
+  name NULL
+  numMaterials 1
+  material {
+    diffColor 0.1 0.6 0.1
+    ambColor 0.2 0.2 0.2
+    specColor 0 0 0
+    emisColor 0 0 0
+    shininess 0.2
+    ktran 0
+  }
+  type POLYSET_TRI_MESH
+  normType PER_FACE_NORMAL
+  materialBinding PER_OBJECT_MATERIAL
+  hasTextureCoords FALSE
+  rowSize 0
+  numPolys 12
+  poly {
+    numVertices 3
+    pos 8 -10 -10
+    pos 8.1 -10 -10
+    pos 8.1 10 -10
+  }
+  poly {
+    numVertices 3
+    pos 8 -10 -10
+    pos 8 10 -10
+    pos 8.1 10 -10
+  }
+  poly {
+    numVertices 3
+    pos 8 -10 10
+    pos 8.1 -10 10
+    pos 8.1 10 10
+  }
+  poly {
+    numVertices 3
+    pos 8 -10 10
+    pos 8 10 10
+    pos 8.1 10 10
+  }
+  poly {
+    numVertices 3
+    pos 8 -10 -10
+    pos 8 10 -10
+    pos 8 10 10
+  }
+  poly {
+    numVertices 3
+    pos 8 -10 -10
+    pos 8 -10 10
+    pos 8 10 10
+  }
+  poly {
+    numVertices 3
+    pos 8.1 -10 -10
+    pos 8.1 10 -10
+    pos 8.1 10 10
+  }
+  poly {
+    numVertices 3
+    pos 8.1 -10 -10
+    pos 8.1 -10 10
+    pos 8.1 10 10
+  }
+  poly {
+    numVertices 3
+    pos 8 -10 -10
+    pos 8.1 -10 -10
+    pos 8.1 -10 10
+  }
+  poly {
+    numVertices 3
+    pos 8 -10 -10
+    pos 8 -10 10
+    pos 8.1 -10 10
+  }
+  poly {
+    numVertices 3
+    pos 8 10 -10
+    pos 8.1 10 -10
+    pos 8.1 10 10
+  }
+  poly {
+    numVertices 3
+    pos 8 10 -10
+    pos 8 10 10
+    pos 8.1 10 10
+  }
+}
+
+poly_set {
+  name NULL
+  numMaterials 1
+  material {
+    diffColor 0.6 0.1 0.1
+    ambColor 0.2 0.2 0.2
+    specColor 0 0 0
+    emisColor 0 0 0
+    shininess 0.2
+    ktran 0
+  }
+  type POLYSET_TRI_MESH
+  normType PER_FACE_NORMAL
+  materialBinding PER_OBJECT_MATERIAL
+  hasTextureCoords FALSE
+  rowSize 0
+  numPolys 12
+  poly {
+    numVertices 3
+    pos -5 -10 -10
+    pos -5.1 -10 -10
+    pos -5.1 10 -10
+  }
+  poly {
+    numVertices 3
+    pos -5 -10 -10
+    pos -5 10 -10
+    pos -5.1 10 -10
+  }
+  poly {
+    numVertices 3
+    pos -5 -10 10
+    pos -5.1 -10 10
+    pos -5.1 10 10
+  }
+  poly {
+    numVertices 3
+    pos -5 -10 10
+    pos -5 10 10
+    pos -5.1 10 10
+  }
+  poly {
+    numVertices 3
+    pos -5 -10 -10
+    pos -5 10 -10
+    pos -5 10 10
+  }
+  poly {
+    numVertices 3
+    pos -5 -10 -10
+    pos -5 -10 10
+    pos -5 10 10
+  }
+  poly {
+    numVertices 3
+    pos -5.1 -10 -10
+    pos -5.1 10 -10
+    pos -5.1 10 10
+  }
+  poly {
+    numVertices 3
+    pos -5.1 -10 -10
+    pos -5.1 -10 10
+    pos -5.1 10 10
+  }
+  poly {
+    numVertices 3
+    pos -5 -10 -10
+    pos -5.1 -10 -10
+    pos -5.1 -10 10
+  }
+  poly {
+    numVertices 3
+    pos -5 -10 -10
+    pos -5 -10 10
+    pos -5.1 -10 10
+  }
+  poly {
+    numVertices 3
+    pos -5 10 -10
+    pos -5.1 10 -10
+    pos -5.1 10 10
+  }
+  poly {
+    numVertices 3
+    pos -5 10 -10
+    pos -5 10 10
+    pos -5.1 10 10
+  }
+}
+poly_set {
+  name NULL
+  numMaterials 1
+  material {
+    diffColor 0.1 0.1 0.1
+    ambColor 0.2 0.2 0.2
+    specColor 0 0 0
+    emisColor 0 0 0
+    shininess 0.2
+    ktran 0
+  }
+  type POLYSET_TRI_MESH
+  normType PER_FACE_NORMAL
+  materialBinding PER_OBJECT_MATERIAL
+  hasTextureCoords FALSE
+  rowSize 0
+  numPolys 4
+  poly {
+    numVertices 3
+    pos 8 0 10
+    pos -5 0 10
+    pos -5 0 -10
+  }
+  poly {
+    numVertices 3
+    pos 8 0 10
+    pos 8 0 -10
+    pos -5 0 -10
+  }
+  poly {
+    numVertices 3
+    pos 8 -0.1 10
+    pos -5 -0.1 10
+    pos -5 -0.1 -10
+  }
+  poly {
+    numVertices 3
+    pos 8 -0.1 10
+    pos 8 -0.1 -10
+    pos -5 -0.1 -10
+  }
+}
+poly_set {
+  name NULL
+  numMaterials 1
+  material {
+    diffColor 0.1 0.1 0.1
+    ambColor 0.2 0.2 0.2
+    specColor 0 0 0
+    emisColor 0 0 0
+    shininess 0.2
+    ktran 0
+  }
+  type POLYSET_TRI_MESH
+  normType PER_FACE_NORMAL
+  materialBinding PER_OBJECT_MATERIAL
+  hasTextureCoords FALSE
+  rowSize 0
+  numPolys 4
+  poly {
+    numVertices 3
+    pos 8 -10 10
+    pos -5 -10 10
+    pos -5 10 10
+  }
+  poly {
+    numVertices 3
+    pos 8 -10 10
+    pos 8 10 10
+    pos -5 10 10
+  }
+  poly {
+    numVertices 3
+    pos 8 -10 10.1
+    pos -5 -10 10.1
+    pos -5 10 10.1
+  }
+  poly {
+    numVertices 3
+    pos 8 -10 10.1
+    pos 8 10 10.1
+    pos -5 10 10.1
+  }
+}

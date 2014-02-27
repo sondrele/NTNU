@@ -82,6 +82,8 @@ public:
     const friend Vect operator +(const Vect &, const Vect &);
     const friend Vect operator -(const Vect &, const Vect &);
     const friend Vect operator *(const Vect &, const Vect &);
+    const friend Vect operator *(const Vect &, const float);
+    const friend Vect operator *(const float, const Vect &);
 };
 
 bool operator < (const Vect&, const Vect&);

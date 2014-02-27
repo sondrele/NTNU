@@ -28,6 +28,7 @@ SRCS = src/ray.cpp\
     src/texture.cpp\
     src/bvhtree.cpp\
     src/rand.cpp\
+    src/progress.cpp\
     src/raytracer.cpp
 OBJS = $(SRCS:.cpp=.o) $(LIBS:.cpp=.o) 
 INCS = $(wildcard ./inc/*.h)
