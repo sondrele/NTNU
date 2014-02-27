@@ -23,7 +23,6 @@ SRCS = src/ray.cpp\
     src/sphere.cpp\
     src/mesh.cpp\
     src/triangle.cpp\
-    src/whitted.cpp\
     src/material.cpp\
     src/shader.cpp\
     src/texture.cpp\

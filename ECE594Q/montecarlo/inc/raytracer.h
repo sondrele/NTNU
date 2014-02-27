@@ -6,7 +6,6 @@
 #include <iostream>
 
 #include "Matrix.h"
-#include "whitted.h"
 #include "ray.h"
 #include "raybuffer.h"
 #include "camera.h"

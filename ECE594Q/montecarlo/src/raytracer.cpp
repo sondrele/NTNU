@@ -232,7 +232,7 @@ float RayTracer::calculateFattj(Vect Pt, Light *l) {
 }
 
 SColor RayTracer::ambientLightning(float kt, SColor ka, SColor Cd) {
-    assert(kt >= 0 && kt <= 1);
+    // assert(kt >= 0 && kt <= 1);
     return Cd.linearMult(ka).linearMult((1.0f - kt));
 }
 
@@ -256,11 +256,11 @@ SColor RayTracer::whittedIllumination(Light *lt, Intersection in, SColor Sj, flo
         Dj = pos - Pt;
         Dj.normalize();
     }
-    Vect N = in.calculateSurfaceNormal();
-    SColor diffuseLight = diffuseLightning(kt, Cd, N, Dj);
+    Vect Norm = in.calculateSurfaceNormal();
+    SColor diffuseLight = diffuseLightning(kt, Cd, Norm, Dj);
 
     Vect V = in.getDirection().linearMult(-1);
-    SColor specLight = specularLightning(q, ks, N, Dj, V);
+    SColor specLight = specularLightning(q, ks, Norm, Dj, V);
 
     dirLight = dirLight.linearMult(diffuseLight + specLight);
     // dirLight = dirLight.linearMult(Cd);
@@ -270,17 +270,17 @@ SColor RayTracer::whittedIllumination(Light *lt, Intersection in, SColor Sj, flo
     return dirLight;
 }
 
-SColor RayTracer::diffuseLightning(float kt, SColor Cd, Vect N, Vect Dj) {
+SColor RayTracer::diffuseLightning(float kt, SColor Cd, Vect Norm, Vect Dj) {
     float a = (1.0f - kt);
-    float b = max(0.0f, N.dotProduct(Dj));
+    float b = max(0.0f, Norm.dotProduct(Dj));
 
     // TODO: Flip normal if the ray is inside a transparent object
     return Cd.linearMult(a * b);
 }
 
-SColor RayTracer::specularLightning(float q, SColor ks, Vect N, Vect Dj, Vect V) {
-    float t = N.dotProduct(Dj); 
-    Vect Q = N.linearMult(t);
+SColor RayTracer::specularLightning(float q, SColor ks, Vect Norm, Vect Dj, Vect V) {
+    float t = Norm.dotProduct(Dj); 
+    Vect Q = Norm.linearMult(t);
     Vect Rj = Q.linearMult(2);
     Rj = Rj - Dj;
     t = Rj.dotProduct(V);
@@ -313,8 +313,8 @@ RayBuffer RayTracer::traceRaysWithAntiAliasing() {
     cout << "m = " << M << ", n = " << N << endl;
     cout << "d = " << depth << endl;
     for (uint y = 0; y < HEIGHT; y++) {
-        omp_set_num_threads(16);
-        #pragma omp parallel for
+        // omp_set_num_threads(16);
+        // #pragma omp parallel for
         for (uint x = 0; x < WIDTH; x++) {
             // Loop over samples to get the right color
             float R = 0, G = 0, B = 0;
