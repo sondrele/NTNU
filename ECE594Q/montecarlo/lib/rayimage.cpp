@@ -1,5 +1,7 @@
 #include "rayimage.h"
 
+#include <iostream>
+
 int RayImage::width() {
     return img.width();
 }
@@ -8,20 +10,40 @@ int RayImage::height() {
     return img.height();
 }
 
-void RayImage::loadTexture(std::string name) {
-    img = cimg_library::CImg<unsigned char>(name.c_str());
+void RayImage::loadImage(std::string n) {
+    name = n;
+    img.load(name.c_str());
 }
 
-PX_Color RayImage::getSample(int x, int y) {
-    y = height() - y;
-    PX_Color c;
-    c.R = img(x, y, 0, 0);
-    c.G = img(x, y, 0, 1);
-    c.B = img(x, y, 0, 2);
+void RayImage::displayImage() {
+    cimg_library::CImgDisplay main_disp(img, name.c_str());
+    while (!main_disp.is_closed())
+        ;
+}
+
+SColor RayImage::getSample(int x, int y, float maxval) {
+    // y = height() - y;
+    // TODO: y must be changed for textures
+
+    SColor c;
+    c.R(img(x, y, 0, 0) / maxval);
+    c.G(img(x, y, 0, 1) / maxval);
+    c.B(img(x, y, 0, 2) / maxval);
     return c;
 }
 
-void RayImage::createImage(RayBuffer buffer, const char *name) {
+// SColor RayImage::getSColor(int x, int y) {
+//     float r = img(x, y, 0, 0) / 65535.0f;
+//     float g = img(x, y, 0, 1) / 65535.0f;
+//     float b = img(x, y, 0, 2) / ;
+//     SColor c;
+//     c.R(r);
+//     c.G(g);
+//     c.B(b);
+//     return c;
+// }
+
+void RayImage::createImage(RayBuffer buffer, std::string name) {
     cimg_library::CImg<unsigned char> image(buffer.getWidth(), buffer.getHeight(), 1, 3, 0);
 
     for (uint y = 0; y < buffer.getHeight(); y++) {
@@ -37,5 +59,5 @@ void RayImage::createImage(RayBuffer buffer, const char *name) {
         }
     }
 
-    image.save_bmp(name);
+    image.save_bmp(name.c_str());
 }

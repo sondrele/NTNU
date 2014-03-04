@@ -14,8 +14,8 @@ private:
     RayImage img;
 
 public:
-    Texture();
-    ~Texture();
+    Texture() {}
+    ~Texture() {}
 
     void loadTexture(std::string);
     SColor getTexel(float, float);
