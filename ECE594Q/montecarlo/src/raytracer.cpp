@@ -130,8 +130,14 @@ Ray RayTracer::computeMonteCarloRay(float x, float y) {
 }
 
 SColor RayTracer::calculateShadowScalar(Light *lt, Intersection &in, int d) {
-    if (d < 0) {
-        return SColor(0, 0, 0);   
+    if (d <= 0) {
+        return SColor(0, 0, 0);
+    } else if (!in.hasIntersected()) {
+        if (!usingEnvMap) {
+            return SColor(0, 0, 0);
+        } else {
+            return envMap.getTexel(in.getDirection());
+        }
     }
 
     Vect p = lt->getPos();
@@ -343,20 +349,27 @@ RayBuffer RayTracer::tracePaths() {
         #pragma omp parallel for
         for (uint x = 0; x < WIDTH; x++) {
             // Loop over samples to get the right color
-            float R = 0, G = 0, B = 0;
-            for (int s = 0; s < numSamples; s++) {
-                Ray r = computeMonteCarloRay((float) x, (float) y);
-                Intersection in = scene->intersectsWithBVHTree(r);
-                SColor c = shadeIntersectionPath(in, (int) depth);
-                // c = c * scene->getLights().size();
-                R += c.R(); G += c.G(); B += c.B();
+            Ray r = computeMonteCarloRay((float) x, (float) y);
+            Intersection in = scene->intersectsWithBVHTree(r);
+            SColor c = shadeIntersectionPath(in, (int) depth);
+            float R = c.R(), G = c.G(), B = c.B();
+
+            if (in.hasIntersected()) {
+                for (int s = 1; s < numSamples; s++) {
+                    r = computeMonteCarloRay((float) x, (float) y);
+                    in = scene->intersectsWithBVHTree(r);
+                    c = shadeIntersectionPath(in, (int) depth);
+                    R += c.R(); G += c.G(); B += c.B();
+                }
+                R /= (float) numSamples; G /= (float) numSamples; B /= (float) numSamples;
             }
-            R /= (float) numSamples; G /= (float) numSamples; B /= (float) numSamples;
+
             PX_Color color;
             color.R = (uint8_t) (255 * R);
             color.G = (uint8_t) (255 * G);
             color.B = (uint8_t) (255 * B);
             buffer.setPixel(x, y, color);
+
             #pragma omp critical
             {
                 p.tick();
@@ -381,7 +394,6 @@ SColor RayTracer::shadeIntersectionPath(Intersection in, int d) {
 
     Material *mat = in.getMaterial();
     float kt = mat->getTransparency();
-    // shade = mat->getDiffColor();
     SColor ks = mat->getSpecColor();
     Vect Pt = in.calculateIntersectionPoint();
 
