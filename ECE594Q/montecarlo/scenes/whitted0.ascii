@@ -6,14 +6,6 @@ camera {
   orthoUp 0 1 0
   verticalFOV 0.785398
 }
-point_light {
-  position -10 0 -3
-  color 1 1 1
-}
-directional_light {
-  direction 0.580339 -0.523277 -0.62401
-  color 1 1 1
-}
 sphere {
   name Venus
   numMaterials 1

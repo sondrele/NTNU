@@ -297,6 +297,9 @@ RayBuffer RayTracer::traceRays() {
     cout << "Tracing rays: " << WIDTH << "x" << HEIGHT << endl;
     cout << "m = " << M << ", n = " << M << endl;
     cout << "depth = " << depth << endl;
+    Progress p;
+    p.setGoal((int) (HEIGHT * WIDTH));
+
     for (uint y = 0; y < HEIGHT; y++) {
         // omp_set_num_threads(16);
         // #pragma omp parallel for
@@ -319,6 +322,10 @@ RayBuffer RayTracer::traceRays() {
             color.G = (uint8_t) (255 * G);
             color.B = (uint8_t) (255 * B);
             buffer.setPixel(x, y, color);
+            #pragma omp critical
+            {
+                p.tick();
+            }
         }
     }
     return buffer;
@@ -374,34 +381,34 @@ SColor RayTracer::shadeIntersectionPath(Intersection in, int d) {
 
     Material *mat = in.getMaterial();
     float kt = mat->getTransparency();
+    // shade = mat->getDiffColor();
     SColor ks = mat->getSpecColor();
-    SColor ka = mat->getAmbColor();
     Vect Pt = in.calculateIntersectionPoint();
-    SColor Cd = in.getColor();
 
-    SColor ambLight = ambientLightning(kt, ka, Cd);
-
+    // Trace shadow scalar towards single light
     std::vector<Light *> lts = scene->getLights();
-    uint p = (uint) ((double) lts.size() * Rand::Random());
-    Light *l = lts.at(p);
-    float Fattj = calculateFattj(Pt, l);
-    if (Fattj > 0) {
-        SColor Sj = calculateShadowScalar(l, in, (int) depth);
-        shade = shade + directIllumination(l, in, Sj, Fattj);
-        SColor diffRefl = diffuseInterreflect(in, d - 1);
-
-        shade = shade + diffRefl * 0.2f;
+    if (!lts.empty()) {
+        uint p = (uint) ((double) lts.size() * Rand::Random());
+        Light *l = lts.at(p);
+        float Fattj = calculateFattj(Pt, l);
+        if (Fattj > 0) {
+            SColor Sj = calculateShadowScalar(l, in, (int) depth);
+            shade = shade + directIllumination(l, in, Sj, Fattj);
+        }
     }
+    SColor diffRefl = diffuseInterreflect(in, d - 1);
+    shade = shade + diffRefl;
     
-    SColor reflection;
     if (ks.length() > 0) {
+        SColor reflection;
         Ray r = in.calculateReflection();
         Intersection rin = scene->intersectsWithBVHTree(r);
         reflection = shadeIntersectionPath(rin, d - 1).linearMult(ks);
+        shade = shade + reflection;
     }
 
-    SColor refraction;
     if (kt > 0) {
+        SColor refraction;
         Ray r;
         if (in.calculateRefraction(r)) {
             Intersection rin = scene->intersectsWithBVHTree(r);
@@ -409,9 +416,8 @@ SColor RayTracer::shadeIntersectionPath(Intersection in, int d) {
         } else {
             refraction = SColor(0, 0, 0);
         }
+        shade = shade + refraction;
     }
-
-    shade = ambLight + shade + reflection + refraction;
 
     return shade;
 }
@@ -419,16 +425,26 @@ SColor RayTracer::shadeIntersectionPath(Intersection in, int d) {
 SColor RayTracer::diffuseInterreflect(Intersection intersection, int d) {
     Vect norm = intersection.calculateSurfaceNormal();
     Vect rayDir = uniformSampleUpperHemisphere(norm);
-    Ray diffuseRay(intersection.calculateIntersectionPoint() + rayDir.linearMult(0.00001f), rayDir);
+    Ray diffuseRay(intersection.calculateIntersectionPoint() + norm.linearMult(0.00001f), rayDir);
+
     intersection = scene->intersectsWithBVHTree(diffuseRay);
-    SColor albedo;
-    SColor diffColor;
     if (intersection.hasIntersected()) {
-        albedo = intersection.getColor();
-        diffColor = shadeIntersection(intersection, d);
+        SColor diffRefl = intersection.getColor();
+
+        float cos_theta = rayDir.dotProduct(norm);
+        // Material *mat = intersection.getMaterial();
+        // SColor ks = mat->getSpecColor();
+        SColor BRDF = 2 * diffRefl * cos_theta;
+        SColor reflected = shadeIntersectionPath(intersection, d);
+        // Compute BRDF
+        return reflected * BRDF;// * BRDF;
     }
 
-    return albedo * diffColor;
+    if (usingEnvMap) {
+        return envMap.getTexel(rayDir);
+    } else {
+        return SColor();
+    }
 }
 
 Vect RayTracer::uniformSampleUpperHemisphere(Vect &sampleDir) {
@@ -444,9 +460,9 @@ Vect RayTracer::uniformSampleUpperHemisphere(Vect &sampleDir) {
 
     Vect sample(x, y, z);
     sample.normalize();
-    if (sample.dotProduct(sampleDir) < 0)
-        sample = sample.invert();
 
+    if (sample.dotProduct(sampleDir) < 0)
+        return sample.invert();
     return sample;
 }
 

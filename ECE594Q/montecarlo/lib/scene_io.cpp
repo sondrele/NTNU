@@ -565,7 +565,7 @@ read_objectA(ObjIO *obj, FILE *fp)
     obj->name = NULL;
   } else {
     if (word[0] != '\"' || word[strlen(word)-1] != '\"' ) {
-      printf("Error in object name format: %s\n", word);
+      // printf("Error in object name format: %s\n", word);
       obj->name = NULL;
     } else {
       word[strlen(word)-1] = '\0';	/* eat trailing quote */
