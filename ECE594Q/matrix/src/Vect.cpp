@@ -111,8 +111,41 @@ const Vect operator +(const Vect &a, const Vect &b) {
     return v;
 }
 
+const Vect operator +(const Vect &a, const float f) {
+    Vect v;
+    v.x = a.x + f;
+    v.y = a.y + f;
+    v.z = a.z + f;
+    return v;
+}
+
+const Vect operator +(const float f, const Vect &a) {
+    Vect v;
+    v.x = f + a.x;
+    v.y = f + a.y;
+    v.z = f + a.z;
+    return v;
+}
+
+
 const Vect operator -(const Vect &a, const Vect &b) {
     Vect v(a.x - b.x, a.y - b.y, a.z - b.z);
+    return v;
+}
+
+const Vect operator -(const Vect &a, const float f) {
+    Vect v;
+    v.x = a.x - f;
+    v.y = a.y - f;
+    v.z = a.z - f;
+    return v;
+}
+
+const Vect operator -(const float f, const Vect &a) {
+    Vect v;
+    v.x = f - a.x;
+    v.y = f - a.y;
+    v.z = f - a.z;
     return v;
 }
 
