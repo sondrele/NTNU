@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-// #include <chrono>
+#include <chrono>
 #include "scene_io.h"
 #include "rand.h"
 
@@ -36,6 +36,7 @@ static void loadScene(const char *name, RayTracer &rayTracer) {
     RaySceneFactory::CreateCamera(cam, *(scene->camera));
     rayTracer.setCamera(cam);
     rayTracer.setScene(rayScene);
+    rayTracer.loadEnvMap("textures/uffizi_latlong.exr");
 
     // auto end = std::chrono::system_clock::now();
     // auto elapsed =
@@ -80,7 +81,7 @@ static void render(RayTracer &rayTracer) {
     rayTracer.setM(m);
     rayTracer.setNumSamples(m);
 
-    // auto start = std::chrono::system_clock::now();
+    auto start = std::chrono::system_clock::now();
 
     RayBuffer rayBuffer;
     if (!pathTracing) {
@@ -89,13 +90,13 @@ static void render(RayTracer &rayTracer) {
         rayBuffer = rayTracer.tracePaths();
     }
     
-    // auto end = std::chrono::system_clock::now();
-    // auto elapsed =
-    //     std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    // std::cout << "Tracing time: " << elapsed.count() << std::endl;
+    auto end = std::chrono::system_clock::now();
+    auto elapsed =
+        std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    std::cout << "Tracing time: " << elapsed.count() << std::endl;
 
     RayImage img;
-    img.createImage(rayBuffer, out.c_str());
+    img.createImage(rayBuffer, out);
 }
 
 static void parseInput(int argc, char *argv[]) {

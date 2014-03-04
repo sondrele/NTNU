@@ -19,7 +19,7 @@ private:
     Vect dir;
     enum LightType type;
     SColor intensity;
-
+    
 public:
     enum LightType getType() const { return type;}
     void setType(enum LightType t) { type = t;}

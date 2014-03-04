@@ -73,6 +73,11 @@ double RayTracer::getHorizontalFOV() {
     return horiFov;
 }
 
+void RayTracer::loadEnvMap(std::string name) {
+    envMap.loadMap(name);
+    usingEnvMap = true;
+}
+
 Vect RayTracer::vertical() {
     float f = (float) tan(getVerticalFOV() / 2) * scaleConst;
     Vect vert = parallelUp.linearMult(f);
@@ -172,9 +177,14 @@ SColor RayTracer::calculateShadowScalar(Light *lt, Intersection &in, int d) {
 }
 
 SColor RayTracer::shadeIntersection(Intersection in, int d) {
-    if (d <= 0 || !in.hasIntersected()) {
-        // terminate recursion
+    if (d <= 0) {
         return SColor(0, 0, 0);
+    } else if (!in.hasIntersected()) {
+        if (!usingEnvMap) {
+            return SColor(0, 0, 0);
+        } else {
+            return envMap.getTexel(in.getDirection());
+        }
     }
 
     SColor shade(0, 0, 0);
@@ -196,7 +206,6 @@ SColor RayTracer::shadeIntersection(Intersection in, int d) {
         if (Fattj > 0) {
             SColor Sj = calculateShadowScalar(l, in, (int) depth);
             shade = shade + directIllumination(l, in, Sj, Fattj);
-            shade = shade;// + diffRefl;
         }
     }
     
@@ -242,7 +251,6 @@ SColor RayTracer::directIllumination(Light *lt, Intersection in, SColor Sj, floa
     Material *mat = in.getMaterial();
     float kt = mat->getTransparency();
     SColor ks = mat->getSpecColor();
-    // SColor Cd = mat->getDiffColor();
     SColor Cd = in.getColor();
     float q = mat->getShininess() * 128;
     SColor Ij = lt->getIntensity();
@@ -263,10 +271,6 @@ SColor RayTracer::directIllumination(Light *lt, Intersection in, SColor Sj, floa
     SColor specLight = specularLightning(q, ks, Norm, Dj, V);
 
     dirLight = dirLight.linearMult(diffuseLight + specLight);
-    // dirLight = dirLight.linearMult(Cd);
-
-    // SColor Q = N * N.dotProduct(Dj);
-    // SColor Rj = Q.linearMult(2) - Dj;
     return dirLight;
 }
 
@@ -357,9 +361,14 @@ RayBuffer RayTracer::tracePaths() {
 }
 
 SColor RayTracer::shadeIntersectionPath(Intersection in, int d) {
-    if (d <= 0 || !in.hasIntersected()) {
-        // terminate recursion
+    if (d <= 0) {
         return SColor(0, 0, 0);
+    } else if (!in.hasIntersected()) {
+        if (!usingEnvMap) {
+            return SColor(0, 0, 0);
+        } else {
+            return envMap.getTexel(in.getDirection());
+        }
     }
 
     SColor shade(0, 0, 0);
@@ -382,6 +391,7 @@ SColor RayTracer::shadeIntersectionPath(Intersection in, int d) {
         SColor Sj = calculateShadowScalar(l, in, (int) depth);
         shade = shade + directIllumination(l, in, Sj, Fattj);
         SColor diffRefl = diffuseInterreflect(in, d - 1);
+
         shade = shade + diffRefl * 0.2;
     }
     
@@ -408,12 +418,10 @@ SColor RayTracer::shadeIntersectionPath(Intersection in, int d) {
     return shade;
 }
 
-SColor RayTracer::diffuseInterreflect(Intersection &intersection, int depth) {
+SColor RayTracer::diffuseInterreflect(Intersection intersection, int depth) {
     Vect norm = intersection.calculateSurfaceNormal();
     Vect rayDir = uniformSampleUpperHemisphere(norm);
     Ray diffuseRay(intersection.calculateIntersectionPoint() + rayDir.linearMult(0.00001), rayDir);
-    // cout << diffuseRay.getOrigin() << endl;
-    // cout << diffuseRay.getDirection() << endl;
     intersection = scene->intersectsWithBVHTree(diffuseRay);
     SColor albedo;
     SColor diffColor;
@@ -424,14 +432,6 @@ SColor RayTracer::diffuseInterreflect(Intersection &intersection, int depth) {
 
     // cout << diffColor << endl;
     return albedo * diffColor;
-    // if (settings.sampljeType == UNIFORM) {
-    //     // Probablity: 1/(2PI) -- (1/probability)*cos(theta)*brdf*radiancealongray
-    // } else if (settings.sampleType == IMPORTANCE) {
-    //     // Probability: cos(theta)/PI -- (1/probability)*cos(theta)*brdf*radiancealongray
-    //     return albedo * diffColor;
-    // } else {
-    //     return SColor(0, 0, 0);
-    // }
 }
 
 Vect RayTracer::uniformSampleUpperHemisphere(Vect &sampleDir) {
@@ -446,10 +446,10 @@ Vect RayTracer::uniformSampleUpperHemisphere(Vect &sampleDir) {
     z = 1 - 2 * r3;
 
     Vect sample(x, y, z);
+    sample.normalize();
     if (sample.dotProduct(sampleDir) < 0)
         sample = sample.invert();
 
-    sample.normalize();
     return sample;
 }
 

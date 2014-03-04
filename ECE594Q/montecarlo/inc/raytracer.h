@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "progress.h"
+#include "envmap.h"
 #include "Matrix.h"
 #include "rand.h"
 #include "ray.h"
@@ -23,9 +24,12 @@ private:
     uint depth;
     float scaleConst;   // c
 
+    bool usingEnvMap = false;
+
     RayBuffer buffer;
     RayScene *scene;
     Camera camera;
+    EnvMap envMap;
 
     Vect parallelRight; // A: viewDir x orthogonalUp - dir of x-axis
     Vect parallelUp;    // B: A x viewDir
@@ -34,10 +38,9 @@ private:
     void calculateImagePlane();
 
 public:
-    // RayTracer(uint, uint);
     RayTracer(uint, uint, uint);
-    // RayTracer(uint, uint, Vect, Vect);
     ~RayTracer();
+    // Setters and getters
     uint getWidth() { return WIDTH;}
     uint getHeight() { return HEIGHT;}
     void setM(float m) { M = m; }
@@ -47,7 +50,6 @@ public:
     Camera getCamera() { return camera; }
     void setCameraPos(Vect);
     Vect getCameraPos() { return camera.getPos(); }
-
     void setViewDirection(Vect);
     Vect getViewDirection() { return camera.getViewDir(); }
     void setOrthogonalUp(Vect);
@@ -55,14 +57,15 @@ public:
     Vect getParallelRight() { return parallelRight; }
     Vect getParallelUp() { return parallelUp; }
     Vect getImageCenter();
-
+    // Util functions for setting up scenes
+    void loadEnvMap(std::string);
     Vect vertical();
     Vect horizontal();
     double getVerticalFOV() { return camera.getVerticalFOV(); }
     double getHorizontalFOV();
     Point_2D computePoint(uint, uint);
     Vect computeDirection(uint, uint);
-
+    // Ray tracing functions
     Ray computeRay(uint, uint);
     Ray computeMonteCarloRay(float, float);
     SColor calculateShadowScalar(Light *, Intersection &, int);
@@ -70,17 +73,15 @@ public:
     SColor shadeIntersectionPath(Intersection in, int d);
     RayBuffer traceRays();
     RayBuffer tracePaths();
-
     // Whitted illumination
     float calculateFattj(Vect, Light *);        
     SColor ambientLightning(float, SColor, SColor);
     SColor directIllumination(Light *, Intersection, SColor, float);
     SColor diffuseLightning(float, SColor, Vect, Vect);
     SColor specularLightning(float, SColor, Vect, Vect, Vect);
-
     // Pathtracing
     bool russianRoulette(SColor, float &);
-    SColor diffuseInterreflect(Intersection &, int);
+    SColor diffuseInterreflect(Intersection , int);
     Vect uniformSampleUpperHemisphere(Vect &);
 };
 

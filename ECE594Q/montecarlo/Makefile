@@ -4,7 +4,7 @@ INCLUDEPATH=\
     -I./inc
 CC=clang++
 CC=g++
-CFLAGS = $(INCLUDEPATH) -Wall -std=c++11 -lm -O3 -fopenmp -ffast-math
+CFLAGS = $(INCLUDEPATH) -Wall -std=c++11 -lm -O3 -fopenmp -ffast-math -g
 #-pg
 CIMGFLAGS = $(CFLAGS) -L/usr/X11R6/lib -lm -lpthread -lX11
 LDFLAGS=
@@ -29,6 +29,7 @@ SRCS = src/ray.cpp\
     src/bvhtree.cpp\
     src/rand.cpp\
     src/progress.cpp\
+    src/envmap.cpp\
     src/raytracer.cpp
 OBJS = $(SRCS:.cpp=.o) $(LIBS:.cpp=.o) 
 INCS = $(wildcard ./inc/*.h)
@@ -40,6 +41,9 @@ all: montecarlo
 
 montecarlo: montecarlo.o $(OBJS)
 	$(CC) -o $@ $^ $(CIMGFLAGS)
+
+cornell: montecarlo
+	time ./montecarlo cornell 300 300 5 10
 
 clean:
 	rm -f *.o

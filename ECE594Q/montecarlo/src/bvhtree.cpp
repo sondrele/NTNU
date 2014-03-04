@@ -138,7 +138,7 @@ Intersection BVHTree::searchTree(BVHNode *n, Ray r) {
                 return i.hasIntersected() ? i : j;
             }
         }
-        return Intersection();
+        return Intersection(r);
     }
 }
 

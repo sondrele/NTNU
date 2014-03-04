@@ -1,17 +1,13 @@
 Composer format 2.1 ascii
 camera {
-  position 0 0 0
-  viewDirection 0 0 -1
+  position -3 5 15
+  viewDirection 0.1 -0.2 -1
   focalDistance 12.2118
   orthoUp 0 1 0
   verticalFOV 0.785398
 }
 point_light {
-  position -1.84647 0.778452 2.67544
-  color 1 1 1
-}
-point_light {
-  position -7.78433 2.38677 -5.08224
+  position -10 0 -3
   color 1 1 1
 }
 directional_light {
@@ -19,18 +15,18 @@ directional_light {
   color 1 1 1
 }
 sphere {
-  name NULL
+  name Venus
   numMaterials 1
   material {
-    diffColor 0.56 0.35 0.14
+    diffColor 0.201923 0.197083 0.200713
     ambColor 0.2 0.2 0.2
-    specColor 0.5 0.5 0.5
+    specColor 0.721154 0.721154 0.721154
     emisColor 0 0 0
-    shininess 0.2
+    shininess 0.8
     ktran 0
   }
-  origin 0 0 -5
-  radius 1.33453
+  origin -4 0 -12
+  radius 5.5
   xaxis 1 0 0
   xlength 1.33453
   yaxis 0 1 0
