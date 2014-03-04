@@ -13,7 +13,7 @@
 #define EXR_MAX_VAL     65535.0f
 
 class RImage {
-public:
+protected:
     cimg_library::CImg<float> img;
     std::string name;
 
