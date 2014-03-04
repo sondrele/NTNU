@@ -1,7 +1,7 @@
 Composer format 2.1 ascii
 camera {
-  position 5 5 -20
-  viewDirection -0.1 -0.2 0.8
+  position 2 6 -18
+  viewDirection 0 -0.1 0.8
   focalDistance 6.37114
   orthoUp 0 1 0
   verticalFOV 0.785398
@@ -15,7 +15,7 @@ point_light {
   color 1 1 1
 }
 poly_set {
-  name NULL
+  name WhiteBox
   numMaterials 1
   material {
     diffColor 1 1 1
@@ -30,82 +30,70 @@ poly_set {
   materialBinding PER_OBJECT_MATERIAL
   hasTextureCoords FALSE
   rowSize 0
-  numPolys 12
+  numPolys 10
   poly {
     numVertices 3
-    pos 0 0 0
-    pos 2 0 0
-    pos 2 2 0
+    pos 0 0 -2
+    pos 3 0 0
+    pos 3 4 0
   }
   poly {
     numVertices 3
-    pos 0 0 0
-    pos 0 2 0
-    pos 2 2 0
+    pos 0 0 -2
+    pos 0 4 -2
+    pos 3 4 0
   }
   poly {
     numVertices 3
-    pos 0 0 2
-    pos 2 0 2
-    pos 2 2 2
+    pos 0 0 -2
+    pos -2 0 2
+    pos -2 4 2
   }
   poly {
     numVertices 3
-    pos 0 0 2
-    pos 0 2 2
-    pos 2 2 2
+    pos 0 0 -2
+    pos 0 4 -2
+    pos -2 4 2
   }
   poly {
     numVertices 3
-    pos 0 0 0
-    pos 0 2 0
-    pos 0 2 2
+    pos 3 4 0
+    pos 1 4 4
+    pos 3 0 0
   }
   poly {
     numVertices 3
-    pos 0 0 0
-    pos 0 0 2
-    pos 0 2 2
+    pos 3 0 0
+    pos 1 0 4
+    pos 1 4 4
   }
   poly {
     numVertices 3
-    pos 2 0 0
-    pos 2 2 0
-    pos 2 2 2
+    pos 1 0 4
+    pos 1 4 4
+    pos -2 0 2
   }
   poly {
     numVertices 3
-    pos 2 0 0
-    pos 2 0 2
-    pos 2 2 2
+    pos -2 0 2
+    pos -2 4 2
+    pos 1 4 4
   }
   poly {
     numVertices 3
-    pos 0 0 0
-    pos 2 0 0
-    pos 2 0 2
+    pos 3 4 0
+    pos -2 4 2
+    pos 0 4 -2
   }
   poly {
     numVertices 3
-    pos 0 0 0
-    pos 0 0 2
-    pos 2 0 2
-  }
-  poly {
-    numVertices 3
-    pos 0 2 0
-    pos 2 2 0
-    pos 2 2 2
-  }
-  poly {
-    numVertices 3
-    pos 0 2 0
-    pos 0 2 2
-    pos 2 2 2
+    pos 3 4 0
+    pos -2 4 2
+    pos 1 4 4
   }
 }
 poly_set {
-  name NULL
+  name GreenWall
   numMaterials 1
   material {
     diffColor 0.1 0.6 0.1
@@ -194,9 +182,8 @@ poly_set {
     pos 8.1 10 10
   }
 }
-
 poly_set {
-  name NULL
+  name RedWall
   numMaterials 1
   material {
     diffColor 0.6 0.1 0.1
@@ -286,7 +273,7 @@ poly_set {
   }
 }
 poly_set {
-  name NULL
+  name Floor
   numMaterials 1
   material {
     diffColor 0.1 0.1 0.1
@@ -328,7 +315,7 @@ poly_set {
   }
 }
 poly_set {
-  name NULL
+  name BackWall
   numMaterials 1
   material {
     diffColor 0.1 0.1 0.1
