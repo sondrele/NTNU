@@ -1,6 +1,6 @@
 INCLUDEPATH=\
     -I../matrix/inc\
-    -Ilib\
+    -I./lib\
     -I./inc
 CC=clang++
 CC=g++
@@ -11,6 +11,7 @@ LDFLAGS=
 LIBS = \
     lib/scene_io.cpp\
     lib/rayimage.cpp\
+    lib/rand.cpp\
     ../matrix/src/Matrix.cpp\
     ../matrix/src/Vect.cpp
 SRCS = src/ray.cpp\
@@ -27,7 +28,6 @@ SRCS = src/ray.cpp\
     src/shader.cpp\
     src/texture.cpp\
     src/bvhtree.cpp\
-    src/rand.cpp\
     src/progress.cpp\
     src/envmap.cpp\
     src/raytracer.cpp

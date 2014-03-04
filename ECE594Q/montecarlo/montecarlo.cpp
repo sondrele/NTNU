@@ -36,7 +36,7 @@ static void loadScene(const char *name, RayTracer &rayTracer) {
     RaySceneFactory::CreateCamera(cam, *(scene->camera));
     rayTracer.setCamera(cam);
     rayTracer.setScene(rayScene);
-    rayTracer.loadEnvMap("textures/uffizi_latlong.exr");
+    //rayTracer.loadEnvMap("textures/uffizi_latlong.exr");
 
     // auto end = std::chrono::system_clock::now();
     // auto elapsed =

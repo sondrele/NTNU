@@ -24,7 +24,7 @@ private:
     uint depth;
     float scaleConst;   // c
 
-    bool usingEnvMap = false;
+    bool usingEnvMap;
 
     RayBuffer buffer;
     RayScene *scene;
