@@ -75,7 +75,7 @@ double RayTracer::getHorizontalFOV() {
 }
 
 void RayTracer::loadEnvMap(std::string name) {
-    envMap.loadMap(name);
+    envMap.loadImage(name);
     usingEnvMap = true;
 }
 
@@ -432,12 +432,9 @@ SColor RayTracer::diffuseInterreflect(Intersection intersection, int d) {
         SColor diffRefl = intersection.getColor();
 
         float cos_theta = rayDir.dotProduct(norm);
-        // Material *mat = intersection.getMaterial();
-        // SColor ks = mat->getSpecColor();
         SColor BRDF = 2 * diffRefl * cos_theta;
         SColor reflected = shadeIntersectionPath(intersection, d);
-        // Compute BRDF
-        return reflected * BRDF;// * BRDF;
+        return reflected * BRDF /* + diffRefl * 0.2f */;
     }
 
     if (usingEnvMap) {

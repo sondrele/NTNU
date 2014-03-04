@@ -7,19 +7,14 @@
 
 #include "material.h"
 #include "raybuffer.h"
-#include "rayimage.h"
+#include "rimage.h"
 
-class Texture {
-private:
-    RayImage img;
-
+class Texture : public RImage {
 public:
     Texture() {}
     ~Texture() {}
 
-    void loadTexture(std::string);
     SColor getTexel(float, float);
-
 };
 
 #endif // _TEXTURE_H_

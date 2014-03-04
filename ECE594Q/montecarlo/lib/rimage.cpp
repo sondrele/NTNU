@@ -1,27 +1,27 @@
-#include "rayimage.h"
+#include "rimage.h"
 
 #include <iostream>
 
-int RayImage::width() {
+int RImage::width() {
     return img.width();
 }
 
-int RayImage::height() {
+int RImage::height() {
     return img.height();
 }
 
-void RayImage::loadImage(std::string n) {
+void RImage::loadImage(std::string n) {
     name = n;
     img.load(name.c_str());
 }
 
-void RayImage::displayImage() {
+void RImage::displayImage() {
     cimg_library::CImgDisplay main_disp(img, name.c_str());
     while (!main_disp.is_closed())
         ;
 }
 
-SColor RayImage::getSample(int x, int y, float maxval) {
+SColor RImage::getSample(int x, int y, float maxval) {
     // y = height() - y;
     // TODO: y must be changed for textures
 
@@ -32,18 +32,7 @@ SColor RayImage::getSample(int x, int y, float maxval) {
     return c;
 }
 
-// SColor RayImage::getSColor(int x, int y) {
-//     float r = img(x, y, 0, 0) / 65535.0f;
-//     float g = img(x, y, 0, 1) / 65535.0f;
-//     float b = img(x, y, 0, 2) / ;
-//     SColor c;
-//     c.R(r);
-//     c.G(g);
-//     c.B(b);
-//     return c;
-// }
-
-void RayImage::createImage(RayBuffer buffer, std::string name) {
+void RImage::createImage(RayBuffer buffer, std::string name) {
     cimg_library::CImg<unsigned char> image(buffer.getWidth(), buffer.getHeight(), 1, 3, 0);
 
     for (uint y = 0; y < buffer.getHeight(); y++) {

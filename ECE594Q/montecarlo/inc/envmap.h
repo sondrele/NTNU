@@ -6,19 +6,14 @@
 #include "material.h"
 #include "ray.h"
 #include "raybuffer.h"
-#include "rayimage.h"
+#include "rimage.h"
 
-class EnvMap {
-private:
-    RayImage img;
-
+class EnvMap : public RImage {
 public:
     EnvMap() {}
     ~EnvMap() {}
 
-    void loadMap(std::string);
-    void show();
     SColor getTexel(Vect);
 };
 
-#endif
+#endif // _ENVMAP_H_

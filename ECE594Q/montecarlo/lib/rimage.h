@@ -1,5 +1,5 @@
-#ifndef _RAYIMAGE_H_
-#define _RAYIMAGE_H_
+#ifndef _RIMAGE_H_
+#define _RIMAGE_H_
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,7 +12,7 @@
 #define BMP_MAX_VAL     255.0f
 #define EXR_MAX_VAL     65535.0f
 
-class RayImage {
+class RImage {
 public:
     cimg_library::CImg<float> img;
     std::string name;
@@ -26,4 +26,4 @@ public:
     SColor getSample(int, int, float);
 };
 
-#endif // _RAYIMAGE_H_
+#endif // _RIMAGE_H_

@@ -4,13 +4,13 @@ INCLUDEPATH=\
     -I./inc
 CC=clang++
 CC=g++
-CFLAGS = $(INCLUDEPATH) -Wall -std=c++11 -lm -O3 -fopenmp -ffast-math -g
+CFLAGS = $(INCLUDEPATH) -Wall -std=c++11 -lm -fopenmp -ffast-math -g
 #-pg
 CIMGFLAGS = $(CFLAGS) -L/usr/X11R6/lib -lm -lpthread -lX11
 LDFLAGS=
 LIBS = \
     lib/scene_io.cpp\
-    lib/rayimage.cpp\
+    lib/rimage.cpp\
     lib/rand.cpp\
     ../matrix/src/Matrix.cpp\
     ../matrix/src/Vect.cpp

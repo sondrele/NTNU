@@ -6,7 +6,7 @@
 
 #include "raytracer.h"
 #include "rayscene_factory.h"
-#include "rayimage.h"
+#include "rimage.h"
 
 #define SCENES         "./scenes/"
 #define ASCII           ".ascii"
@@ -52,12 +52,12 @@ static void loadShaderScene(const char *name, RayTracer &rayTracer) {
     
     // Load the textures and shaders for the demo scene
     Texture *jupterTexture = new Texture();
-    jupterTexture->loadTexture(std::string("textures/jupiter.bmp"));
+    jupterTexture->loadImage(std::string("textures/jupiter.bmp"));
     Sphere *s0 = (Sphere *) rayScene->getShape(0);
     s0->setTexture(jupterTexture);
 
     Texture *earthTexture = new Texture();
-    earthTexture->loadTexture(std::string("textures/earth.bmp"));
+    earthTexture->loadImage(std::string("textures/earth.bmp"));
     Sphere *s1 = (Sphere *) rayScene->getShape(1);
     s1->setTexture(earthTexture);
 
@@ -66,7 +66,7 @@ static void loadShaderScene(const char *name, RayTracer &rayTracer) {
 
 
     Texture *venusTexture = new Texture();
-    venusTexture->loadTexture(std::string("textures/venus.bmp"));
+    venusTexture->loadImage(std::string("textures/venus.bmp"));
     Sphere *s3 = (Sphere *) rayScene->getShape(3);
     s3->setTexture(venusTexture);
     // s3->setIShader(new CheckIShader());
@@ -95,7 +95,7 @@ static void render(RayTracer &rayTracer) {
         std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
     std::cout << "Tracing time: " << elapsed.count() << std::endl;
 
-    RayImage img;
+    RImage img;
     img.createImage(rayBuffer, out);
 }
 
