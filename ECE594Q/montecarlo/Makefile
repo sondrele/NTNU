@@ -18,9 +18,9 @@ SRCS = src/ray.cpp\
     src/intersection.cpp\
     src/camera.cpp\
     src/raybuffer.cpp\
-    src/rayscene.cpp\
-    src/rayscene_factory.cpp\
-    src/rayscene_shapes.cpp\
+    src/rscene.cpp\
+    src/rscenefactory.cpp\
+    src/shapes.cpp\
     src/sphere.cpp\
     src/mesh.cpp\
     src/triangle.cpp\

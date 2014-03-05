@@ -1,4 +1,4 @@
-#include "rayscene_shapes.h"
+#include "shapes.h"
 
 Sphere::Sphere() {
     radius = 0;

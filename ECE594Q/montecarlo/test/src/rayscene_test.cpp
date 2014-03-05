@@ -1,12 +1,12 @@
 #include "CppUTest/CommandLineTestRunner.h"
 #include "CppUTestExt/MockSupport.h"
-#include "rayscene.h"
-#include "rayscene_factory.h"
+#include "rscene.h"
+#include "rscenefactory.h"
 
 Shape *sphere0;
 Shape *sphere1;
 
-TEST_GROUP(RaySceneTest) {
+TEST_GROUP(RSceneTest) {
     void setup() {
         Sphere *s = new Sphere();
         s->setRadius(1);
@@ -25,8 +25,8 @@ TEST_GROUP(RaySceneTest) {
     }
 };
 
-TEST(RaySceneTest, can_add_shapes) {
-    RayScene s;
+TEST(RSceneTest, can_add_shapes) {
+    RScene s;
     s.addShape(sphere0);
     s.addShape(sphere1);
 
@@ -37,8 +37,8 @@ TEST(RaySceneTest, can_add_shapes) {
     CHECK_EQUAL(1, sp->getRadius());
 }
 
-TEST(RaySceneTest, ray_intersects_with_shape) {
-    RayScene s;
+TEST(RSceneTest, ray_intersects_with_shape) {
+    RScene s;
     s.addShape(sphere0);
     s.addShape(sphere1);
     Ray r(Vect(0, 0, 0), Vect(0, 0, -1));
@@ -54,8 +54,8 @@ TEST(RaySceneTest, ray_intersects_with_shape) {
     DOUBLES_EQUAL(2.0, is.getIntersectionPoint(), 0.000001);
 }
 
-TEST(RaySceneTest, ray_intersects_with_scenes_searchtree) {
-    RayScene s;
+TEST(RSceneTest, ray_intersects_with_scenes_searchtree) {
+    RScene s;
     s.addShape(sphere0);
     s.addShape(sphere1);
     Ray r(Vect(0, 0, 0), Vect(0, 0, -1));

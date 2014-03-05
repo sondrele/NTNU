@@ -5,7 +5,7 @@
 #include <sstream>
 
 #include "ray.h"
-#include "rayscene_shapes.h"
+#include "shapes.h"
 
 class SColor;
 class Shape;

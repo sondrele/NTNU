@@ -1,6 +1,6 @@
 #include "CppUTest/CommandLineTestRunner.h"
 #include "CppUTestExt/MockSupport.h"
-#include "rayscene_shapes.h"
+#include "shapes.h"
 
 Triangle *t;
 Material *mat0;
@@ -8,7 +8,7 @@ Material *mat1;
 Material *mat2;
 
 
-TEST_GROUP(RaySceneShapesTest) {
+TEST_GROUP(RSceneShapesTest) {
     void setup() {
         mat0 = new Material(); mat0->setDiffColor(SColor(0, 0, 0));
         mat1 = new Material(); mat1->setDiffColor(SColor(0, 0, 0));
@@ -27,7 +27,7 @@ TEST_GROUP(RaySceneShapesTest) {
     }
 };
 
-TEST(RaySceneShapesTest, ray_can_intersect_with_triangle) {
+TEST(RSceneShapesTest, ray_can_intersect_with_triangle) {
     Triangle t0;
     t0.setA(Vertex(0, 0, 1));
     t0.setB(Vertex(-1, -1, 2));
@@ -52,7 +52,7 @@ TEST(RaySceneShapesTest, ray_can_intersect_with_triangle) {
     CHECK_FALSE(is.hasIntersected());
 }
 
-TEST(RaySceneShapesTest, ray_can_intersect_with_mesh) {
+TEST(RSceneShapesTest, ray_can_intersect_with_mesh) {
     Material *m0 = new Material();
     Triangle *t0 = new Triangle();
     t0->addMaterial(m0);
@@ -85,7 +85,7 @@ TEST(RaySceneShapesTest, ray_can_intersect_with_mesh) {
 
 }
 
-TEST(RaySceneShapesTest, triangle_has_per_vertex_normals) {
+TEST(RSceneShapesTest, triangle_has_per_vertex_normals) {
     Vect n0 = t->getA().getSurfaceNormal();
     Vect n1 = t->getB().getSurfaceNormal();
     Vect n2 = t->getC().getSurfaceNormal();
@@ -94,7 +94,7 @@ TEST(RaySceneShapesTest, triangle_has_per_vertex_normals) {
     CHECK_EQUAL(-1, n2.getZ());
 }
 
-TEST(RaySceneShapesTest, triangle_has_area) {
+TEST(RSceneShapesTest, triangle_has_area) {
     Triangle t0;
     t0.setA(Vertex(0, 0, -4));
     t0.setB(Vertex(2, 2, -4));
@@ -103,7 +103,7 @@ TEST(RaySceneShapesTest, triangle_has_area) {
     DOUBLES_EQUAL(2, area, 0.00001);
 }
 
-TEST(RaySceneShapesTest, can_get_interpolation_of_triangle_surface) {
+TEST(RSceneShapesTest, can_get_interpolation_of_triangle_surface) {
     Ray r(Vect(0, 1, -1), Vect(0, -1, 0));
     Intersection in = t->intersects(r);
     CHECK(in.hasIntersected());
@@ -125,7 +125,7 @@ TEST(RaySceneShapesTest, can_get_interpolation_of_triangle_surface) {
     DOUBLES_EQUAL(-0.707101f, n.getZ(), 0.00001);
 }
 
-TEST(RaySceneShapesTest, can_get_interpolated_color) {
+TEST(RSceneShapesTest, can_get_interpolated_color) {
     t->setPerVertexMaterial(true);
 
     SColor color = t->getColor(Vect(0, 0, -1));
@@ -139,7 +139,7 @@ TEST(RaySceneShapesTest, can_get_interpolated_color) {
     CHECK_EQUAL(0.5f, color.B());
 }
 
-TEST(RaySceneShapesTest, can_get_long_and_lat_from_sphere) {
+TEST(RSceneShapesTest, can_get_long_and_lat_from_sphere) {
     Sphere s;
     s.setOrigin(Vect(0, -1, -1));
     s.setRadius(1);
@@ -153,7 +153,7 @@ TEST(RaySceneShapesTest, can_get_long_and_lat_from_sphere) {
     DOUBLES_EQUAL(0, pt.y, 0.00001);
 }
 
-TEST(RaySceneShapesTest, can_compare_shapes) {
+TEST(RSceneShapesTest, can_compare_shapes) {
     Sphere s;
     s.setOrigin(Vect(-2, -1, -1));
     s.setRadius(2);
@@ -167,7 +167,7 @@ TEST(RaySceneShapesTest, can_compare_shapes) {
     CHECK(*t < s);
 }
 
-TEST(RaySceneShapesTest, ray_can_intersect_with_boundingBox) {
+TEST(RSceneShapesTest, ray_can_intersect_with_boundingBox) {
     BBox box;
     box.setMin(Vect(0, 0, 0));
     box.setMax(Vect(1, 1, 1));
@@ -188,7 +188,7 @@ TEST(RaySceneShapesTest, ray_can_intersect_with_boundingBox) {
     CHECK_FALSE(box.intersects(r));
 }
 
-TEST(RaySceneShapesTest, mesh_boundingbox_updates_for_every_triangle) {
+TEST(RSceneShapesTest, mesh_boundingbox_updates_for_every_triangle) {
     Vertex a0(0, 0, 0); Vertex a1(1, 0, 0); Vertex a2(0, 0, -1);
     Vertex b0(0, 1, 0);
     Vertex c0(-2, -2, -3); Vertex c1(-2, 3, 1.5f); Vertex c2(3, 1.5f, -1);
@@ -224,7 +224,7 @@ TEST(RaySceneShapesTest, mesh_boundingbox_updates_for_every_triangle) {
 
 }
 
-TEST(RaySceneShapesTest, can_get_bbox_centroid) {
+TEST(RSceneShapesTest, can_get_bbox_centroid) {
     BBox x;
     x.setMin(Vect(-2, -2, -2));
     x.setMax(Vect(1, 1, 1));
@@ -234,7 +234,7 @@ TEST(RaySceneShapesTest, can_get_bbox_centroid) {
     CHECK_EQUAL(-0.5f, centroid.getZ());
 }
 
-TEST(RaySceneShapesTest, can_sum_bboxes) {
+TEST(RSceneShapesTest, can_sum_bboxes) {
     BBox x;
     x.setMin(Vect(-2, -2, -2));
     x.setMax(Vect(1, 1, 1));

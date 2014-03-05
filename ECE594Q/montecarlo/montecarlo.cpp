@@ -5,7 +5,7 @@
 #include "rand.h"
 
 #include "raytracer.h"
-#include "rayscene_factory.h"
+#include "rscenefactory.h"
 #include "rimage.h"
 
 #define SCENES         "./scenes/"
@@ -29,11 +29,11 @@ static void loadScene(const char *name, RayTracer &rayTracer) {
     
     /* load the scene into the SceneIO data structure using given parsing code */
     scene = readScene(name);
-    RayScene *rayScene = new RayScene();
-    RaySceneFactory::CreateScene(*rayScene, *scene);
+    RScene *rayScene = new RScene();
+    RSceneFactory::CreateScene(*rayScene, *scene);
 
     Camera cam;
-    RaySceneFactory::CreateCamera(cam, *(scene->camera));
+    RSceneFactory::CreateCamera(cam, *(scene->camera));
     rayTracer.setCamera(cam);
     rayTracer.setScene(rayScene);
     rayTracer.loadEnvMap("textures/uffizi_latlong.exr");
@@ -47,8 +47,8 @@ static void loadScene(const char *name, RayTracer &rayTracer) {
 static void loadShaderScene(const char *name, RayTracer &rayTracer) {
     /* load the scene into the SceneIO data structure using given parsing code */
     scene = readScene(name);
-    RayScene *rayScene = new RayScene();
-    RaySceneFactory::CreateScene(*rayScene, *scene);
+    RScene *rayScene = new RScene();
+    RSceneFactory::CreateScene(*rayScene, *scene);
     
     // Load the textures and shaders for the demo scene
     Texture *jupterTexture = new Texture();
@@ -72,7 +72,7 @@ static void loadShaderScene(const char *name, RayTracer &rayTracer) {
     // s3->setIShader(new CheckIShader());
 
     Camera cam;
-    RaySceneFactory::CreateCamera(cam, *(scene->camera));
+    RSceneFactory::CreateCamera(cam, *(scene->camera));
     rayTracer.setCamera(cam);
     rayTracer.setScene(rayScene);
 }

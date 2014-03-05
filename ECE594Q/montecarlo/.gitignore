@@ -16,3 +16,4 @@ raytracer.vcxproj.filters
 raytracer.vcxproj.user
 *.txt
 textures
+tinyobjloader-master

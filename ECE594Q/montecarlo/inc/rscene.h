@@ -10,7 +10,7 @@
 #include "ray.h"
 #include "intersection.h"
 #include "raybuffer.h"
-#include "rayscene_shapes.h"
+#include "shapes.h"
 #include "bvhtree.h"
 
 class Light {
@@ -31,15 +31,15 @@ public:
     void setIntensity(SColor i) { intensity = i; }
 };
 
-class RayScene {
+class RScene {
 private:
     std::vector<Light *> lights;
     std::vector<Shape *> shapes;
     BVHTree searchTree;
 
 public:
-    RayScene();
-    ~RayScene();
+    RScene();
+    ~RScene();
 
     void setLights(std::vector<Light *>);
     void addLight(Light *);

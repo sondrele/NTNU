@@ -14,7 +14,7 @@ sphere {
     ambColor 0.2 0.2 0.2
     specColor 0.721154 0.721154 0.721154
     emisColor 0 0 0
-    shininess 0.8
+    shininess 0
     ktran 0
   }
   origin -4 0 -12

@@ -19,7 +19,7 @@ void Progress::update() {
     int p = (int) ((float) current / (float) goal * 100);
     if (p > percentage) {
         percentage = p;
-        if (percentage % 20 == 0)
+        if (percentage % 5 == 0)
             std::cout << percentage << "%" << std::endl;
     }
 }

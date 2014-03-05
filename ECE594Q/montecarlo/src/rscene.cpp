@@ -1,9 +1,9 @@
-#include "rayscene.h"
+#include "rscene.h"
 
-RayScene::RayScene() {
+RScene::RScene() {
 }
 
-RayScene::~RayScene() {
+RScene::~RScene() {
     for (uint i = 0; i < shapes.size(); i++) {
         Shape *s = shapes.at(i);
         delete s;
@@ -14,20 +14,20 @@ RayScene::~RayScene() {
     }
 }
 
-void RayScene::setLights(std::vector<Light *> ls) {
+void RScene::setLights(std::vector<Light *> ls) {
     lights = ls;
 }
 
-void RayScene::addLight(Light *l) {
+void RScene::addLight(Light *l) {
     lights.push_back(l);
 
 }
 
-Light * RayScene::getLight(uint pos) {
+Light * RScene::getLight(uint pos) {
     return lights.at(pos);
 }
 
-void RayScene::setShapes(std::vector<Shape *> ss) {
+void RScene::setShapes(std::vector<Shape *> ss) {
     shapes = ss;
     std::vector<Shape *> shps;
     for (uint i = 0; i < shapes.size(); i++) {
@@ -42,16 +42,16 @@ void RayScene::setShapes(std::vector<Shape *> ss) {
     searchTree.buildTree(shps);
 }
 
-void RayScene::addShape(Shape *s) {
+void RScene::addShape(Shape *s) {
     shapes.push_back(s);
     searchTree.buildTree(shapes);
 }
 
-Shape * RayScene::getShape(uint pos) {
+Shape * RScene::getShape(uint pos) {
     return shapes.at(pos);
 }
 
-Intersection RayScene::calculateRayIntersection(Ray ray) {
+Intersection RScene::calculateRayIntersection(Ray ray) {
     Intersection ins;
     for (uint i = 0; i < shapes.size(); i++) {
         Shape *s = shapes.at(i);
@@ -73,6 +73,6 @@ Intersection RayScene::calculateRayIntersection(Ray ray) {
     return ins;
 }
 
-Intersection RayScene::intersectsWithBVHTree(Ray ray) {
+Intersection RScene::intersectsWithBVHTree(Ray ray) {
     return searchTree.intersects(ray);
 }

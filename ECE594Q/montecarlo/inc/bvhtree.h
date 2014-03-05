@@ -8,7 +8,7 @@
 
 #include "ray.h"
 #include "intersection.h"
-#include "rayscene_shapes.h"
+#include "shapes.h"
 
 class BVHTree;
 

@@ -1,7 +1,7 @@
 #include "CppUTest/CommandLineTestRunner.h"
 #include "CppUTestExt/MockSupport.h"
-#include "rayscene.h"
-#include "rayscene_factory.h"
+#include "rscene.h"
+#include "rscenefactory.h"
 
 SphereIO sphere;
 PolygonIO triangle0, triangle1;
@@ -14,7 +14,7 @@ LightIO light1;
 CameraIO camera;
 SceneIO scene;
 
-TEST_GROUP(RaySceneFactory) {
+TEST_GROUP(RSceneFactory) {
     void setup() {
         sphere.origin[0] = -2.11537f;
         sphere.origin[1] = -0.766425f;
@@ -122,9 +122,9 @@ TEST_GROUP(RaySceneFactory) {
     }
 };
 
-TEST(RaySceneFactory, can_init_sphere) {
+TEST(RSceneFactory, can_init_sphere) {
     Sphere s;
-    RaySceneFactory::CreateSphere(s, sphere);
+    RSceneFactory::CreateSphere(s, sphere);
 
     CHECK_EQUAL(1.33453f, s.getRadius());
     CHECK_EQUAL(1.33453f, s.getXlen());
@@ -136,19 +136,19 @@ TEST(RaySceneFactory, can_init_sphere) {
     CHECK_EQUAL(0, x.getZ());
 }
 
-TEST(RaySceneFactory, can_convert_color_to_PX_Color) {
+TEST(RSceneFactory, can_convert_color_to_PX_Color) {
     Color c;
     c[0] = 0;
     c[1] = 0.5;
     c[2] = 1;
-    PX_Color color = RaySceneFactory::ColorToPX_Color(c);
+    PX_Color color = RSceneFactory::ColorToPX_Color(c);
     CHECK_EQUAL(0, color.R);
     CHECK_EQUAL(127, color.G);
     CHECK_EQUAL(255, color.B);
 }
 
-TEST(RaySceneFactory, can_init_triangle) {
-    Triangle *t = RaySceneFactory::CreateTriangle(triangle0);
+TEST(RSceneFactory, can_init_triangle) {
+    Triangle *t = RSceneFactory::CreateTriangle(triangle0);
     Vect b = t->getB();
     DOUBLES_EQUAL(0.4, b.getX(), 0.00001);
     DOUBLES_EQUAL(0.5, b.getY(), 0.00001);
@@ -157,8 +157,8 @@ TEST(RaySceneFactory, can_init_triangle) {
     delete t;
 }
 
-TEST(RaySceneFactory, can_init_triangle_with_bindings) {
-    Triangle *t = RaySceneFactory::CreateTriangleWithBindings(triangle1);
+TEST(RSceneFactory, can_init_triangle_with_bindings) {
+    Triangle *t = RSceneFactory::CreateTriangleWithBindings(triangle1);
     
     Vect norm = t->getA().getSurfaceNormal();
     CHECK_EQUAL(0, norm.getX());
@@ -173,8 +173,8 @@ TEST(RaySceneFactory, can_init_triangle_with_bindings) {
     delete t;
 }
 
-TEST(RaySceneFactory, can_create_material) {
-    Material *m = RaySceneFactory::CreateMaterial(material);
+TEST(RSceneFactory, can_create_material) {
+    Material *m = RSceneFactory::CreateMaterial(material);
 
     DOUBLES_EQUAL(1, m->getShininess(), 0.00001);
     DOUBLES_EQUAL(0.5f, m->getTransparency(), 0.00001);
@@ -182,14 +182,14 @@ TEST(RaySceneFactory, can_create_material) {
     delete m;
 }
 
-TEST(RaySceneFactory, can_init_mesh) {
-    Material *ms = RaySceneFactory::CreateMaterial(material);
+TEST(RSceneFactory, can_init_mesh) {
+    Material *ms = RSceneFactory::CreateMaterial(material);
     std::vector<Material *> v;
     v.push_back(ms);
 
     Mesh m;
-    RaySceneFactory::AddMaterials(&m, v);
-    RaySceneFactory::CreateMesh(m, trimesh, v);
+    RSceneFactory::AddMaterials(&m, v);
+    RSceneFactory::CreateMesh(m, trimesh, v);
     Material *mat = m.getMaterial();
     POINTERS_EQUAL(ms, mat);
 
@@ -210,20 +210,20 @@ TEST(RaySceneFactory, can_init_mesh) {
     DOUBLES_EQUAL(0.6, a.getZ(), 0.00001);
 }
 
-TEST(RaySceneFactory, mesh_with_per_surface_material) {
+TEST(RSceneFactory, mesh_with_per_surface_material) {
     std::vector<Material *> v;
-    v.push_back(RaySceneFactory::CreateMaterial(material));
+    v.push_back(RSceneFactory::CreateMaterial(material));
     material.diffColor[0] = 10;
     material.diffColor[1] = 0.1f;
-    v.push_back(RaySceneFactory::CreateMaterial(material));
-    v.push_back(RaySceneFactory::CreateMaterial(material));
+    v.push_back(RSceneFactory::CreateMaterial(material));
+    v.push_back(RSceneFactory::CreateMaterial(material));
 
     trimesh.materialBinding = PER_VERTEX_MATERIAL;
     trimesh.numPolys = 1;
 
     Mesh m;
-    RaySceneFactory::AddMaterials(&m, v);
-    RaySceneFactory::CreateMesh(m, trimesh, v);
+    RSceneFactory::AddMaterials(&m, v);
+    RSceneFactory::CreateMesh(m, trimesh, v);
     Triangle *t = m.getTriangle(0);
     Material *m0 = t->getMaterial('a');
     Material *m1 = t->getMaterial('b');
@@ -240,8 +240,8 @@ TEST(RaySceneFactory, mesh_with_per_surface_material) {
 }
 
 
-TEST(RaySceneFactory, can_init_light) {
-    Light *l = RaySceneFactory::CreateLight(light0);
+TEST(RSceneFactory, can_init_light) {
+    Light *l = RSceneFactory::CreateLight(light0);
 
     Vect d = l->getDir();
     CHECK_EQUAL(2, d.getX());
@@ -250,9 +250,9 @@ TEST(RaySceneFactory, can_init_light) {
     delete l;
 }
 
-TEST(RaySceneFactory, can_init_lights) {
+TEST(RSceneFactory, can_init_lights) {
     std::vector<Light *> lts;
-    RaySceneFactory::CreateLights(lts, light0);
+    RSceneFactory::CreateLights(lts, light0);
 
     CHECK_EQUAL(2, lts.size());
 
@@ -264,18 +264,18 @@ TEST(RaySceneFactory, can_init_lights) {
     delete lts[1];
 }
 
-TEST(RaySceneFactory, can_init_camera) {
+TEST(RSceneFactory, can_init_camera) {
     Camera cam;
-    RaySceneFactory::CreateCamera(cam, camera);
+    RSceneFactory::CreateCamera(cam, camera);
 
     Vect p = cam.getPos();
     CHECK_EQUAL(1, p.getX());
     DOUBLES_EQUAL(0.2, cam.getVerticalFOV(), 0.00001);
 }
 
-TEST(RaySceneFactory, can_create_scene) {
-    RayScene s;
-    RaySceneFactory::CreateScene(s, scene);
+TEST(RSceneFactory, can_create_scene) {
+    RScene s;
+    RSceneFactory::CreateScene(s, scene);
 
     Light *l = s.getLight(0);
     CHECK_EQUAL(DIRECTIONAL_LIGHT, l->getType());

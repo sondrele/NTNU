@@ -1,5 +1,5 @@
-#ifndef _RAYSCENE_SHAPES_H_
-#define _RAYSCENE_SHAPES_H_
+#ifndef _SHAPES_H_
+#define _SHAPES_H_
 
 #include <cstdlib>
 #include <stdint.h>
@@ -208,4 +208,4 @@ public:
     virtual BBox getBBox();
 };
 
-#endif // _RAYSCENE_SHAPES_H_
+#endif // _SHAPES_H_

@@ -12,8 +12,8 @@
 #include "ray.h"
 #include "raybuffer.h"
 #include "camera.h"
-#include "rayscene.h"
-#include "rayscene_shapes.h"
+#include "rscene.h"
+#include "shapes.h"
 
 class RayTracer {
 private:
@@ -27,7 +27,7 @@ private:
     bool usingEnvMap;
 
     RayBuffer buffer;
-    RayScene *scene;
+    RScene *scene;
     Camera camera;
     EnvMap envMap;
 
@@ -45,7 +45,7 @@ public:
     uint getHeight() { return HEIGHT;}
     void setM(float m) { M = m; }
     void setNumSamples(int s) { numSamples = s; }
-    void setScene(RayScene *s) { scene = s; }
+    void setScene(RScene *s) { scene = s; }
     void setCamera(Camera c);
     Camera getCamera() { return camera; }
     void setCameraPos(Vect);

@@ -2,8 +2,8 @@
 #include "CppUTestExt/MockSupport.h"
 
 #include <vector>
-#include "rayscene_shapes.h"
-#include "rayscene_factory.h"
+#include "shapes.h"
+#include "rscenefactory.h"
 #include "bvhtree.h"
 
 
@@ -16,10 +16,10 @@ static std::vector<Shape *> v;
 
 TEST_GROUP(BVHTreeTest) {
     void setup() {
-        s0 = RaySceneFactory::NewSphere(1, Vect(0, 0, 0));
-        s1 = RaySceneFactory::NewSphere(1, Vect(-1, 2, 1));
-        s2 = RaySceneFactory::NewSphere(1, Vect(-2, -2, 2));
-        s3 = RaySceneFactory::NewSphere(1, Vect(2, 2, -1));
+        s0 = RSceneFactory::NewSphere(1, Vect(0, 0, 0));
+        s1 = RSceneFactory::NewSphere(1, Vect(-1, 2, 1));
+        s2 = RSceneFactory::NewSphere(1, Vect(-2, -2, 2));
+        s3 = RSceneFactory::NewSphere(1, Vect(2, 2, -1));
     }
     void teardown() {
         delete s0;
