@@ -404,7 +404,7 @@ SColor RayTracer::shadeIntersectionPath(Intersection in, int d) {
     if (!lts.empty()) {
         uint p = (uint) ((double) lts.size() * Rand::Random());
         Light *l = lts.at(p);
-        float Fattj = calculateFattj(Pt, l);
+        float Fattj = 0.7f;//calculateFattj(Pt, l);
         if (Fattj > 0) {
             SColor Sj = calculateShadowScalar(l, in, (int) depth);
             shade = shade + directIllumination(l, in, Sj, Fattj);
@@ -438,8 +438,10 @@ SColor RayTracer::shadeIntersectionPath(Intersection in, int d) {
 
 SColor RayTracer::diffuseInterreflect(Intersection intersection, int d) {
     Vect norm = intersection.calculateSurfaceNormal();
-    Vect rayDir = uniformSampleUpperHemisphere(norm);
-    Ray diffuseRay(intersection.calculateIntersectionPoint() + norm.linearMult(0.00001f), rayDir);
+    Vect rayDir = specularSampleUpperHemisphere(intersection);
+    Ray diffuseRay(intersection.calculateIntersectionPoint() + norm.linearMult(0.0001f), rayDir);
+
+    SColor albedo = intersection.getColor();
 
     intersection = scene->intersectsWithBVHTree(diffuseRay);
     if (intersection.hasIntersected()) {
@@ -448,7 +450,8 @@ SColor RayTracer::diffuseInterreflect(Intersection intersection, int d) {
         float cos_theta = rayDir.dotProduct(norm);
         SColor BRDF = 2 * diffRefl * cos_theta;
         SColor reflected = shadeIntersectionPath(intersection, d);
-        return reflected * BRDF /* + diffRefl * 0.2f */;
+        // return reflected * BRDF /* + diffRefl * 0.2f */;
+        return albedo * reflected;
     }
 
     if (usingEnvMap) {
@@ -459,20 +462,31 @@ SColor RayTracer::diffuseInterreflect(Intersection intersection, int d) {
 }
 
 Vect RayTracer::uniformSampleUpperHemisphere(Vect &sampleDir) {
-    double r1, r2, r3;
-    r1 = Rand::Random();
-    r2 = Rand::Random();
-    r3 = Rand::Random();
-
-    float x, y, z;
-    x = 1 - 2 * (float) r1;
-    y = 1 - 2 * (float) r2;
-    z = 1 - 2 * (float) r3;
+    float x = 1 - 2 * (float) Rand::Random();
+    float y = 1 - 2 * (float) Rand::Random();
+    float z = 1 - 2 * (float) Rand::Random();
 
     Vect sample(x, y, z);
     sample.normalize();
-
     if (sample.dotProduct(sampleDir) < 0)
+        return sample.invert();
+ return sample;
+}
+
+Vect RayTracer::specularSampleUpperHemisphere(Intersection &ins) {
+    // PI < x, y, < PI
+    float specular = ins.specColor().length();
+    float x = specular * (M_PI - 2 * M_PI * (float) Rand::Random());
+    float y = specular * (M_PI - 2 * M_PI * (float) Rand::Random());
+
+    Vect dir = ins.calculateReflection().getDirection();
+    Vect_h dir_h(dir.getX(), dir.getY(), dir.getZ());
+    Vect_h::Rotate(dir_h, 'x', x);
+    Vect_h::Rotate(dir_h, 'y', y);
+
+    Vect sample(dir_h.getX(), dir_h.getY(), dir_h.getZ());
+    sample.normalize();
+    if (sample.dotProduct(ins.calculateSurfaceNormal()) < 0)
         return sample.invert();
     return sample;
 }

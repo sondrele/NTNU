@@ -17,3 +17,5 @@ raytracer.vcxproj.user
 *.txt
 textures
 tinyobjloader-master
+tinyobj
+tinyobj.cpp

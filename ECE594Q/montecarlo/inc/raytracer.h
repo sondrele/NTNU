@@ -83,6 +83,7 @@ public:
     bool russianRoulette(SColor, float &);
     SColor diffuseInterreflect(Intersection , int);
     Vect uniformSampleUpperHemisphere(Vect &);
+    Vect specularSampleUpperHemisphere(Intersection &ins);
 };
 
 #endif // _RAYTRACER_H_

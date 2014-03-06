@@ -14,6 +14,7 @@ LIBS = \
     lib/rimage.cpp\
     lib/rand.cpp\
     ../matrix/src/Matrix.cpp\
+    ../matrix/src/Vect_h.cpp\
     ../matrix/src/Vect.cpp
 SRCS = src/ray.cpp\
     src/intersection.cpp\

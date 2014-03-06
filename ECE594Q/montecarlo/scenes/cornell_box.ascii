@@ -7,6 +7,6 @@ camera {
   verticalFOV 1.570796
 }
 point_light {
-  position 220 500 250
+  position 280 490 250
   color 1 1 1
 }
