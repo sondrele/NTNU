@@ -307,8 +307,8 @@ RayBuffer RayTracer::traceRays() {
     p.setGoal((int) (HEIGHT * WIDTH));
 
     for (uint y = 0; y < HEIGHT; y++) {
-        // omp_set_num_threads(16);
-        // #pragma omp parallel for
+        omp_set_num_threads(16);
+        #pragma omp parallel for
         for (uint x = 0; x < WIDTH; x++) {
             // Loop over samples to get the right color
             float R = 0, G = 0, B = 0;
@@ -328,10 +328,10 @@ RayBuffer RayTracer::traceRays() {
             color.G = (uint8_t) (255 * G);
             color.B = (uint8_t) (255 * B);
             buffer.setPixel(x, y, color);
-            // #pragma omp critical
-            // {
-            //     p.tick();
-            // }
+            #pragma omp critical
+            {
+                p.tick();
+            }
         }
     }
     return buffer;
@@ -345,8 +345,8 @@ RayBuffer RayTracer::tracePaths() {
     p.setGoal((int) (HEIGHT * WIDTH));
 
     for (uint y = 0; y < HEIGHT; y++) {
-        // omp_set_num_threads(16);
-        // #pragma omp parallel for
+        omp_set_num_threads(16);
+        #pragma omp parallel for
         for (uint x = 0; x < WIDTH; x++) {
             // Loop over samples to get the right color
             Ray r = computeMonteCarloRay((float) x, (float) y);
@@ -370,10 +370,10 @@ RayBuffer RayTracer::tracePaths() {
             color.B = (uint8_t) (255 * B);
             buffer.setPixel(x, y, color);
 
-            // #pragma omp critical
-            // {
-            //     p.tick();
-            // }
+            #pragma omp critical
+            {
+                p.tick();
+            }
         }
     }
     return buffer;
@@ -396,6 +396,8 @@ SColor RayTracer::shadeIntersectionPath(Intersection in, int d) {
     float kt = mat->getTransparency();
     SColor ks = mat->getSpecColor();
     Vect Pt = in.calculateIntersectionPoint();
+
+    shade = mat->getAmbColor();
 
     // Trace shadow scalar towards single light
     std::vector<Light *> lts = scene->getLights();

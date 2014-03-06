@@ -1,0 +1,12 @@
+Composer format 2.1 ascii
+camera {
+  position 275 270 -260
+  viewDirection 0 0 1
+  focalDistance 12.2118
+  orthoUp 0 1 0
+  verticalFOV 1.570796
+}
+point_light {
+  position 220 500 250
+  color 1 1 1
+}

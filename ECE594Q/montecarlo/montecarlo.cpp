@@ -10,8 +10,9 @@
 #include "rscenefactory.h"
 #include "rimage.h"
 
-#define SCENES         "./scenes/"
+#define SCENES          "./scenes/"
 #define ASCII           ".ascii"
+#define OBJ             ".obj"
 #define IMG             ".bmp"
 #define IMAGE_WIDTH     500
 #define IMAGE_HEIGHT    500
@@ -22,11 +23,12 @@ SceneIO *scene = NULL;
 
 uint w, h, d, m = 1;
 std::string in;
+std::string inObj;
 std::string out;
 
 bool shaders = false;
-bool obj = true;
-bool pathTracing = true;
+bool objScene = false;
+bool pathTracing = false;
 
 static void loadScene(const char *name, RayTracer &rayTracer) {
     // auto start = std::chrono::system_clock::now();
@@ -49,36 +51,27 @@ static void loadScene(const char *name, RayTracer &rayTracer) {
 }
 
 static void loadObjScene(const char *name, RayTracer &rayTracer) {
-    in = std::string("./scenes/cornell_box.obj");
-    out = std::string("cornell_box.bmp");
-
     std::vector<tinyobj::shape_t> shapes;
-    std::string err = tinyobj::LoadObj(shapes, in.c_str(), "./scenes/");
+    scene = readScene(name);
+    std::string err = tinyobj::LoadObj(shapes, inObj.c_str(), SCENES);
 
     if (!err.empty()) {
       std::cerr << err << std::endl;
       exit(1);
     }
+
     RScene *rayScene = new RScene();
     RSceneFactory::CreateSceneFromObj(rayScene, shapes);
-    scene = readScene("./scenes/whitted1.ascii");
 
-    // std::vector<Light *> lts;
-    // RSceneFactory::CreateLights(lts, *scene->lights);
-    Light *l = new Light();
-    // l->setType(DIRECTIONAL_LIGHT);
-    // l->setDir(Vect(-0.3f, -0.3f, 1));
-    l->setType(POINT_LIGHT);
-    l->setPos(Vect(240, 500, 250));
-    l->setIntensity(SColor(1, 1, 1));
-    rayScene->addLight(l);
+
+    std::vector<Light *> lts;
+    RSceneFactory::CreateLights(lts, *(scene->lights));
+    rayScene->setLights(lts);
 
     Camera cam;
-    cam.setPos(Vect(275, 270, -260));
-    cam.setViewDir(Vect(0, 0, 1));
+    RSceneFactory::CreateCamera(cam, *(scene->camera));
     rayTracer.setCamera(cam);
     rayTracer.setScene(rayScene);
-    // rayTracer.loadEnvMap("textures/uffizi_latlong.exr");
 
     // auto end = std::chrono::system_clock::now();
     // auto elapsed =
@@ -153,9 +146,14 @@ static void parseInput(int argc, char *argv[]) {
         w = atoi(argv[2]);
         h = atoi(argv[3]);
         d = atoi(argv[4]);
-        if (argc == 6) {
+        if (argc >= 6) {
             m = atoi(argv[5]);
             pathTracing = true;
+        }
+        if (argc == 7) {
+            inObj = std::string(SCENES) + std::string(argv[1]) + std::string(OBJ);
+            cout << "Obj: " << inObj << endl;
+            objScene = true;
         }
     } else if (argc == 2) {
         w = IMAGE_WIDTH;
@@ -171,9 +169,10 @@ static void parseInput(int argc, char *argv[]) {
         in = std::string(SCENES) + std::string("whitted1.ascii");
         out = std::string("whitted1.bmp");
     }
+    cout << "Scene: " << in << endl;
+    cout << "Output: " << out << endl;
 
-    if (argc == 6) {
-    }
+    cout << endl;
 }
 
 int main(int argc, char *argv[]) {
@@ -184,10 +183,10 @@ int main(int argc, char *argv[]) {
     try {
         RayTracer rayTracer(w, h, d);
         // Load the scene
-        if (shaders) {
-            loadShaderScene(in.c_str(), rayTracer);
-        } else if (obj) {
+        if (objScene) {
             loadObjScene(in.c_str(), rayTracer);
+        } else if (shaders) {
+            loadShaderScene(in.c_str(), rayTracer);
         } else {
             loadScene(in.c_str(), rayTracer);
         }
