@@ -41,6 +41,9 @@ public:
     Shape * getShape() { return shape; }
     Material *getMaterial();
     SColor getColor();
+    SColor diffColor();
+    SColor specColor();
+    SColor ambColor();
 
     std::string toString();
 };

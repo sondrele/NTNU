@@ -96,6 +96,19 @@ SColor Intersection::getColor() {
     return shape->getColor(calculateIntersectionPoint());
 }
 
+
+SColor Intersection::diffColor() {
+    return shape->getMaterial()->getDiffColor();
+}
+
+SColor Intersection::specColor() {
+    return shape->getMaterial()->getSpecColor();
+}
+
+SColor Intersection::ambColor() {
+    return shape->getMaterial()->getAmbColor();
+}
+
 Material * Intersection::getMaterial() {
     if (shape != NULL) {
         return shape->getMaterial();
