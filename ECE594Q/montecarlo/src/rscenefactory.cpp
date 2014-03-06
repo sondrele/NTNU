@@ -216,6 +216,17 @@ Mesh * RSceneFactory::CreateMeshFromObj(tinyobj::mesh_t msh, Material *mat) {
         vertexes.push_back(v);
     }
 
+    assert(msh.normals.size() % 3 == 0);
+    int j = 0;
+    for (uint i = 0; i < msh.normals.size(); i += 3) {
+        Vect v(msh.normals[i], msh.normals[i + 1], msh.normals[i + 2]);
+        vertexes[j].setSurfaceNormal(v);
+        j += 1;
+    }
+
+    if (msh.normals.size() > 0)
+        m->perVertexNormal(true);
+
     assert(msh.indices.size() % 3 == 0);
     for (uint i = 0; i < msh.indices.size(); i += 3) {
         int a = msh.indices[i];

@@ -72,6 +72,7 @@ static void loadObjScene(const char *name, RayTracer &rayTracer) {
     RSceneFactory::CreateCamera(cam, *(scene->camera));
     rayTracer.setCamera(cam);
     rayTracer.setScene(rayScene);
+    rayTracer.loadEnvMap("textures/doge2_latlong.exr");
 
     // auto end = std::chrono::system_clock::now();
     // auto elapsed =
@@ -147,13 +148,13 @@ static void parseInput(int argc, char *argv[]) {
         h = atoi(argv[3]);
         d = atoi(argv[4]);
         if (argc >= 6) {
-            m = atoi(argv[5]);
-            pathTracing = true;
-        }
-        if (argc == 7) {
             inObj = std::string(SCENES) + std::string(argv[1]) + std::string(OBJ);
             cout << "Obj: " << inObj << endl;
             objScene = true;
+        }
+        if (argc >= 7) {
+            m = atoi(argv[5]);
+            pathTracing = true;
         }
     } else if (argc == 2) {
         w = IMAGE_WIDTH;

@@ -389,7 +389,6 @@ SColor RayTracer::shadeIntersectionPath(Intersection in, int d) {
             return envMap.getTexel(in.getDirection());
         }
     }
-
     SColor shade(0, 0, 0);
 
     Material *mat = in.getMaterial();
@@ -439,6 +438,7 @@ SColor RayTracer::shadeIntersectionPath(Intersection in, int d) {
 SColor RayTracer::diffuseInterreflect(Intersection intersection, int d) {
     Vect norm = intersection.calculateSurfaceNormal();
     Vect rayDir = specularSampleUpperHemisphere(intersection);
+    // Vect rayDir = uniformSampleUpperHemisphere(norm);
     Ray diffuseRay(intersection.calculateIntersectionPoint() + norm.linearMult(0.0001f), rayDir);
 
     SColor albedo = intersection.getColor();
@@ -476,8 +476,8 @@ Vect RayTracer::uniformSampleUpperHemisphere(Vect &sampleDir) {
 Vect RayTracer::specularSampleUpperHemisphere(Intersection &ins) {
     // PI < x, y, < PI
     float specular = ins.specColor().length();
-    float x = specular * (M_PI - 2 * M_PI * (float) Rand::Random());
-    float y = specular * (M_PI - 2 * M_PI * (float) Rand::Random());
+    float x = (1 - specular) * (M_PI - 2 * M_PI * (float) Rand::Random());
+    float y = (1 - specular) * (M_PI - 2 * M_PI * (float) Rand::Random());
 
     Vect dir = ins.calculateReflection().getDirection();
     Vect_h dir_h(dir.getX(), dir.getY(), dir.getZ());
