@@ -2,8 +2,11 @@
 #define _RSCENEFACTORY_H_ value
 
 #include <vector>
+#include <assert.h>
 
 #include "scene_io.h"
+#include "tiny_obj_loader.h"
+
 #include "raybuffer.h"
 #include "ray.h"
 #include "camera.h"
@@ -13,6 +16,7 @@
 
 class RSceneFactory {
 public:
+    // Parse scene_io object
     static PX_Color ColorToPX_Color(Color);
     static Vect PointToVect(Point);
     static Vertex PointToVertex(Point);
@@ -32,6 +36,13 @@ public:
     static void CreateShapes(std::vector<Shape *> &shps, ObjIO &oio);
     static void CreateCamera(Camera &c, CameraIO &cio);
     static void CreateScene(RScene &s, SceneIO &sio);
+
+    // Parse obj
+    static Mesh * CreateMeshFromObj(tinyobj::mesh_t, Material *);
+    static Material * CreateMaterialFromObj(tinyobj::material_t);
+    static Shape * CreateShapeFromObj(tinyobj::shape_t);
+    static void CreateShapesFromObj(std::vector<Shape *> &, std::vector<tinyobj::shape_t> &);
+    static void CreateSceneFromObj(RScene *, std::vector<tinyobj::shape_t> &);
 };
 
 #endif // _RSCENEFACTORY_H_

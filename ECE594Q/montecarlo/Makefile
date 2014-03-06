@@ -10,6 +10,7 @@ CIMGFLAGS = $(CFLAGS) -L/usr/X11R6/lib -lm -lpthread -lX11
 LDFLAGS=
 LIBS = \
     lib/scene_io.cpp\
+    lib/tiny_obj_loader.cc\
     lib/rimage.cpp\
     lib/rand.cpp\
     ../matrix/src/Matrix.cpp\
@@ -44,6 +45,12 @@ montecarlo: montecarlo.o $(OBJS)
 
 cornell: montecarlo
 	time ./montecarlo cornell 300 300 5 10
+
+
+TOBJSRC = lib/tiny_obj_loader.cc
+TOBJOBJ = $(TOBJSRC:.cpp=.o)
+tinyobj: tinyobj.o $(TOBJOBJ)
+	$(CC) -o $@ $^ $(CFLAGS)
 
 clean:
 	rm -f *.o

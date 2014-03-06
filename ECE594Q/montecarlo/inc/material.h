@@ -1,6 +1,9 @@
 #ifndef _MATERIAL_H_
 #define _MATERIAL_H_
 
+#include <sstream>
+#include <iostream>
+
 #include "Matrix.h"
 #include "scene_io.h"
 
@@ -51,6 +54,8 @@ public:
 
     bool isReflective();
     bool isRefractive();
+
+    friend ostream& operator <<(ostream &, const Material &);
 };
 
 #endif // _MATERIAL_H_

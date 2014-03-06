@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <chrono>
+
 #include "scene_io.h"
+#include "tiny_obj_loader.h"
 #include "rand.h"
 
 #include "raytracer.h"
@@ -19,10 +21,12 @@ typedef unsigned char u08;
 SceneIO *scene = NULL;
 
 uint w, h, d, m = 1;
-bool shaders = false;
-bool pathTracing = false;
 std::string in;
 std::string out;
+
+bool shaders = false;
+bool obj = true;
+bool pathTracing = true;
 
 static void loadScene(const char *name, RayTracer &rayTracer) {
     // auto start = std::chrono::system_clock::now();
@@ -37,6 +41,44 @@ static void loadScene(const char *name, RayTracer &rayTracer) {
     rayTracer.setCamera(cam);
     rayTracer.setScene(rayScene);
     rayTracer.loadEnvMap("textures/uffizi_latlong.exr");
+
+    // auto end = std::chrono::system_clock::now();
+    // auto elapsed =
+    //     std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    // std::cout << "Preprocess time: " << elapsed.count() << std::endl;
+}
+
+static void loadObjScene(const char *name, RayTracer &rayTracer) {
+    in = std::string("./scenes/cornell_box.obj");
+    out = std::string("cornell_box.bmp");
+
+    std::vector<tinyobj::shape_t> shapes;
+    std::string err = tinyobj::LoadObj(shapes, in.c_str(), "./scenes/");
+
+    if (!err.empty()) {
+      std::cerr << err << std::endl;
+      exit(1);
+    }
+    RScene *rayScene = new RScene();
+    RSceneFactory::CreateSceneFromObj(rayScene, shapes);
+    scene = readScene("./scenes/whitted1.ascii");
+
+    // std::vector<Light *> lts;
+    // RSceneFactory::CreateLights(lts, *scene->lights);
+    Light *l = new Light();
+    // l->setType(DIRECTIONAL_LIGHT);
+    // l->setDir(Vect(-0.3f, -0.3f, 1));
+    l->setType(POINT_LIGHT);
+    l->setPos(Vect(240, 500, 250));
+    l->setIntensity(SColor(1, 1, 1));
+    rayScene->addLight(l);
+
+    Camera cam;
+    cam.setPos(Vect(275, 270, -260));
+    cam.setViewDir(Vect(0, 0, 1));
+    rayTracer.setCamera(cam);
+    rayTracer.setScene(rayScene);
+    // rayTracer.loadEnvMap("textures/uffizi_latlong.exr");
 
     // auto end = std::chrono::system_clock::now();
     // auto elapsed =
@@ -144,6 +186,8 @@ int main(int argc, char *argv[]) {
         // Load the scene
         if (shaders) {
             loadShaderScene(in.c_str(), rayTracer);
+        } else if (obj) {
+            loadObjScene(in.c_str(), rayTracer);
         } else {
             loadScene(in.c_str(), rayTracer);
         }

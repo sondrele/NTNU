@@ -203,3 +203,67 @@ void RSceneFactory::CreateCamera(Camera &c, CameraIO &cio) {
     c.setFocalDist(cio.focalDistance);
     c.setVerticalFOV(cio.verticalFOV);
 }
+
+// Parse obj
+Mesh * RSceneFactory::CreateMeshFromObj(tinyobj::mesh_t msh, Material *mat) {
+    Vertex a, b, c;
+    Mesh *m = new Mesh();
+    std::vector<Vertex> vertexes;
+
+    assert(msh.positions.size() % 3 == 0);
+    for (uint i = 0; i < msh.positions.size(); i += 3) {
+        Vertex v(msh.positions[i], msh.positions[i + 1], msh.positions[i + 2]);
+        vertexes.push_back(v);
+    }
+
+    assert(msh.indices.size() % 3 == 0);
+    for (uint i = 0; i < msh.indices.size(); i += 3) {
+        int a = msh.indices[i];
+        int b = msh.indices[i + 1];
+        int c = msh.indices[i + 2];
+
+        Triangle *t = new Triangle();
+        t->setA(vertexes[a]);
+        t->setB(vertexes[b]);
+        t->setC(vertexes[c]);
+        t->setMaterial(mat, 'a');
+        m->addTriangle(t);
+    }
+
+    // TODO: Add normals
+
+    return m;
+}
+
+Material * RSceneFactory::CreateMaterialFromObj(tinyobj::material_t mat) {
+    Material *m = new Material();
+    m->setDiffColor(SColor(mat.diffuse[0], mat.diffuse[1], mat.diffuse[2]));
+    m->setAmbColor(SColor(mat.ambient[0], mat.ambient[1], mat.ambient[2]));
+    m->setSpecColor(SColor(mat.specular[0], mat.specular[1], mat.specular[2]));
+    // m->setEmissColor(SColor(mat.emission[0], mat.emission[1], mat.emission[2]));
+    m->setShininess(mat.shininess);
+    m->setTransparency(mat.transmittance[0]);
+    return m;
+}
+
+Shape * RSceneFactory::CreateShapeFromObj(tinyobj::shape_t shp) {
+    Material *mat = RSceneFactory::CreateMaterialFromObj(shp.material);
+    Mesh *mesh = RSceneFactory::CreateMeshFromObj(shp.mesh, mat);
+    mesh->addMaterial(mat);
+    return mesh;
+}
+
+void RSceneFactory::CreateShapesFromObj(std::vector<Shape *> &shps,
+    std::vector<tinyobj::shape_t> &objshps)
+{
+    for (uint i = 0; i < objshps.size(); i++) {
+        Shape *s = CreateShapeFromObj(objshps[i]);
+        shps.push_back(s);
+    }
+}
+
+void RSceneFactory::CreateSceneFromObj(RScene *scene, std::vector<tinyobj::shape_t> &objshps) {
+    std::vector<Shape *> shps;
+    RSceneFactory::CreateShapesFromObj(shps, objshps);
+    scene->setShapes(shps);
+}

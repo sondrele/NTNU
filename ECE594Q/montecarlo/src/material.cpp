@@ -62,3 +62,15 @@ bool Material::isReflective() {
 bool Material::isRefractive() {
     return transparency > 0;
 }
+
+ostream& operator <<(ostream &stream, const Material &m) {
+    stringstream s;
+    s << "Material:" << endl;
+    s << "diffColor: " << m.diffColor << endl;
+    s << "ambColor:" << m.ambColor << endl;
+    s << "specColor:" << m.specColor << endl;
+    s << "shininess:" << m.shininess << endl;
+    s << "transparency:" << m.transparency << endl;
+    stream << s.str();
+    return stream;
+}
