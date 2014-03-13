@@ -16,22 +16,25 @@ LIBS = \
     ../matrix/src/Matrix.cpp\
     ../matrix/src/Vect_h.cpp\
     ../matrix/src/Vect.cpp
-SRCS = src/ray.cpp\
+SRCS = src/argparser.cpp\
+    src/progress.cpp\
+    src/ray.cpp\
     src/intersection.cpp\
-    src/camera.cpp\
-    src/raybuffer.cpp\
     src/rscene.cpp\
     src/rscenefactory.cpp\
     src/shapes.cpp\
+    src/material.cpp\
     src/sphere.cpp\
     src/mesh.cpp\
     src/triangle.cpp\
-    src/material.cpp\
+    src/raybuffer.cpp\
+    src/camera.cpp\
     src/shader.cpp\
     src/texture.cpp\
     src/bvhtree.cpp\
-    src/progress.cpp\
     src/envmap.cpp\
+    src/pathtracer.cpp\
+    src/whittedtracer.cpp\
     src/raytracer.cpp
 OBJS = $(SRCS:.cpp=.o) $(LIBS:.cpp=.o) 
 INCS = $(wildcard ./inc/*.h)
@@ -47,7 +50,6 @@ montecarlo: montecarlo.o $(OBJS)
 cornell: montecarlo
 	time ./montecarlo cornell 300 300 5 10
 
-
 TOBJSRC = lib/tiny_obj_loader.cc
 TOBJOBJ = $(TOBJSRC:.cpp=.o)
 tinyobj: tinyobj.o $(TOBJOBJ)
@@ -56,4 +58,5 @@ tinyobj: tinyobj.o $(TOBJOBJ)
 clean:
 	rm -f *.o
 	rm -rf **/*.o
+
 

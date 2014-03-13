@@ -5,6 +5,7 @@
 #include "scene_io.h"
 #include "tiny_obj_loader.h"
 #include "rand.h"
+#include "argparser.h"
 
 #include "raytracer.h"
 #include "rscenefactory.h"
@@ -21,7 +22,7 @@ typedef unsigned char u08;
 
 SceneIO *scene = NULL;
 
-uint w, h, d, m = 1;
+uint w, h, d, numSamples = 1;
 std::string in;
 std::string inObj;
 std::string out;
@@ -30,27 +31,19 @@ bool shaders = false;
 bool objScene = false;
 bool pathTracing = false;
 
-static void loadScene(const char *name, RayTracer &rayTracer) {
-    // auto start = std::chrono::system_clock::now();
-    
-    /* load the scene into the SceneIO data structure using given parsing code */
+static void loadScene(const char *name, RayTracer *rayTracer) {
     scene = readScene(name);
     RScene *rayScene = new RScene();
     RSceneFactory::CreateScene(*rayScene, *scene);
 
     Camera cam;
     RSceneFactory::CreateCamera(cam, *(scene->camera));
-    rayTracer.setCamera(cam);
-    rayTracer.setScene(rayScene);
-    rayTracer.loadEnvMap("textures/uffizi_latlong.exr");
-
-    // auto end = std::chrono::system_clock::now();
-    // auto elapsed =
-    //     std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    // std::cout << "Preprocess time: " << elapsed.count() << std::endl;
+    rayTracer->setCamera(cam);
+    rayTracer->setScene(rayScene);
+    rayTracer->loadEnvMap("textures/uffizi_latlong.exr");
 }
 
-static void loadObjScene(const char *name, RayTracer &rayTracer) {
+static void loadObjScene(const char *name, RayTracer *rayTracer) {
     std::vector<tinyobj::shape_t> shapes;
     scene = readScene(name);
     std::string err = tinyobj::LoadObj(shapes, inObj.c_str(), SCENES);
@@ -70,18 +63,12 @@ static void loadObjScene(const char *name, RayTracer &rayTracer) {
 
     Camera cam;
     RSceneFactory::CreateCamera(cam, *(scene->camera));
-    rayTracer.setCamera(cam);
-    rayTracer.setScene(rayScene);
-    rayTracer.loadEnvMap("textures/doge2_latlong.exr");
-
-    // auto end = std::chrono::system_clock::now();
-    // auto elapsed =
-    //     std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    // std::cout << "Preprocess time: " << elapsed.count() << std::endl;
+    rayTracer->setCamera(cam);
+    rayTracer->setScene(rayScene);
+    rayTracer->loadEnvMap("textures/doge2_latlong.exr");
 }
 
-static void loadShaderScene(const char *name, RayTracer &rayTracer) {
-    /* load the scene into the SceneIO data structure using given parsing code */
+static void loadShaderScene(const char *name, RayTracer *rayTracer) {
     scene = readScene(name);
     RScene *rayScene = new RScene();
     RSceneFactory::CreateScene(*rayScene, *scene);
@@ -109,22 +96,15 @@ static void loadShaderScene(const char *name, RayTracer &rayTracer) {
 
     Camera cam;
     RSceneFactory::CreateCamera(cam, *(scene->camera));
-    rayTracer.setCamera(cam);
-    rayTracer.setScene(rayScene);
+    rayTracer->setCamera(cam);
+    rayTracer->setScene(rayScene);
 }
 
-static void render(RayTracer &rayTracer) {
-    rayTracer.setM(m);
-    rayTracer.setNumSamples(m);
+static void render(RayTracer *rayTracer) {
+    rayTracer->setNumSamples(numSamples);
 
     auto start = std::chrono::system_clock::now();
-
-    RayBuffer rayBuffer;
-    if (!pathTracing) {
-        rayBuffer = rayTracer.traceRays();
-    } else {
-        rayBuffer = rayTracer.tracePaths();
-    }
+    RayBuffer rayBuffer = rayTracer->traceScene();
     
     auto end = std::chrono::system_clock::now();
     auto elapsed =
@@ -135,54 +115,70 @@ static void render(RayTracer &rayTracer) {
     img.createImage(rayBuffer, out);
 }
 
-static void parseInput(int argc, char *argv[]) {
-    cout << "Normal usage:\nRun with 5 arguments: scene, width, height, depth, numSamples" << endl;
-    cout << "Example (whitted illumination):  ./montecarlo test1 100 100 10" << endl;
-    cout << "Example (path tracing):          ./montecarlo test1 100 100 10 10" << endl;
-    cout << "Shader demo:  ./montecarlo shaders" << endl << endl;
+static void parseCommandLine(int argc, char *argv[]) {
+    cout << "help: ./montecarlo -h" << endl;
+    if (ArgParser::CmdOptExists(argv, argv+argc, "-h")) {
+        cout << "Run with following parameters: " << endl;
+        cout << "-h:                Display help message" << endl;
+        cout << "-size num_pixels:  Image size, widht and height" << endl;
+        cout << "-scene scene_name: Specify which scene to load" << endl;
+        cout << "-obj:              Set if the scene is in .obj format" << endl;
+        cout << "-depth ray_depth:  Specify depth of reflective rays" << endl;
+        cout << "-n num_samples:    Specify number of samples for pathtracing" << endl;
+    }
 
-    if (argc >= 5) {
-        in = std::string(SCENES) + std::string(argv[1]) + std::string(ASCII);
-        out = std::string(argv[1]) + std::string(IMG);
-        w = atoi(argv[2]);
-        h = atoi(argv[3]);
-        d = atoi(argv[4]);
-        if (argc >= 6) {
-            inObj = std::string(SCENES) + std::string(argv[1]) + std::string(OBJ);
-            cout << "Obj: " << inObj << endl;
-            objScene = true;
-        }
-        if (argc >= 7) {
-            m = atoi(argv[5]);
-            pathTracing = true;
-        }
-    } else if (argc == 2) {
-        w = IMAGE_WIDTH;
-        h = IMAGE_HEIGHT;
-        d = 10;
-        in = std::string(SCENES) + std::string("shaders.ascii");
-        out = std::string("shaders.bmp");
-        shaders = true;
+    char *size = ArgParser::GetCmdOpt(argv, argv + argc, "-size");
+    if (size) {
+        w = atoi(size);
+        h = atoi(size);
     } else {
         w = IMAGE_WIDTH;
         h = IMAGE_HEIGHT;
-        d = 2;
+    }
+
+    if (ArgParser::CmdOptExists(argv, argv+argc, "-obj")) {
+        objScene = true;
+    }
+
+    char *scene = ArgParser::GetCmdOpt(argv, argv + argc, "-scene");
+    if (scene) {
+        if (objScene) {
+            inObj = std::string(SCENES) + std::string(scene) + std::string(OBJ);
+        }
+        in = std::string(SCENES) + std::string(scene) + std::string(ASCII);
+        out = std::string(scene) + std::string(IMG);
+    } else {
         in = std::string(SCENES) + std::string("whitted1.ascii");
         out = std::string("whitted1.bmp");
     }
-    cout << "Scene: " << in << endl;
-    cout << "Output: " << out << endl;
 
-    cout << endl;
+    char *depth = ArgParser::GetCmdOpt(argv, argv + argc, "-depth");
+    if (depth) {
+        d = atoi(depth);
+    } else {
+        d = 5;
+    }
+
+    char *samples = ArgParser::GetCmdOpt(argv, argv + argc, "-n");
+    if (samples) {
+        numSamples = atoi(samples);
+        pathTracing = true;
+    } else {
+        numSamples = 1;
+    }
 }
 
 int main(int argc, char *argv[]) {
-    parseInput(argc, argv);
-
-    // auto start = std::chrono::system_clock::now();
+    parseCommandLine(argc, argv);
 
     try {
-        RayTracer rayTracer(w, h, d);
+        RayTracer *rayTracer;
+        if (pathTracing) {
+            rayTracer = new PathTracer(w, h, d);
+        } else {
+            rayTracer = new WhittedTracer(w, h, d);
+        }
+
         // Load the scene
         if (objScene) {
             loadObjScene(in.c_str(), rayTracer);
@@ -198,14 +194,10 @@ int main(int argc, char *argv[]) {
         /* cleanup */
         if (scene != NULL) {
             deleteScene(scene);
+            delete rayTracer;
         }
     } catch (const char *str) {
         cout << str << endl;
     }
-
-    // auto end = std::chrono::system_clock::now();
-    // auto elapsed =
-    //     std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    // std::cout << "Total time: " << elapsed.count() << std::endl;
     return 0;
 }

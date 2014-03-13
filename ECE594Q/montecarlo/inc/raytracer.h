@@ -5,6 +5,11 @@
 #include <cfloat>
 #include <iostream>
 
+#ifndef _WINDOWS
+#include "omp.h"
+#endif  // _WINDOWS
+
+
 #include "progress.h"
 #include "envmap.h"
 #include "Matrix.h"
@@ -16,11 +21,10 @@
 #include "shapes.h"
 
 class RayTracer {
-private:
+protected:
     uint WIDTH;
     uint HEIGHT;
     int numSamples;
-    float M;
     uint depth;
     float scaleConst;   // c
 
@@ -38,12 +42,12 @@ private:
     void calculateImagePlane();
 
 public:
+    RayTracer();
     RayTracer(uint, uint, uint);
-    ~RayTracer();
+    virtual ~RayTracer();
     // Setters and getters
     uint getWidth() { return WIDTH;}
     uint getHeight() { return HEIGHT;}
-    void setM(float m) { M = m; }
     void setNumSamples(int s) { numSamples = s; }
     void setScene(RScene *s) { scene = s; }
     void setCamera(Camera c);
@@ -66,24 +70,43 @@ public:
     Point_2D computePoint(uint, uint);
     Vect computeDirection(uint, uint);
     // Ray tracing functions
-    Ray computeRay(uint, uint);
-    Ray computeMonteCarloRay(float, float);
+    Ray computeRay(float, float);
     SColor calculateShadowScalar(Light *, Intersection &, int);
-    SColor shadeIntersection(Intersection, int);
-    SColor shadeIntersectionPath(Intersection in, int d);
-    RayBuffer traceRays();
-    RayBuffer tracePaths();
-    // Whitted illumination
-    float calculateFattj(Vect, Light *);        
-    SColor ambientLightning(float, SColor, SColor);
-    SColor directIllumination(Light *, Intersection, SColor, float);
+
+    // Direct illumination
     SColor diffuseLightning(float, SColor, Vect, Vect);
     SColor specularLightning(float, SColor, Vect, Vect, Vect);
+    SColor directIllumination(Light *, Intersection, SColor, float);
+    float calculateFattj(Vect, Light *);
+
+    virtual RayBuffer traceScene() = 0;
+};
+
+class WhittedTracer : public RayTracer {
+public:
+    WhittedTracer(uint, uint, uint);
+    virtual ~WhittedTracer();
+
+    // Whitted illumination
+    SColor ambientLightning(float, SColor, SColor);
+    SColor shadeIntersection(Intersection, int);
+
+    virtual RayBuffer traceScene();
+};
+
+class PathTracer : public RayTracer {
+public:
+    PathTracer(uint, uint, uint);
+    virtual ~PathTracer();
+    
     // Pathtracing
     bool russianRoulette(SColor, float &);
     SColor diffuseInterreflect(Intersection , int);
     Vect uniformSampleUpperHemisphere(Vect &);
     Vect specularSampleUpperHemisphere(Intersection &ins);
+    SColor shadeIntersectionPath(Intersection in, int d);
+
+    virtual RayBuffer traceScene();
 };
 
 #endif // _RAYTRACER_H_
