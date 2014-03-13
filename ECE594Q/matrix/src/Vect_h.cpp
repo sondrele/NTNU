@@ -36,7 +36,7 @@ void Vect_h::homogenize() {
 }
 
 void Vect_h::Scale(Vect_h &vect, const float dx, const float dy, const float dz) {
-    if (vect.getRows() == 4 and vect.getCols() == 1) {
+    if (vect.getRows() == 4 && vect.getCols() == 1) {
         Matrix scaleMat(4, 4);
         scaleMat.setCell(0, 0, dx);
         scaleMat.setCell(1, 1, dy);
