@@ -23,6 +23,7 @@ typedef unsigned char u08;
 SceneIO *scene = NULL;
 
 uint w, h, d, numSamples = 1;
+float fattjScale = 1.0f;
 std::string in;
 std::string inObj;
 std::string out;
@@ -30,6 +31,8 @@ std::string out;
 bool shaders = false;
 bool objScene = false;
 bool pathTracing = false;
+bool bidirectional = false;
+bool environmentMap = false;
 
 static void loadScene(const char *name, RayTracer *rayTracer) {
     scene = readScene(name);
@@ -40,7 +43,9 @@ static void loadScene(const char *name, RayTracer *rayTracer) {
     RSceneFactory::CreateCamera(cam, *(scene->camera));
     rayTracer->setCamera(cam);
     rayTracer->setScene(rayScene);
-    rayTracer->loadEnvMap("textures/uffizi_latlong.exr");
+    if (environmentMap) {
+        rayTracer->loadEnvMap("textures/uffizi_latlong.exr");
+    }
 }
 
 static void loadObjScene(const char *name, RayTracer *rayTracer) {
@@ -65,7 +70,9 @@ static void loadObjScene(const char *name, RayTracer *rayTracer) {
     RSceneFactory::CreateCamera(cam, *(scene->camera));
     rayTracer->setCamera(cam);
     rayTracer->setScene(rayScene);
-    rayTracer->loadEnvMap("textures/doge2_latlong.exr");
+    if (environmentMap) {
+        rayTracer->loadEnvMap("textures/doge2_latlong.exr");
+    }
 }
 
 static void loadShaderScene(const char *name, RayTracer *rayTracer) {
@@ -120,11 +127,16 @@ static void parseCommandLine(int argc, char *argv[]) {
     if (ArgParser::CmdOptExists(argv, argv+argc, "-h")) {
         cout << "Run with following parameters: " << endl;
         cout << "-h:                Display help message" << endl;
-        cout << "-size num_pixels:  Image size, widht and height" << endl;
         cout << "-scene scene_name: Specify which scene to load" << endl;
+        cout << "-out img_name:     Specify the name of the output image" << endl;
         cout << "-obj:              Set if the scene is in .obj format" << endl;
-        cout << "-depth ray_depth:  Specify depth of reflective rays" << endl;
+        cout << "-bi:               Specifies that bidirectional path tracing should be used" << endl;
+        cout << "-env:              Load uffizi environment map" << endl;
+        cout << "-size num_pixels:  Image size, width and height" << endl;
+        cout << "-d ray_depth:      Specify depth of reflective rays" << endl;
         cout << "-n num_samples:    Specify number of samples for pathtracing" << endl;
+        cout << "-f:                Specify a scale constant for Fattj" << endl;
+        exit(0);
     }
 
     char *size = ArgParser::GetCmdOpt(argv, argv + argc, "-size");
@@ -136,8 +148,16 @@ static void parseCommandLine(int argc, char *argv[]) {
         h = IMAGE_HEIGHT;
     }
 
+    if (ArgParser::CmdOptExists(argv, argv+argc, "-bi")) {
+        bidirectional = true;
+    }
+
     if (ArgParser::CmdOptExists(argv, argv+argc, "-obj")) {
         objScene = true;
+    }
+
+    if (ArgParser::CmdOptExists(argv, argv+argc, "-env")) {
+        environmentMap = true;
     }
 
     char *scene = ArgParser::GetCmdOpt(argv, argv + argc, "-scene");
@@ -152,7 +172,12 @@ static void parseCommandLine(int argc, char *argv[]) {
         out = std::string("whitted1.bmp");
     }
 
-    char *depth = ArgParser::GetCmdOpt(argv, argv + argc, "-depth");
+    char *outname = ArgParser::GetCmdOpt(argv, argv + argc, "-out");
+    if (outname) {
+        out = std::string(outname) + std::string(IMG);
+    }
+
+    char *depth = ArgParser::GetCmdOpt(argv, argv + argc, "-d");
     if (depth) {
         d = atoi(depth);
     } else {
@@ -166,6 +191,11 @@ static void parseCommandLine(int argc, char *argv[]) {
     } else {
         numSamples = 1;
     }
+
+    char *fs = ArgParser::GetCmdOpt(argv, argv + argc, "-f");
+    if (fs) {
+        fattjScale = atof(fs);
+    }
 }
 
 int main(int argc, char *argv[]) {
@@ -173,11 +203,15 @@ int main(int argc, char *argv[]) {
 
     try {
         RayTracer *rayTracer;
-        if (pathTracing) {
+        if (bidirectional) {
+            rayTracer = new BiPathTracer(w, h, d);
+        }
+        else if (pathTracing) {
             rayTracer = new PathTracer(w, h, d);
         } else {
             rayTracer = new WhittedTracer(w, h, d);
         }
+        rayTracer->setFattjScale(fattjScale);
 
         // Load the scene
         if (objScene) {

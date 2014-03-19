@@ -13,6 +13,7 @@ RayTracer::RayTracer(uint width, uint height, uint d) {
     depth = d;
     numSamples = 1;
     scaleConst = 10000;
+    fattjScale = 1.0f;
     buffer = RayBuffer(WIDTH, HEIGHT);
     scene = NULL;
     usingEnvMap = false;
@@ -137,7 +138,7 @@ SColor RayTracer::calculateShadowScalar(Light *lt, Intersection &in, int d) {
     }
 
     Vect p = lt->getPos();
-    Vect ori = in.calculateIntersectionPoint();// + in.calculateSurfaceNormal().linearMult(0.0001f);
+    Vect ori = in.calculateIntersectionPoint();
     Vect dir;
     if (lt->getType() == DIRECTIONAL_LIGHT) {
         dir = lt->getDir().invert();
@@ -169,19 +170,18 @@ SColor RayTracer::calculateShadowScalar(Light *lt, Intersection &in, int d) {
     } else { // The shape is transparent
         // Normalize the color for this material, and recursively trace for other
         // transparent objects
-        // SColor Cd = mat->getDiffColor();
         SColor Cd = ins.getColor();
         float maxval = max(Cd.R(), max(Cd.G(), Cd.B()));
         Cd.R(Cd.R() / maxval); Cd.G(Cd.G() / maxval); Cd.B(Cd.B() / maxval);
-        SColor Si = Cd.linearMult(mat->getTransparency());
-        return Si.linearMult(calculateShadowScalar(lt, ins, d - 1));
+        SColor Si = Cd * mat->getTransparency();
+        return Si * calculateShadowScalar(lt, ins, d - 1);
     }
 }
 
 float RayTracer::calculateFattj(Vect Pt, Light *l) {
     if (l->getType() == POINT_LIGHT) {
         float dist = Pt.euclideanDistance(l->getPos());
-        return (float) min(1.0, 1.0 / (0.25 + 0.1 * dist + 0.01 * dist * dist));
+        return (float) min(1.0, fattjScale / (0.25 + 0.1 * dist + 0.01 * dist * dist));
     } else {
         return 1.0;
     }

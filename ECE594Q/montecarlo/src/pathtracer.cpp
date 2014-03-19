@@ -8,7 +8,6 @@ PathTracer::~PathTracer() {
 
 }
 
-
 RayBuffer PathTracer::traceScene() {
     cout << "Tracing paths: " << WIDTH << "x" << HEIGHT << endl;
     cout << "depth = " << depth << endl;
@@ -31,7 +30,9 @@ RayBuffer PathTracer::traceScene() {
                     r = computeRay((float) x, (float) y);
                     in = scene->intersectsWithBVHTree(r);
                     c = shadeIntersectionPath(in, (int) depth);
-                    R += c.R(); G += c.G(); B += c.B();
+                    R += c.R();
+                    G += c.G();
+                    B += c.B();
                 }
                 R /= (float) numSamples; G /= (float) numSamples; B /= (float) numSamples;
             }
@@ -75,7 +76,7 @@ SColor PathTracer::shadeIntersectionPath(Intersection in, int d) {
     if (!lts.empty()) {
         uint p = (uint) ((double) lts.size() * Rand::Random());
         Light *l = lts.at(p);
-        float Fattj = 0.7;// calculateFattj(Pt, l);
+        float Fattj = calculateFattj(Pt, l);
         if (Fattj > 0) {
             SColor Sj = calculateShadowScalar(l, in, (int) depth);
             shade = shade + directIllumination(l, in, Sj, Fattj);
@@ -117,10 +118,9 @@ SColor PathTracer::diffuseInterreflect(Intersection intersection, int d) {
 
     intersection = scene->intersectsWithBVHTree(diffuseRay);
     if (intersection.hasIntersected()) {
-        SColor diffRefl = intersection.getColor();
-
-        float cos_theta = rayDir.dotProduct(norm);
-        SColor BRDF = 2 * diffRefl * cos_theta;
+        // SColor diffRefl = intersection.getColor();
+        // float cos_theta = rayDir.dotProduct(norm);
+        // SColor BRDF = 2 * diffRefl * cos_theta;
         SColor reflected = shadeIntersectionPath(intersection, d);
         // return reflected * BRDF /* + diffRefl * 0.2f */;
         return albedo * reflected;

@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <cfloat>
 #include <iostream>
+#include <assert.h>
 
 #ifndef _WINDOWS
 #include "omp.h"
@@ -27,6 +28,7 @@ protected:
     int numSamples;
     uint depth;
     float scaleConst;   // c
+    float fattjScale;
 
     bool usingEnvMap;
 
@@ -46,8 +48,9 @@ public:
     RayTracer(uint, uint, uint);
     virtual ~RayTracer();
     // Setters and getters
-    uint getWidth() { return WIDTH;}
-    uint getHeight() { return HEIGHT;}
+    uint getWidth() { return WIDTH; }
+    uint getHeight() { return HEIGHT; }
+    void setFattjScale(float fs) { fattjScale = fs; }
     void setNumSamples(int s) { numSamples = s; }
     void setScene(RScene *s) { scene = s; }
     void setCamera(Camera c);
@@ -106,6 +109,28 @@ public:
     Vect specularSampleUpperHemisphere(Intersection &ins);
     SColor shadeIntersectionPath(Intersection in, int d);
 
+    virtual RayBuffer traceScene();
+};
+
+class BiPathTracer : public RayTracer {
+private:
+    int length;
+
+public:
+    BiPathTracer(uint, uint, uint);
+    virtual ~BiPathTracer();
+
+    Ray computeaRayFromLightSource(Light *);
+    Light * pickRandomLight();
+    Vect specularSampleUpperHemisphere(Intersection &);
+    SColor shootRayFromLightSource(Light *, Vect &, int);
+    SColor connectPaths(Vect &, Vect &, SColor &);
+    SColor traceRayFromCamera(uint, uint, Vect &, int, int);
+    bool russianRoulette(SColor);
+    float fattj(Vect, Vect);
+    SColor shadeIntersectionPoint(Intersection &, Vect &, int &, int);
+
+    // Bidirectional path tracing
     virtual RayBuffer traceScene();
 };
 

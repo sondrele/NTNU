@@ -21,12 +21,12 @@ private:
     SColor intensity;
     
 public:
-    enum LightType getType() const { return type;}
-    void setType(enum LightType t) { type = t;}
-    Vect getPos() { return pos;}
-    void setPos(Vect p) { pos = p;}
-    Vect getDir() { return dir;}
-    void setDir(Vect d) { dir = d;}
+    enum LightType getType() const { return type; }
+    void setType(enum LightType t) { type = t; }
+    Vect getPos() { return pos; }
+    void setPos(Vect p) { pos = p; }
+    Vect getDir() { return dir; }
+    void setDir(Vect d) { dir = d; }
     SColor getIntensity() { return intensity; }
     void setIntensity(SColor i) { intensity = i; }
 };

@@ -59,7 +59,7 @@ bool Intersection::calculateRefraction(Ray &r) {
 
         float cosI = N.dotProduct(I);
         if(cosI  > 0) {
-           N = N.linearMult(-1);
+           N = N.invert();
         }
 
         float c = I.dotProduct(N);
@@ -68,7 +68,7 @@ bool Intersection::calculateRefraction(Ray &r) {
             return false;
         else {
             float cosPhi = sqrt(cosPhi2);
-            Vect term1 = (I - N.linearMult(c));
+            Vect term1 = (I - N * c);
             term1.linearMult(n);
             Vect d0 = term1 - N.linearMult(cosPhi);
             r = ray;
