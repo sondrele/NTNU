@@ -1,6 +1,20 @@
 #include "rscene.h"
 
+void Light::setArea(Vect min, Vect max) {
+    type = AREA_LIGHT;
+    area.setMin(min);
+    area.setMin(max);
+}
+
+bool Light::intersects(Ray ray) {
+    if (type == AREA_LIGHT) {
+        return area.intersects(ray);
+    }
+    return false;
+}
+
 RScene::RScene() {
+
 }
 
 RScene::~RScene() {
@@ -51,28 +65,6 @@ Shape * RScene::getShape(uint pos) {
     return shapes.at(pos);
 }
 
-Intersection RScene::calculateRayIntersection(Ray ray) {
-    Intersection ins;
-    for (uint i = 0; i < shapes.size(); i++) {
-        Shape *s = shapes.at(i);
-        BBox bbox = s->getBBox();
-        if (bbox.intersects(ray)) {
-            Intersection j = s->intersects(ray);
-            if (j.hasIntersected()) {
-                if (!ins.hasIntersected()) {
-                    ins = j;
-                } 
-                else if (ins.hasIntersected() &&
-                    j.getIntersectionPoint() < ins.getIntersectionPoint())
-                {
-                    ins = j;
-                }
-            }
-        }
-    }
-    return ins;
-}
-
-Intersection RScene::intersectsWithBVHTree(Ray ray) {
+Intersection RScene::intersects(Ray ray) {
     return searchTree.intersects(ray);
 }

@@ -65,7 +65,7 @@ typedef struct CameraIO {
 
     /* We allow point, directional, and spot lights. */
 
-enum LightType {POINT_LIGHT, DIRECTIONAL_LIGHT, SPOT_LIGHT};
+enum LightType {POINT_LIGHT, DIRECTIONAL_LIGHT, SPOT_LIGHT, AREA_LIGHT};
 
 typedef struct LightIO {
     struct LightIO *next; /* Pointer to next light in linked list	*/

@@ -16,6 +16,7 @@
 class Light {
 private:
     Vect pos;
+    BBox area;
     Vect dir;
     enum LightType type;
     SColor intensity;
@@ -25,6 +26,8 @@ public:
     void setType(enum LightType t) { type = t; }
     Vect getPos() { return pos; }
     void setPos(Vect p) { pos = p; }
+    void setArea(Vect, Vect);
+    bool intersects(Ray);
     Vect getDir() { return dir; }
     void setDir(Vect d) { dir = d; }
     SColor getIntensity() { return intensity; }
@@ -49,8 +52,7 @@ public:
     void setShapes(std::vector<Shape *>);
     void addShape(Shape *);
     Shape * getShape(uint);
-    Intersection calculateRayIntersection(Ray);
-    Intersection intersectsWithBVHTree(Ray);
+    Intersection intersects(Ray);
 };
 
 #endif

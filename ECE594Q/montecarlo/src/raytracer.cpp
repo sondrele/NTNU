@@ -137,45 +137,56 @@ SColor RayTracer::calculateShadowScalar(Light *lt, Intersection &in, int d) {
         }
     }
 
+    int num_samples = 1;
     Vect p = lt->getPos();
     Vect ori = in.calculateIntersectionPoint();
     Vect dir;
     if (lt->getType() == DIRECTIONAL_LIGHT) {
         dir = lt->getDir().invert();
+    } else if (lt->getType() == AREA_LIGHT) {
+        num_samples = 4;
     } else {
         dir = p - ori;
         dir.normalize();
     }
     ori = ori + dir.linearMult(0.001f);
-    Ray shdw(ori, dir);
 
-    Intersection ins = scene->intersectsWithBVHTree(shdw);
-    Material *mat = ins.getMaterial();
-    
-    if (!ins.hasIntersected()) {
-        // The point is in direct light
-        return SColor(1, 1, 1);
-    } else if (mat->getTransparency() <= 0.00000001) {
-        // The material is fully opaque
-        Vect pos = ins.calculateIntersectionPoint();
-        if (lt->getType() == DIRECTIONAL_LIGHT ||
-            ori.euclideanDistance(pos) < ori.euclideanDistance(lt->getPos())) {
-            // The ray intersects with an object before the light source
-            return SColor(0, 0, 0);
-        } else {
-            // The ray intersects with an object behind the lightsource
-            // or a direction light, thus fully in light
-            return SColor(1, 1, 1);
+    float Sj = 0.0f;
+    for (int i = 0; i < num_samples; i++) {
+        Ray shdw(ori, dir);
+
+        Intersection ins = scene->intersects(shdw);
+        Material *mat = ins.getMaterial();
+        
+        if (!ins.hasIntersected()) {
+            // The point is in direct light
+            Sj += 1.0f;
+        } else if (mat->getTransparency() <= 0.00000001) {
+            // The material is fully opaque
+            Vect pos = ins.calculateIntersectionPoint();
+            if (lt->getType() == DIRECTIONAL_LIGHT ||
+                ori.euclideanDistance(pos) < ori.euclideanDistance(lt->getPos())) {
+                // The ray intersects with an object before the light source
+                return SColor(0, 0, 0);
+            } else {
+                // The ray intersects with an object behind the lightsource
+                // or a direction light, thus fully in light
+                Sj += 1;
+            }
+        } else { // The shape is transparent
+            // Normalize the color for this material, and recursively trace for other
+            // transparent objects
+            SColor Cd = ins.getColor();
+            float maxval = max(Cd.R(), max(Cd.G(), Cd.B()));
+            Cd.R(Cd.R() / maxval); Cd.G(Cd.G() / maxval); Cd.B(Cd.B() / maxval);
+            SColor Si = Cd * mat->getTransparency();
+            Si = Si * calculateShadowScalar(lt, ins, d - 1);
+            Sj += Si.R();
         }
-    } else { // The shape is transparent
-        // Normalize the color for this material, and recursively trace for other
-        // transparent objects
-        SColor Cd = ins.getColor();
-        float maxval = max(Cd.R(), max(Cd.G(), Cd.B()));
-        Cd.R(Cd.R() / maxval); Cd.G(Cd.G() / maxval); Cd.B(Cd.B() / maxval);
-        SColor Si = Cd * mat->getTransparency();
-        return Si * calculateShadowScalar(lt, ins, d - 1);
     }
+
+    Sj /= num_samples;
+    return SColor(Sj, Sj, Sj);
 }
 
 float RayTracer::calculateFattj(Vect Pt, Light *l) {

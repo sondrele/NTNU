@@ -50,7 +50,7 @@ SColor WhittedTracer::shadeIntersection(Intersection in, int d) {
     SColor reflection;
     if (ks.length() > 0) {
         Ray r = in.calculateReflection();
-        Intersection rin = scene->intersectsWithBVHTree(r);
+        Intersection rin = scene->intersects(r);
         reflection = shadeIntersection(rin, d - 1).linearMult(ks);
     }
 
@@ -58,7 +58,7 @@ SColor WhittedTracer::shadeIntersection(Intersection in, int d) {
     if (kt > 0) {
         Ray r;
         if (in.calculateRefraction(r)) {
-            Intersection rin = scene->intersectsWithBVHTree(r);
+            Intersection rin = scene->intersects(r);
             refraction = shadeIntersection(rin, d - 1).linearMult(kt);
         } else {
             refraction = SColor(0, 0, 0);
@@ -89,7 +89,7 @@ RayBuffer WhittedTracer::traceScene() {
                     float dx = dm / numSamples;
                     float dy = dn / numSamples;
                     Ray r = computeRay((float) (x + dx), (float) (y + dy));
-                    Intersection in = scene->intersectsWithBVHTree(r);
+                    Intersection in = scene->intersects(r);
                     SColor c = shadeIntersection(in, (int) depth);
                     R += c.R(); G += c.G(); B += c.B();
                 }

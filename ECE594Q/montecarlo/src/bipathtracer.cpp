@@ -50,7 +50,7 @@ Vect BiPathTracer::specularSampleUpperHemisphere(Intersection &ins) {
 
 SColor BiPathTracer::shootRayFromLightSource(Light *l, Vect &intersectionPt, int s) {
     Ray r = computeaRayFromLightSource(l);
-    Intersection in = scene->intersectsWithBVHTree(r);
+    Intersection in = scene->intersects(r);
     SColor emmittance;
     if (in.hasIntersected()) {
         emmittance = in.getColor() * l->getIntensity();
@@ -61,7 +61,7 @@ SColor BiPathTracer::shootRayFromLightSource(Light *l, Vect &intersectionPt, int
             r.setOrigin(intersectionPt + N * 0.0001);
             r.setDirection(specularSampleUpperHemisphere(in));
 
-            in = scene->intersectsWithBVHTree(r);
+            in = scene->intersects(r);
             if (in.hasIntersected()) {
                 intersectionPt = in.calculateIntersectionPoint();
                 N = in.calculateSurfaceNormal();
@@ -76,7 +76,7 @@ SColor BiPathTracer::shootRayFromLightSource(Light *l, Vect &intersectionPt, int
 
 SColor BiPathTracer::connectPaths(Vect &gatheringPt, Vect &shootingPt, SColor &shootingEmmittance) {
     Ray r(gatheringPt, shootingPt);
-    Intersection in = scene->intersectsWithBVHTree(r);
+    Intersection in = scene->intersects(r);
 
     // If true, then the paths can be connected
     if (in.hasIntersected() && 
@@ -123,7 +123,7 @@ SColor BiPathTracer::shadeIntersectionPoint(Intersection &in, Vect &intersection
     r.setOrigin(intersectionPt + N * 0.0001);
     r.setDirection(specularSampleUpperHemisphere(in));
     
-    in = scene->intersectsWithBVHTree(r);
+    in = scene->intersects(r);
     if (in.hasIntersected()) {
         float decreasing = fattj(intersectionPt, in.calculateIntersectionPoint());
         SColor Cd = in.getColor();
@@ -135,7 +135,7 @@ SColor BiPathTracer::shadeIntersectionPoint(Intersection &in, Vect &intersection
 
 SColor BiPathTracer::traceRayFromCamera(uint x, uint y, Vect &intersectionPt, int s, int t) {
     Ray r = computeRay((float) x, (float) y);
-    Intersection in = scene->intersectsWithBVHTree(r);
+    Intersection in = scene->intersects(r);
 
     return shadeIntersectionPoint(in, intersectionPt, s, t);
 }

@@ -21,14 +21,14 @@ RayBuffer PathTracer::traceScene() {
         for (uint x = 0; x < WIDTH; x++) {
             // Loop over samples to get the right color
             Ray r = computeRay((float) x, (float) y);
-            Intersection in = scene->intersectsWithBVHTree(r);
+            Intersection in = scene->intersects(r);
             SColor c = shadeIntersectionPath(in, (int) depth);
             float R = c.R(), G = c.G(), B = c.B();
 
             if (in.hasIntersected()) {
                 for (int s = 1; s < numSamples; s++) {
                     r = computeRay((float) x, (float) y);
-                    in = scene->intersectsWithBVHTree(r);
+                    in = scene->intersects(r);
                     c = shadeIntersectionPath(in, (int) depth);
                     R += c.R();
                     G += c.G();
@@ -88,7 +88,7 @@ SColor PathTracer::shadeIntersectionPath(Intersection in, int d) {
     if (ks.length() > 0) {
         SColor reflection;
         Ray r = in.calculateReflection();
-        Intersection rin = scene->intersectsWithBVHTree(r);
+        Intersection rin = scene->intersects(r);
         reflection = shadeIntersectionPath(rin, d - 1).linearMult(ks);
         shade = shade + reflection;
     }
@@ -97,7 +97,7 @@ SColor PathTracer::shadeIntersectionPath(Intersection in, int d) {
         SColor refraction;
         Ray r;
         if (in.calculateRefraction(r)) {
-            Intersection rin = scene->intersectsWithBVHTree(r);
+            Intersection rin = scene->intersects(r);
             refraction = shadeIntersectionPath(rin, d - 1).linearMult(kt);
         } else {
             refraction = SColor(0, 0, 0);
@@ -116,7 +116,7 @@ SColor PathTracer::diffuseInterreflect(Intersection intersection, int d) {
 
     SColor albedo = intersection.getColor();
 
-    intersection = scene->intersectsWithBVHTree(diffuseRay);
+    intersection = scene->intersects(diffuseRay);
     if (intersection.hasIntersected()) {
         // SColor diffRefl = intersection.getColor();
         // float cos_theta = rayDir.dotProduct(norm);
