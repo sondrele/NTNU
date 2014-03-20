@@ -81,7 +81,7 @@ SColor BiPathTracer::connectPaths(Vect &gatheringPt, Vect &shootingPt, SColor &s
     // If true, then the paths can be connected
     if (in.hasIntersected() && 
         shootingPt.euclideanDistance(in.calculateIntersectionPoint()) < 0.0001) {
-        return in.getColor() * shootingEmmittance;
+        return shootingEmmittance * fattj(gatheringPt, shootingPt);
     } else {
         return SColor();
     }
@@ -91,11 +91,10 @@ SColor BiPathTracer::shadeIntersectionPoint(Intersection &in, Vect &intersection
     SColor shade;
     
     if (t < 0) {
-        // Vect shootingInsPt;
-        // Light *l = pickRandomLight();
-        // SColor shootingEmmittance = shootRayFromLightSource(l, shootingInsPt, s);
-        // return connectPaths(intersectionPt, shootingInsPt, shootingEmmittance);
-        return shade;
+        Vect shootingInsPt;
+        Light *l = pickRandomLight();
+        SColor shootingEmmittance = shootRayFromLightSource(l, shootingInsPt, s);
+        return connectPaths(intersectionPt, shootingInsPt, shootingEmmittance);
     } else if (!in.hasIntersected()) {
         if (!usingEnvMap) {
             return shade;
@@ -119,15 +118,15 @@ SColor BiPathTracer::shadeIntersectionPoint(Intersection &in, Vect &intersection
         }
     }
 
+    SColor Cd = in.getColor();
+
     Ray r;
     r.setOrigin(intersectionPt + N * 0.0001);
     r.setDirection(specularSampleUpperHemisphere(in));
-    
+
     in = scene->intersects(r);
     if (in.hasIntersected()) {
-        float decreasing = fattj(intersectionPt, in.calculateIntersectionPoint());
-        SColor Cd = in.getColor();
-        shade = shade + Cd * decreasing * shadeIntersectionPoint(in, intersectionPt, s, t - 1);
+        shade = shade + Cd * shadeIntersectionPoint(in, intersectionPt, s, t - 1);
     }
     
     return shade;

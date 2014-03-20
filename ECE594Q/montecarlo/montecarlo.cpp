@@ -29,6 +29,7 @@ std::string inObj;
 std::string out;
 
 bool shaders = false;
+bool area = false;
 bool objScene = false;
 bool pathTracing = false;
 bool bidirectional = false;
@@ -38,6 +39,13 @@ static void loadScene(const char *name, RayTracer *rayTracer) {
     scene = readScene(name);
     RScene *rayScene = new RScene();
     RSceneFactory::CreateScene(*rayScene, *scene);
+
+    if (area) {
+        Light *l = new Light();
+        l->setIntensity(SColor(1, 1, 1));
+        l->setArea(Vect(1, 5, -2), Vect(1.2f, 5, -2.2f));
+        rayScene->addLight(l);
+    }
 
     Camera cam;
     RSceneFactory::CreateCamera(cam, *(scene->camera));
@@ -61,10 +69,15 @@ static void loadObjScene(const char *name, RayTracer *rayTracer) {
     RScene *rayScene = new RScene();
     RSceneFactory::CreateSceneFromObj(rayScene, shapes);
 
-
     std::vector<Light *> lts;
     RSceneFactory::CreateLights(lts, *(scene->lights));
     rayScene->setLights(lts);
+    if (area) {
+        Light *l = new Light();
+        l->setIntensity(SColor(1, 1, 1));
+        l->setArea(Vect(213, 540, 227), Vect(343, 540, 332));
+        rayScene->addLight(l);
+    }
 
     Camera cam;
     RSceneFactory::CreateCamera(cam, *(scene->camera));
@@ -137,6 +150,10 @@ static void parseCommandLine(int argc, char *argv[]) {
         cout << "-n num_samples:    Specify number of samples for pathtracing" << endl;
         cout << "-f:                Specify a scale constant for Fattj" << endl;
         exit(0);
+    }
+
+    if (ArgParser::CmdOptExists(argv, argv+argc, "-area")) {
+        area = true;
     }
 
     char *size = ArgParser::GetCmdOpt(argv, argv + argc, "-size");

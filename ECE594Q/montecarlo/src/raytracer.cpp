@@ -143,16 +143,23 @@ SColor RayTracer::calculateShadowScalar(Light *lt, Intersection &in, int d) {
     Vect dir;
     if (lt->getType() == DIRECTIONAL_LIGHT) {
         dir = lt->getDir().invert();
+        ori = ori + dir.linearMult(0.001f);
     } else if (lt->getType() == AREA_LIGHT) {
-        num_samples = 4;
+        // TODO: Do not need to sample this many times of this is a secoundary
+        // or third bounce
+        num_samples = 10;
+        ori = ori + in.calculateSurfaceNormal() * 0.001;
     } else {
         dir = p - ori;
         dir.normalize();
+        ori = ori + dir.linearMult(0.001f);
     }
-    ori = ori + dir.linearMult(0.001f);
 
     float Sj = 0.0f;
     for (int i = 0; i < num_samples; i++) {
+        if (lt->getType() == AREA_LIGHT) {
+            dir = lt->samplePoint() - ori;
+        }
         Ray shdw(ori, dir);
 
         Intersection ins = scene->intersects(shdw);
@@ -167,7 +174,7 @@ SColor RayTracer::calculateShadowScalar(Light *lt, Intersection &in, int d) {
             if (lt->getType() == DIRECTIONAL_LIGHT ||
                 ori.euclideanDistance(pos) < ori.euclideanDistance(lt->getPos())) {
                 // The ray intersects with an object before the light source
-                return SColor(0, 0, 0);
+                Sj += 0.0f;
             } else {
                 // The ray intersects with an object behind the lightsource
                 // or a direction light, thus fully in light
@@ -190,7 +197,7 @@ SColor RayTracer::calculateShadowScalar(Light *lt, Intersection &in, int d) {
 }
 
 float RayTracer::calculateFattj(Vect Pt, Light *l) {
-    if (l->getType() == POINT_LIGHT) {
+    if (l->getType() != DIRECTIONAL_LIGHT) {
         float dist = Pt.euclideanDistance(l->getPos());
         return (float) min(1.0, fattjScale / (0.25 + 0.1 * dist + 0.01 * dist * dist));
     } else {

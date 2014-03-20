@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "Matrix.h"
+#include "rand.h"
 #include "scene_io.h"
 #include "ray.h"
 #include "intersection.h"
@@ -27,6 +28,7 @@ public:
     Vect getPos() { return pos; }
     void setPos(Vect p) { pos = p; }
     void setArea(Vect, Vect);
+    Vect samplePoint();
     bool intersects(Ray);
     Vect getDir() { return dir; }
     void setDir(Vect d) { dir = d; }

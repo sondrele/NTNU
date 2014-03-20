@@ -2,6 +2,7 @@
 
 void Light::setArea(Vect min, Vect max) {
     type = AREA_LIGHT;
+    pos = (min + max) * 0.5f;
     area.setMin(min);
     area.setMin(max);
 }
@@ -11,6 +12,16 @@ bool Light::intersects(Ray ray) {
         return area.intersects(ray);
     }
     return false;
+}
+
+Vect Light::samplePoint() {
+    float dx = abs(area.getMax().getX() - area.getMin().getX()) * 0.5f;
+    float dy = abs(area.getMax().getY() - area.getMin().getY()) * 0.5f;
+    float dz = abs(area.getMax().getZ() - area.getMin().getZ()) * 0.5f;
+    dx = dx - (float) Rand::Random() * (dx * 2);
+    dy = dy - (float) Rand::Random() * (dy * 2);
+    dz = dz - (float) Rand::Random() * (dz * 2);
+    return Vect(pos.getX() + dx, pos.getY() + dy, pos.getZ() + dz);
 }
 
 RScene::RScene() {
