@@ -11,7 +11,7 @@ BiPathTracer::~BiPathTracer() {
 
 Ray BiPathTracer::computeaRayFromLightSource(Light *l) {
     Ray r;
-    if (l->getType() == POINT_LIGHT) {
+    if (l->getType() != DIRECTIONAL_LIGHT) {
         r.setOrigin(l->getPos());
         r.setDirection(Rand::RandomVect());
     }
@@ -92,7 +92,9 @@ SColor BiPathTracer::connectPaths(Vect &gatheringPt, Vect &shootingPt, SColor &s
     }
 }
 
-SColor BiPathTracer::shadeIntersectionPoint(Intersection &in, Vect &intersectionPt, int &s, int t) {
+SColor BiPathTracer::shadeIntersectionPoint(Intersection &in, Vect &intersectionPt,
+    int &s, int t, bool sampleAreaLights)
+{
     SColor shade;
     intersectionPt = in.calculateIntersectionPoint();
     
@@ -122,7 +124,11 @@ SColor BiPathTracer::shadeIntersectionPoint(Intersection &in, Vect &intersection
     if (l != NULL) {
         float Fattj = calculateFattj(intersectionPt, l);
         if (Fattj > 0) {
-            SColor Sj = calculateShadowScalar(l, in, (int) depth);
+            SColor Sj;
+            if (sampleAreaLights)
+                Sj = calculateShadowScalar(l, in, (int) depth, 1);
+            else
+                Sj = calculateShadowScalar(l, in, (int) depth, 10);
             shade = shade + directIllumination(l, in, Sj, Fattj);
         }
     }
@@ -135,7 +141,7 @@ SColor BiPathTracer::shadeIntersectionPoint(Intersection &in, Vect &intersection
 
     in = scene->intersects(r);
     if (in.hasIntersected()) {
-        shade = shade + Cd * shadeIntersectionPoint(in, intersectionPt, s, t - 1);
+        shade = shade + Cd * shadeIntersectionPoint(in, intersectionPt, s, t - 1, false);
     }
     
     return shade;
@@ -147,7 +153,7 @@ bool BiPathTracer::traceRayFromCamera(uint x, uint y, SColor &shade, int s, int 
 
     if (in.hasIntersected()) {
         Vect intersectionPt;
-        shade = shadeIntersectionPoint(in, intersectionPt, s, t);
+        shade = shadeIntersectionPoint(in, intersectionPt, s, t, true);
         return true;
     } else {
         return false;

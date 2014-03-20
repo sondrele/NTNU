@@ -78,7 +78,7 @@ SColor PathTracer::shadeIntersectionPath(Intersection in, int d) {
         Light *l = lts.at(p);
         float Fattj = calculateFattj(Pt, l);
         if (Fattj > 0) {
-            SColor Sj = calculateShadowScalar(l, in, (int) depth);
+            SColor Sj = calculateShadowScalar(l, in, (int) depth, 1);
             shade = shade + directIllumination(l, in, Sj, Fattj);
         }
     }

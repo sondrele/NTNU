@@ -126,7 +126,7 @@ Ray RayTracer::computeRay(float x, float y) {
     return r;
 }
 
-SColor RayTracer::calculateShadowScalar(Light *lt, Intersection &in, int d) {
+SColor RayTracer::calculateShadowScalar(Light *lt, Intersection &in, int d, int areaScaling) {
     if (d <= 0) {
         return SColor(0, 0, 0);
     } else if (!in.hasIntersected()) {
@@ -147,7 +147,7 @@ SColor RayTracer::calculateShadowScalar(Light *lt, Intersection &in, int d) {
     } else if (lt->getType() == AREA_LIGHT) {
         // TODO: Do not need to sample this many times of this is a secoundary
         // or third bounce
-        num_samples = 10;
+        num_samples *= areaScaling;
         ori = ori + in.calculateSurfaceNormal() * 0.001;
     } else {
         dir = p - ori;
@@ -187,7 +187,7 @@ SColor RayTracer::calculateShadowScalar(Light *lt, Intersection &in, int d) {
             float maxval = max(Cd.R(), max(Cd.G(), Cd.B()));
             Cd.R(Cd.R() / maxval); Cd.G(Cd.G() / maxval); Cd.B(Cd.B() / maxval);
             SColor Si = Cd * mat->getTransparency();
-            Si = Si * calculateShadowScalar(lt, ins, d - 1);
+            Si = Si * calculateShadowScalar(lt, ins, d - 1, 1);
             Sj += Si.R();
         }
     }

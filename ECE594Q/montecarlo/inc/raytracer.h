@@ -74,7 +74,7 @@ public:
     Vect computeDirection(uint, uint);
     // Ray tracing functions
     Ray computeRay(float, float);
-    SColor calculateShadowScalar(Light *, Intersection &, int);
+    SColor calculateShadowScalar(Light *, Intersection &, int, int);
 
     // Direct illumination
     SColor diffuseLightning(float, SColor, Vect, Vect);
@@ -129,7 +129,7 @@ public:
     float fattj(Vect, Vect);
     SColor shootRayFromLightSource(Light *, Vect &, int);
     bool traceRayFromCamera(uint, uint, SColor &, int, int);
-    SColor shadeIntersectionPoint(Intersection &, Vect &, int &, int);
+    SColor shadeIntersectionPoint(Intersection &, Vect &, int &, int, bool);
 
     // Bidirectional path tracing
     virtual RayBuffer traceScene();
