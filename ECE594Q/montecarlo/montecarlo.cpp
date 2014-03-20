@@ -221,10 +221,13 @@ int main(int argc, char *argv[]) {
     try {
         RayTracer *rayTracer;
         if (bidirectional) {
-            rayTracer = new BiPathTracer(w, h, d);
+            BiPathTracer *pathTracer = new BiPathTracer(w, h, d);
+            pathTracer->setBidirectional(true);
+            rayTracer = pathTracer;
         }
         else if (pathTracing) {
             rayTracer = new PathTracer(w, h, d);
+
         } else {
             rayTracer = new WhittedTracer(w, h, d);
         }

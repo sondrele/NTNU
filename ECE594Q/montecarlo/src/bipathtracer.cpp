@@ -2,6 +2,7 @@
 
 BiPathTracer::BiPathTracer(uint width, uint height, uint d)
 : RayTracer(width, height, d) {
+    bidirectional = false;
 }
 
 BiPathTracer::~BiPathTracer() {
@@ -91,6 +92,10 @@ SColor BiPathTracer::shadeIntersectionPoint(Intersection &in, Vect &intersection
     SColor shade;
     
     if (t < 0) {
+        if (!bidirectional) {
+            return shade;
+        }
+
         Vect shootingInsPt;
         Light *l = pickRandomLight();
         SColor shootingEmmittance = shootRayFromLightSource(l, shootingInsPt, s);
@@ -132,15 +137,24 @@ SColor BiPathTracer::shadeIntersectionPoint(Intersection &in, Vect &intersection
     return shade;
 }
 
-SColor BiPathTracer::traceRayFromCamera(uint x, uint y, Vect &intersectionPt, int s, int t) {
+bool BiPathTracer::traceRayFromCamera(uint x, uint y, SColor &shade, int s, int t) {
     Ray r = computeRay((float) x, (float) y);
     Intersection in = scene->intersects(r);
 
-    return shadeIntersectionPoint(in, intersectionPt, s, t);
+    if (in.hasIntersected()) {
+        Vect intersectionPt;
+        shade = shadeIntersectionPoint(in, intersectionPt, s, t);
+        return true;
+    } else {
+        return false;
+    }
 }
 
 RayBuffer BiPathTracer::traceScene() {
-    cout << "Tracing bidirectional paths: " << WIDTH << "x" << HEIGHT << endl;
+    if (bidirectional)
+        cout << "Tracing bidirectional paths: " << WIDTH << "x" << HEIGHT << endl;
+    else
+        cout << "Tracing paths: " << WIDTH << "x" << HEIGHT << endl;
     cout << "depth = " << depth << endl;
     cout << "numSamples = " << numSamples << endl;
     Progress p;
@@ -151,21 +165,33 @@ RayBuffer BiPathTracer::traceScene() {
         #pragma omp parallel for
         for (uint x = 0; x < WIDTH; x++) {
 
+            bool intersectsScene;
+            int s = 0, t = depth;
             float R = 0, G = 0, B = 0;
             for (int ns = 0; ns < numSamples; ns++) {
-                int s = (int) ((depth + 1) * Rand::Random());
-                int t = depth - s;
-                Vect gatheringInsPt;
-                SColor shade = traceRayFromCamera(x, y, gatheringInsPt, s, t);
+                SColor shade;
 
+                if (bidirectional) {
+                    s = (int) ((depth + 1) * Rand::Random());
+                    t = depth - s;
+                }
+
+                intersectsScene = traceRayFromCamera(x, y, shade, s, t);
                 R += shade.R();
                 G += shade.G();
                 B += shade.B();
 
+                if (!intersectsScene) {
+                    break;
+                }
+
             }
-            R /= (float) numSamples;
-            G /= (float) numSamples;
-            B /= (float) numSamples;
+
+            if (intersectsScene) {
+                R /= (float) numSamples;
+                G /= (float) numSamples;
+                B /= (float) numSamples;
+            }
 
             PX_Color color;
             color.R = (uint8_t) (255 * R);

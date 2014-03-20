@@ -114,20 +114,21 @@ public:
 
 class BiPathTracer : public RayTracer {
 private:
-    int length;
+    bool bidirectional;
 
 public:
     BiPathTracer(uint, uint, uint);
     virtual ~BiPathTracer();
 
+    void setBidirectional(bool b) { bidirectional = b; }
     Ray computeaRayFromLightSource(Light *);
     Light * pickRandomLight();
     Vect specularSampleUpperHemisphere(Intersection &);
-    SColor shootRayFromLightSource(Light *, Vect &, int);
     SColor connectPaths(Vect &, Vect &, SColor &);
-    SColor traceRayFromCamera(uint, uint, Vect &, int, int);
     bool russianRoulette(SColor);
     float fattj(Vect, Vect);
+    SColor shootRayFromLightSource(Light *, Vect &, int);
+    bool traceRayFromCamera(uint, uint, SColor &, int, int);
     SColor shadeIntersectionPoint(Intersection &, Vect &, int &, int);
 
     // Bidirectional path tracing
