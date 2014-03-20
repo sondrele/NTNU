@@ -76,12 +76,16 @@ SColor BiPathTracer::shootRayFromLightSource(Light *l, Vect &intersectionPt, int
 }
 
 SColor BiPathTracer::connectPaths(Vect &gatheringPt, Vect &shootingPt, SColor &shootingEmmittance) {
-    Ray r(gatheringPt, shootingPt);
+    Ray r;
+    Vect dir = shootingPt - gatheringPt;
+    dir.normalize();
+    r.setDirection(dir);
+    r.setOrigin(gatheringPt + dir * 0.001f);
     Intersection in = scene->intersects(r);
 
     // If true, then the paths can be connected
     if (in.hasIntersected() && 
-        shootingPt.euclideanDistance(in.calculateIntersectionPoint()) < 0.0001) {
+        shootingPt.euclideanDistance(in.calculateIntersectionPoint()) < 0.001) {
         return shootingEmmittance * fattj(gatheringPt, shootingPt);
     } else {
         return SColor();
@@ -90,6 +94,7 @@ SColor BiPathTracer::connectPaths(Vect &gatheringPt, Vect &shootingPt, SColor &s
 
 SColor BiPathTracer::shadeIntersectionPoint(Intersection &in, Vect &intersectionPt, int &s, int t) {
     SColor shade;
+    intersectionPt = in.calculateIntersectionPoint();
     
     if (t < 0) {
         if (!bidirectional) {
@@ -111,7 +116,6 @@ SColor BiPathTracer::shadeIntersectionPoint(Intersection &in, Vect &intersection
     Material *mat = in.getMaterial();
     shade = mat->getAmbColor();
     
-    intersectionPt = in.calculateIntersectionPoint();
     Vect N = in.calculateSurfaceNormal();
     Light *l = pickRandomLight();
 
@@ -172,8 +176,8 @@ RayBuffer BiPathTracer::traceScene() {
                 SColor shade;
 
                 if (bidirectional) {
-                    s = (int) ((depth + 1) * Rand::Random());
-                    t = depth - s;
+                    s = (int) (Rand::Random() * depth);
+                    t = (int) (Rand::Random() * depth);
                 }
 
                 intersectsScene = traceRayFromCamera(x, y, shade, s, t);
