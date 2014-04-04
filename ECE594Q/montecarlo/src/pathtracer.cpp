@@ -2,14 +2,169 @@
 
 PathTracer::PathTracer(uint width, uint height, uint d)
 : RayTracer(width, height, d) {
+    bidirectional = false;
 }
 
 PathTracer::~PathTracer() {
 
 }
 
+Ray PathTracer::computeaRayFromLightSource(Light *l) {
+    Ray r;
+    if (l->getType() != DIRECTIONAL_LIGHT) {
+        r.setOrigin(l->getPos());
+        r.setDirection(Rand::RandomVect());
+    }
+    return r;
+}
+
+Light * PathTracer::pickRandomLight() {
+    std::vector<Light *> lts = scene->getLights();
+    if (!lts.empty()) {
+        uint pos = (uint) ((double) lts.size() * Rand::Random());
+        return lts.at(pos);
+    }
+    return NULL;
+}
+
+float PathTracer::fattj(Vect Pt, Vect pos) {
+    float dist = Pt.euclideanDistance(pos);
+    return (float) min(1.0, fattjScale / (0.25 + 0.1 * dist + 0.01 * dist * dist));
+}
+
+Vect PathTracer::specularSampleUpperHemisphere(Intersection &ins) {
+    float specular = ins.specColor().length();
+    float x = (1 - specular) * (M_PI - 2 * M_PI * (float) Rand::Random());
+    float y = (1 - specular) * (M_PI - 2 * M_PI * (float) Rand::Random());
+
+    Vect dir = ins.calculateReflection().getDirection();
+    Vect_h dir_h(dir.getX(), dir.getY(), dir.getZ());
+    Vect_h::Rotate(dir_h, 'x', x);
+    Vect_h::Rotate(dir_h, 'y', y);
+
+    Vect randDir(dir_h.getX(), dir_h.getY(), dir_h.getZ());
+    randDir.normalize();
+    if (randDir.dotProduct(ins.calculateSurfaceNormal()) < 0)
+        return randDir.invert();
+    return randDir;
+}
+
+SColor PathTracer::shootRayFromLightSource(Light *l, Vect &intersectionPt, int s) {
+    Ray r = computeaRayFromLightSource(l);
+    Intersection in = scene->intersects(r);
+    SColor emmittance;
+    if (in.hasIntersected()) {
+        emmittance = in.getColor() * l->getIntensity();
+
+        intersectionPt = in.calculateIntersectionPoint();
+        Vect N = in.calculateSurfaceNormal();
+        for (int i = 1; i < s; i++) {
+            r.setOrigin(intersectionPt + N * 0.0001);
+            r.setDirection(specularSampleUpperHemisphere(in));
+
+            in = scene->intersects(r);
+            if (in.hasIntersected()) {
+                intersectionPt = in.calculateIntersectionPoint();
+                N = in.calculateSurfaceNormal();
+                emmittance = emmittance + emmittance * in.getColor();
+            } else {
+                return emmittance;
+            }
+        }
+    }
+    return emmittance;
+}
+
+SColor PathTracer::connectPaths(Vect &gatheringPt, Vect &shootingPt, SColor &shootingEmmittance) {
+    Ray r;
+    Vect dir = shootingPt - gatheringPt;
+    dir.normalize();
+    r.setDirection(dir);
+    r.setOrigin(gatheringPt + dir * 0.001f);
+    Intersection in = scene->intersects(r);
+
+    // If true, then the paths can be connected
+    if (in.hasIntersected() && 
+        shootingPt.euclideanDistance(in.calculateIntersectionPoint()) < 0.001) {
+        return shootingEmmittance * fattj(gatheringPt, shootingPt);
+    } else {
+        return SColor();
+    }
+}
+
+SColor PathTracer::shadeIntersectionPoint(Intersection &in, Vect &intersectionPt,
+    int &s, int t, bool sampleAreaLights)
+{
+    SColor shade;
+    intersectionPt = in.calculateIntersectionPoint();
+    
+    if (t < 0) {
+        if (!bidirectional) {
+            return shade;
+        }
+
+        Vect shootingInsPt;
+        Light *l = pickRandomLight();
+        SColor shootingEmmittance = shootRayFromLightSource(l, shootingInsPt, s);
+        return connectPaths(intersectionPt, shootingInsPt, shootingEmmittance);
+    } else if (!in.hasIntersected()) {
+        if (!usingEnvMap) {
+            return shade;
+        } else {
+            return envMap.getTexel(in.getDirection());
+        }
+    }
+
+    Material *mat = in.getMaterial();
+    shade = mat->getAmbColor();
+    
+    Vect N = in.calculateSurfaceNormal();
+    Light *l = pickRandomLight();
+
+    if (l != NULL) {
+        float Fattj = calculateFattj(intersectionPt, l);
+        if (Fattj > 0) {
+            SColor Sj;
+            if (sampleAreaLights)
+                Sj = calculateShadowScalar(l, in, (int) depth, 1);
+            else
+                Sj = calculateShadowScalar(l, in, (int) depth, 10);
+            shade = shade + directIllumination(l, in, Sj, Fattj);
+        }
+    }
+
+    SColor Cd = in.getColor();
+
+    Ray r;
+    r.setOrigin(intersectionPt + N * 0.0001);
+    r.setDirection(specularSampleUpperHemisphere(in));
+
+    in = scene->intersects(r);
+    if (in.hasIntersected()) {
+        shade = shade + Cd * shadeIntersectionPoint(in, intersectionPt, s, t - 1, false);
+    }
+    
+    return shade;
+}
+
+bool PathTracer::traceRayFromCamera(uint x, uint y, SColor &shade, int s, int t) {
+    Ray r = computeRay((float) x, (float) y);
+    Intersection in = scene->intersects(r);
+
+    if (in.hasIntersected()) {
+        Vect intersectionPt;
+        shade = shadeIntersectionPoint(in, intersectionPt, s, t, true);
+        return true;
+    } else {
+        return false;
+    }
+}
+
 RayBuffer PathTracer::traceScene() {
-    cout << "Tracing paths: " << WIDTH << "x" << HEIGHT << endl;
+    if (bidirectional)
+        cout << "Tracing bidirectional paths: " << WIDTH << "x" << HEIGHT << endl;
+    else
+        cout << "Tracing paths: " << WIDTH << "x" << HEIGHT << endl;
     cout << "depth = " << depth << endl;
     cout << "numSamples = " << numSamples << endl;
     Progress p;
@@ -19,22 +174,33 @@ RayBuffer PathTracer::traceScene() {
         omp_set_num_threads(16);
         #pragma omp parallel for
         for (uint x = 0; x < WIDTH; x++) {
-            // Loop over samples to get the right color
-            Ray r = computeRay((float) x, (float) y);
-            Intersection in = scene->intersects(r);
-            SColor c = shadeIntersectionPath(in, (int) depth);
-            float R = c.R(), G = c.G(), B = c.B();
 
-            if (in.hasIntersected()) {
-                for (int s = 1; s < numSamples; s++) {
-                    r = computeRay((float) x, (float) y);
-                    in = scene->intersects(r);
-                    c = shadeIntersectionPath(in, (int) depth);
-                    R += c.R();
-                    G += c.G();
-                    B += c.B();
+            bool intersectsScene;
+            int s = 0, t = depth;
+            float R = 0, G = 0, B = 0;
+            for (int ns = 0; ns < numSamples; ns++) {
+                SColor shade;
+
+                if (bidirectional) {
+                    s = (int) (Rand::Random() * depth);
+                    t = (int) (Rand::Random() * depth);
                 }
-                R /= (float) numSamples; G /= (float) numSamples; B /= (float) numSamples;
+
+                intersectsScene = traceRayFromCamera(x, y, shade, s, t);
+                R += shade.R();
+                G += shade.G();
+                B += shade.B();
+
+                if (!intersectsScene) {
+                    break;
+                }
+
+            }
+
+            if (intersectsScene) {
+                R /= (float) numSamples;
+                G /= (float) numSamples;
+                B /= (float) numSamples;
             }
 
             PX_Color color;
@@ -52,120 +218,8 @@ RayBuffer PathTracer::traceScene() {
     return buffer;
 }
 
-SColor PathTracer::shadeIntersectionPath(Intersection in, int d) {
-    if (d <= 0) {
-        return SColor(0, 0, 0);
-    } else if (!in.hasIntersected()) {
-        if (!usingEnvMap) {
-            return SColor(0, 0, 0);
-        } else {
-            return envMap.getTexel(in.getDirection());
-        }
-    }
-    SColor shade(0, 0, 0);
-
-    Material *mat = in.getMaterial();
-    float kt = mat->getTransparency();
-    SColor ks = mat->getSpecColor();
-    Vect Pt = in.calculateIntersectionPoint();
-
-    shade = mat->getAmbColor();
-
-    // Trace shadow scalar towards single light
-    std::vector<Light *> lts = scene->getLights();
-    if (!lts.empty()) {
-        uint p = (uint) ((double) lts.size() * Rand::Random());
-        Light *l = lts.at(p);
-        float Fattj = calculateFattj(Pt, l);
-        if (Fattj > 0) {
-            SColor Sj = calculateShadowScalar(l, in, (int) depth, 1);
-            shade = shade + directIllumination(l, in, Sj, Fattj);
-        }
-    }
-    SColor diffRefl = diffuseInterreflect(in, d - 1);
-    shade = shade + diffRefl;
-    
-    if (ks.length() > 0) {
-        SColor reflection;
-        Ray r = in.calculateReflection();
-        Intersection rin = scene->intersects(r);
-        reflection = shadeIntersectionPath(rin, d - 1).linearMult(ks);
-        shade = shade + reflection;
-    }
-
-    if (kt > 0) {
-        SColor refraction;
-        Ray r;
-        if (in.calculateRefraction(r)) {
-            Intersection rin = scene->intersects(r);
-            refraction = shadeIntersectionPath(rin, d - 1).linearMult(kt);
-        } else {
-            refraction = SColor(0, 0, 0);
-        }
-        shade = shade + refraction;
-    }
-
-    return shade;
-}
-
-SColor PathTracer::diffuseInterreflect(Intersection intersection, int d) {
-    Vect norm = intersection.calculateSurfaceNormal();
-    Vect rayDir = specularSampleUpperHemisphere(intersection);
-    // Vect rayDir = uniformSampleUpperHemisphere(norm);
-    Ray diffuseRay(intersection.calculateIntersectionPoint() + norm.linearMult(0.0001f), rayDir);
-
-    SColor albedo = intersection.getColor();
-
-    intersection = scene->intersects(diffuseRay);
-    if (intersection.hasIntersected()) {
-        // SColor diffRefl = intersection.getColor();
-        // float cos_theta = rayDir.dotProduct(norm);
-        // SColor BRDF = 2 * diffRefl * cos_theta;
-        SColor reflected = shadeIntersectionPath(intersection, d);
-        // return reflected * BRDF /* + diffRefl * 0.2f */;
-        return albedo * reflected;
-    }
-
-    if (usingEnvMap) {
-        return envMap.getTexel(rayDir);
-    } else {
-        return SColor();
-    }
-}
-
-Vect PathTracer::uniformSampleUpperHemisphere(Vect &sampleDir) {
-    float x = 1 - 2 * (float) Rand::Random();
-    float y = 1 - 2 * (float) Rand::Random();
-    float z = 1 - 2 * (float) Rand::Random();
-
-    Vect sample(x, y, z);
-    sample.normalize();
-    if (sample.dotProduct(sampleDir) < 0)
-        return sample.invert();
- return sample;
-}
-
-Vect PathTracer::specularSampleUpperHemisphere(Intersection &ins) {
-    // PI < x, y, < PI
-    float specular = ins.specColor().length();
-    float x = (1 - specular) * (M_PI - 2 * M_PI * (float) Rand::Random());
-    float y = (1 - specular) * (M_PI - 2 * M_PI * (float) Rand::Random());
-
-    Vect dir = ins.calculateReflection().getDirection();
-    Vect_h dir_h(dir.getX(), dir.getY(), dir.getZ());
-    Vect_h::Rotate(dir_h, 'x', x);
-    Vect_h::Rotate(dir_h, 'y', y);
-
-    Vect sample(dir_h.getX(), dir_h.getY(), dir_h.getZ());
-    sample.normalize();
-    if (sample.dotProduct(ins.calculateSurfaceNormal()) < 0)
-        return sample.invert();
-    return sample;
-}
-
-bool PathTracer::russianRoulette(SColor refl, float &survivorMult) {
+bool PathTracer::russianRoulette(SColor refl) {
     float p = max(refl.R(), max(refl.G(), refl.B()));
-    survivorMult = 1.0f / p;
     if (Rand::Random() > p) 
         return true;
     return false;

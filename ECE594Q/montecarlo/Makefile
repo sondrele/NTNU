@@ -35,7 +35,6 @@ SRCS = src/argparser.cpp\
     src/envmap.cpp\
     src/whittedtracer.cpp\
     src/pathtracer.cpp\
-    src/bipathtracer.cpp\
     src/raytracer.cpp
 OBJS = $(SRCS:.cpp=.o) $(LIBS:.cpp=.o) 
 INCS = $(wildcard ./inc/*.h)
@@ -43,18 +42,10 @@ INCS = $(wildcard ./inc/*.h)
 %.o: %.cpp
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-all: montecarlo
+all: tracer
 
-montecarlo: montecarlo.o $(OBJS)
+tracer: tracer.o $(OBJS)
 	$(CC) -o $@ $^ $(CIMGFLAGS)
-
-cornell: montecarlo
-	time ./montecarlo cornell 300 300 5 10
-
-TOBJSRC = lib/tiny_obj_loader.cc
-TOBJOBJ = $(TOBJSRC:.cpp=.o)
-tinyobj: tinyobj.o $(TOBJOBJ)
-	$(CC) -o $@ $^ $(CFLAGS)
 
 clean:
 	rm -f *.o

@@ -6,10 +6,7 @@
 #include <iostream>
 #include <assert.h>
 
-#ifndef _WINDOWS
 #include "omp.h"
-#endif  // _WINDOWS
-
 
 #include "progress.h"
 #include "envmap.h"
@@ -98,27 +95,12 @@ public:
 };
 
 class PathTracer : public RayTracer {
-public:
-    PathTracer(uint, uint, uint);
-    virtual ~PathTracer();
-    
-    // Pathtracing
-    bool russianRoulette(SColor, float &);
-    SColor diffuseInterreflect(Intersection , int);
-    Vect uniformSampleUpperHemisphere(Vect &);
-    Vect specularSampleUpperHemisphere(Intersection &ins);
-    SColor shadeIntersectionPath(Intersection in, int d);
-
-    virtual RayBuffer traceScene();
-};
-
-class BiPathTracer : public RayTracer {
 private:
     bool bidirectional;
 
 public:
-    BiPathTracer(uint, uint, uint);
-    virtual ~BiPathTracer();
+    PathTracer(uint, uint, uint);
+    virtual ~PathTracer();
 
     void setBidirectional(bool b) { bidirectional = b; }
     Ray computeaRayFromLightSource(Light *);

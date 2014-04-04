@@ -136,7 +136,7 @@ static void render(RayTracer *rayTracer) {
 }
 
 static void parseCommandLine(int argc, char *argv[]) {
-    cout << "help: ./montecarlo -h" << endl;
+    cout << "help: ./tracer -h" << endl;
     if (ArgParser::CmdOptExists(argv, argv+argc, "-h")) {
         cout << "Run with following parameters: " << endl;
         cout << "-h:                Display help message" << endl;
@@ -220,14 +220,12 @@ int main(int argc, char *argv[]) {
 
     try {
         RayTracer *rayTracer;
-        if (bidirectional) {
-            BiPathTracer *pathTracer = new BiPathTracer(w, h, d);
-            pathTracer->setBidirectional(true);
+        if (pathTracing) {
+            PathTracer *pathTracer = new PathTracer(w, h, d);
+            if (bidirectional) {
+                pathTracer->setBidirectional(true);
+            }
             rayTracer = pathTracer;
-        }
-        else if (pathTracing) {
-            rayTracer = new PathTracer(w, h, d);
-
         } else {
             rayTracer = new WhittedTracer(w, h, d);
         }

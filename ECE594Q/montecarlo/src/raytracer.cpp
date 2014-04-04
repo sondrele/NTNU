@@ -209,7 +209,6 @@ SColor RayTracer::diffuseLightning(float kt, SColor Cd, Vect Norm, Vect Dj) {
     float a = (1.0f - kt);
     float b = max(0.0f, Norm.dotProduct(Dj));
 
-    // TODO: Flip normal if the ray is inside a transparent object
     return Cd.linearMult(a * b);
 }
 
