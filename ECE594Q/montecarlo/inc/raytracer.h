@@ -107,7 +107,6 @@ public:
     Light * pickRandomLight();
     Vect specularSampleUpperHemisphere(Intersection &);
     SColor connectPaths(Vect &, Vect &, SColor &);
-    bool russianRoulette(SColor);
     float fattj(Vect, Vect);
     SColor shootRayFromLightSource(Light *, Vect &, int);
     bool traceRayFromCamera(uint, uint, SColor &, int, int);

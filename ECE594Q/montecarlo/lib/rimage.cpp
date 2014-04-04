@@ -1,7 +1,5 @@
 #include "rimage.h"
 
-#include <iostream>
-
 int RImage::width() {
     return img.width();
 }

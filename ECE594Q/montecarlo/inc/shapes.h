@@ -59,7 +59,7 @@ public:
     virtual SColor getColor(Vect) = 0;
     virtual BBox getBBox() = 0;
     uint64_t getNumMaterials() { return materials.size(); }
-    void addMaterial(Material *m);
+    void addMaterial(Material *);
 
     void setTexture(Texture *);
     Texture * getTexture();
@@ -67,7 +67,7 @@ public:
 
     void setCShader(CShader *);
     CShader * getCShader();
-    void setIShader(IShader *s);
+    void setIShader(IShader *);
     IShader * getIShader();
 
     static bool CompareX(Shape *, Shape *);
@@ -94,19 +94,19 @@ public:
     virtual ~Sphere();
     virtual ShapeType getType() { return SPHERE; }
 
-    Vect getOrigin() { return origin;}
-    void setOrigin(Vect o) { origin = o;}
-    float getRadius() { return radius;}
-    void setRadius(float r) { radius = r;}
-    Vect getX() { return xaxis;}
-    float getXlen() { return xlength;}
-    void setX(float xlen, Vect x) { xlength = xlen; xaxis = x;}
-    Vect getY() { return yaxis;}
-    float getYlen() { return ylength;}
-    void setY(float ylen, Vect y) { ylength = ylen; yaxis = y;}
-    Vect getZ() { return zaxis;}
-    float getZlen() { return zlength;}
-    void setZ(float zlen, Vect z) { zlength = zlen; zaxis = z;}
+    Vect getOrigin() { return origin; }
+    void setOrigin(Vect o) { origin = o; }
+    float getRadius() { return radius; }
+    void setRadius(float r) { radius = r; }
+    Vect getX() { return xaxis; }
+    float getXlen() { return xlength; }
+    void setX(float xlen, Vect x) { xlength = xlen; xaxis = x; }
+    Vect getY() { return yaxis; }
+    float getYlen() { return ylength; }
+    void setY(float ylen, Vect y) { ylength = ylen; yaxis = y; }
+    Vect getZ() { return zaxis; }
+    float getZlen() { return zlength; }
+    void setZ(float zlen, Vect z) { zlength = zlen; zaxis = z; }
 
     Point_2D getUV(Vect);
 
@@ -137,7 +137,7 @@ public:
     void setTextureCoords(float, float);
     Point_2D getTextureCoords();
 
-    Vertex& operator=(const Vect&);
+    Vertex& operator=(const Vect &);
 };
 
 class Triangle : public Shape {
@@ -153,13 +153,13 @@ public:
     virtual ~Triangle();
     virtual ShapeType getType() { return TRIANGLE; }
 
-    Vertex getA() { return a;}
-    void setA(Vertex x) { a = x;}
-    Vertex getB() { return b;}
-    void setB(Vertex y) { b = y;}
-    Vertex getC() { return c;}
-    void setC(Vertex z) { c = z;}
-    void setMaterial(Material *m, char);
+    Vertex getA() { return a; }
+    void setA(Vertex x) { a = x; }
+    Vertex getB() { return b; }
+    void setB(Vertex y) { b = y; }
+    Vertex getC() { return c; }
+    void setC(Vertex z) { c = z; }
+    void setMaterial(Material *, char);
     void setPerVertexNormal(bool);
     void setPerVertexMaterial(bool);
     Material * getMaterial(char);
@@ -191,9 +191,9 @@ public:
     virtual ShapeType getType() { return MESH; }
 
     void addTriangle(Triangle *t);
-    Triangle * getTriangle(uint64_t i) { return triangles.at(i);}
+    Triangle * getTriangle(uint64_t i) { return triangles.at(i); }
     std::vector<Triangle *> getTriangles() { return triangles; }
-    uint64_t size() { return triangles.size();}
+    uint64_t size() { return triangles.size(); }
     void hasTextureCoords(bool coords) { textureCoords = coords; }
     bool hasTextureCoords() { return textureCoords; }
     void perVertexMaterial(bool mat) { objectMaterial = mat; }

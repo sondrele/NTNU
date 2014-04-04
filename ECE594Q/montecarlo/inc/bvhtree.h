@@ -53,7 +53,7 @@ public:
     BVHNode * buildTree(std::vector<Shape *>);
     BVHNode * buildSubTree(std::vector<Shape *>, int);
     Intersection intersects(Ray);
-    Intersection searchTree(BVHNode *n, Ray r);
+    Intersection searchTree(BVHNode *, Ray);
     BVHNode * getRoot();
 };
 

@@ -15,9 +15,9 @@ private:
 public:
     Ray();
     Ray(Vect, Vect);
-    Vect getOrigin() { return origin;}
-    void setOrigin(Vect o) { origin = o;}
-    Vect getDirection() { return direction;}
+    Vect getOrigin() { return origin; }
+    void setOrigin(Vect o) { origin = o; }
+    Vect getDirection() { return direction; }
     void setDirection(Vect d);
     void switchMedium();
     bool inVacuum();

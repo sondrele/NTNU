@@ -23,19 +23,19 @@ public:
     static Light * CreateLight(LightIO &);
     static void CreateLights(std::vector<Light *> &, LightIO &);
     static Sphere * NewSphere(float, Vect);
-    static void CreateSphere(Sphere &s, SphereIO &sio);
+    static void CreateSphere(Sphere &, SphereIO &);
     static Vertex CreateVertex(VertexIO &);
     static Vertex CreateVertexWithBindings(VertexIO &);
     static Triangle* CreateTriangleWithBindings(PolygonIO &);
     static Triangle * CreateTriangle(PolygonIO &);
-    static void CreateMesh(Mesh &, PolySetIO &, std::vector<Material*>);
-    static Material * CreateMaterial(MaterialIO &mio);
-    static std::vector<Material *> CreateMaterials(MaterialIO *mio, long numMaterials);
+    static void CreateMesh(Mesh &, PolySetIO &, std::vector<Material *>);
+    static Material * CreateMaterial(MaterialIO &);
+    static std::vector<Material *> CreateMaterials(MaterialIO *, long);
     static void AddMaterials(Shape*, std::vector<Material*>);
-    static Shape * CreateShape(ObjIO &oio);
-    static void CreateShapes(std::vector<Shape *> &shps, ObjIO &oio);
-    static void CreateCamera(Camera &c, CameraIO &cio);
-    static void CreateScene(RScene &s, SceneIO &sio);
+    static Shape * CreateShape(ObjIO &);
+    static void CreateShapes(std::vector<Shape *> &, ObjIO &);
+    static void CreateCamera(Camera &, CameraIO &);
+    static void CreateScene(RScene &, SceneIO &);
 
     // Parse obj
     static Mesh * CreateMeshFromObj(tinyobj::mesh_t, Material *);

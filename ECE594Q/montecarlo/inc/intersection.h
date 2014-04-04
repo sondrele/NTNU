@@ -15,7 +15,6 @@ class Intersection {
 private:
     Ray ray;
     Shape *shape;
-    // Point_2D coord;
     float pt;
     bool intersected;
 

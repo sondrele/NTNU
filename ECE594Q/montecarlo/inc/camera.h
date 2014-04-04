@@ -15,19 +15,19 @@ private:
 public:
     Camera();
     
-    Vect getPos() const { return pos;}
+    Vect getPos() const { return pos; }
     void setPos(Vect d);
     float getX() { return pos.getX(); }
     float getY() { return pos.getY(); }
     float getZ() { return pos.getZ(); }
-    Vect getViewDir() { return viewDir;}
+    Vect getViewDir() { return viewDir; }
     void setViewDir(Vect d);
-    Vect getOrthoUp() { return orthoUp;}
+    Vect getOrthoUp() { return orthoUp; }
     void setOrthoUp(Vect d);
-    float getFocalDist() { return focalDist;}
-    void setFocalDist(float f) { focalDist = f;}
-    float getVerticalFOV() { return verticalFOV;}
-    void setVerticalFOV(float f) { verticalFOV = f;}
+    float getFocalDist() { return focalDist; }
+    void setFocalDist(float f) { focalDist = f; }
+    float getVerticalFOV() { return verticalFOV; }
+    void setVerticalFOV(float f) { verticalFOV = f; }
 };
 
 #endif // _CAMERA_H_

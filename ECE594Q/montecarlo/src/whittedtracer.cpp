@@ -9,8 +9,6 @@ WhittedTracer::~WhittedTracer() {
 
 }
 
-
-
 SColor WhittedTracer::ambientLightning(float kt, SColor ka, SColor Cd) {
     return Cd.linearMult(ka).linearMult((1.0f - kt));
 }

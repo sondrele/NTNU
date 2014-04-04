@@ -77,16 +77,6 @@ bool Intersection::calculateRefraction(Ray &r) {
             r.setDirection(d0);
             return true;
         }
-
-        // float sinT2 = n * n * (1 - cosI * cosI);
-        // Vect d0 = I.linearMult(n) - N.linearMult((n + sqrt(1 - sinT2)));
-
-        // Ray r = ray;
-        // r.switchMedium();
-        // r.setOrigin(calculateIntersectionPoint() + d0.linearMult(0.01f));
-        // r.setDirection(d0);
-
-        // return r;
     } else {
         throw "Cannot calculate refraction when no intersection has occured";
     }

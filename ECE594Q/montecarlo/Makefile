@@ -50,5 +50,3 @@ tracer: tracer.o $(OBJS)
 clean:
 	rm -f *.o
 	rm -rf **/*.o
-
-

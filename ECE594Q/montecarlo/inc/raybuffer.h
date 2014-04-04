@@ -6,6 +6,7 @@
 #else
 #include <stdint.h>
 #endif
+
 #include "uint.h"
 #include <stdlib.h>
 #include <vector>

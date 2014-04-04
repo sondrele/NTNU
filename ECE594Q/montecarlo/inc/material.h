@@ -25,7 +25,7 @@ public:
     float B() { return getZ(); }
     void B(float);
 
-    SColor& operator=(const Vect&);
+    SColor & operator=(const Vect &);
 };
 
 class Material {

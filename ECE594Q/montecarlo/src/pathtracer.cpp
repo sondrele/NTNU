@@ -217,10 +217,3 @@ RayBuffer PathTracer::traceScene() {
     }
     return buffer;
 }
-
-bool PathTracer::russianRoulette(SColor refl) {
-    float p = max(refl.R(), max(refl.G(), refl.B()));
-    if (Rand::Random() > p) 
-        return true;
-    return false;
-}
