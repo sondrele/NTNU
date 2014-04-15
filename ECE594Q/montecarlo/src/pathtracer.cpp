@@ -50,6 +50,10 @@ Vect PathTracer::specularSampleUpperHemisphere(Intersection &ins) {
 }
 
 SColor PathTracer::shootRayFromLightSource(Light *l, Vect &intersectionPt, int s) {
+    if (l == NULL) {
+        return SColor();
+    }
+
     Ray r = computeaRayFromLightSource(l);
     Intersection in = scene->intersects(r);
     SColor emmittance;
@@ -171,8 +175,8 @@ RayBuffer PathTracer::traceScene() {
     p.setGoal((int) (HEIGHT * WIDTH));
 
     for (uint y = 0; y < HEIGHT; y++) {
-        // omp_set_num_threads(16);
-        // #pragma omp parallel for
+        omp_set_num_threads(16);
+        #pragma omp parallel for
         for (uint x = 0; x < WIDTH; x++) {
 
             bool intersectsScene;
@@ -209,10 +213,10 @@ RayBuffer PathTracer::traceScene() {
             color.B = (uint8_t) (255 * B);
             buffer.setPixel(x, y, color);
 
-            // #pragma omp critical
-            // {
-            //     p.tick();
-            // }
+            #pragma omp critical
+            {
+                p.tick();
+            }
         }
     }
     return buffer;

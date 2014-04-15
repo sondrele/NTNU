@@ -16,6 +16,7 @@ static void write_lightA(LightIO *, FILE *);
 static void read_point_lightA(SceneIO *scene, FILE *fp);
 static void read_directional_lightA(SceneIO *scene, FILE *fp);
 static void read_spot_lightA(SceneIO *scene, FILE *fp);
+static void read_area_lightA(SceneIO *scene, FILE *fp);
 static void write_lightsB(LightIO *, FILE *);
 static void write_lightB(LightIO *, FILE *);
 static LightIO *read_lightsB(FILE *);
@@ -126,6 +127,8 @@ static SceneIO *readSceneA(FILE *fp) {
       read_directional_lightA(scene,fp);
     } else if (strcmp(word, "spot_light") == 0) {
       read_spot_lightA(scene,fp);
+    } else if (strcmp(word, "area_light") == 0) {
+      read_area_lightA(scene, fp);
     } else if (strcmp(word, "sphere") == 0) {
       read_sphereA(scene,fp);
     } else if (strcmp(word, "poly_set") == 0) {
@@ -391,6 +394,23 @@ read_spot_lightA(SceneIO *scene, FILE *fp)
 		  &light->color[1], &light->color[2]));
   IO_CHECK(1, fscanf(fp," dropOffRate %g", &light->dropOffRate));
   IO_CHECK(1, fscanf(fp," cutOffAngle %g", &light->cutOffAngle));
+  fscanf(fp," }");
+}
+
+
+static void
+read_area_lightA(SceneIO *scene, FILE *fp)
+{
+  LightIO *light = append_light(&scene->lights);
+
+  light->type = AREA_LIGHT;
+  fscanf(fp," {");
+  IO_CHECK(3, fscanf(fp," pos %g %g %g", &light->position[0],
+      &light->position[1], &light->position[2]));
+  IO_CHECK(3, fscanf(fp," pos %g %g %g", &light->direction[0],
+      &light->direction[1], &light->direction[2]));
+  IO_CHECK(3, fscanf(fp," color %g %g %g", &light->color[0],
+      &light->color[1], &light->color[2]));
   fscanf(fp," }");
 }
 

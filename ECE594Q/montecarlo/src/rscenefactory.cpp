@@ -37,8 +37,12 @@ Light * RSceneFactory::CreateLight(LightIO &lio) {
             l->setDir(RSceneFactory::PointToVect(lio.direction));
             break;
         }
+        case AREA_LIGHT: {
+            Vect min = RSceneFactory::PointToVect(lio.position);
+            Vect max = RSceneFactory::PointToVect(lio.direction);
+            l->setArea(min, max);
+        }
         case SPOT_LIGHT:
-        case AREA_LIGHT:
         default:
         break;
     }
