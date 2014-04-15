@@ -82,10 +82,10 @@ public:
     virtual RayBuffer traceScene() = 0;
 };
 
-class WhittedTracer : public RayTracer {
+class DirectIllumTracer : public RayTracer {
 public:
-    WhittedTracer(uint, uint, uint);
-    virtual ~WhittedTracer();
+    DirectIllumTracer(uint, uint, uint);
+    virtual ~DirectIllumTracer();
 
     // Whitted illumination
     SColor ambientLightning(float, SColor, SColor);

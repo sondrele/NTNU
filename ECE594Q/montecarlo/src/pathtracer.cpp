@@ -34,8 +34,8 @@ float PathTracer::fattj(Vect Pt, Vect pos) {
 
 Vect PathTracer::specularSampleUpperHemisphere(Intersection &ins) {
     float specular = ins.specColor().length();
-    float x = (1 - specular) * (M_PI - 2 * M_PI * (float) Rand::Random());
-    float y = (1 - specular) * (M_PI - 2 * M_PI * (float) Rand::Random());
+    float x = (float) ((1 - specular) * (M_PI - 2 * M_PI * Rand::Random()));
+    float y = (float) ((1 - specular) * (M_PI - 2 * M_PI * Rand::Random()));
 
     Vect dir = ins.calculateReflection().getDirection();
     Vect_h dir_h(dir.getX(), dir.getY(), dir.getZ());
@@ -59,7 +59,7 @@ SColor PathTracer::shootRayFromLightSource(Light *l, Vect &intersectionPt, int s
         intersectionPt = in.calculateIntersectionPoint();
         Vect N = in.calculateSurfaceNormal();
         for (int i = 1; i < s; i++) {
-            r.setOrigin(intersectionPt + N * 0.0001);
+            r.setOrigin(intersectionPt + N * 0.0001f);
             r.setDirection(specularSampleUpperHemisphere(in));
 
             in = scene->intersects(r);
@@ -136,7 +136,7 @@ SColor PathTracer::shadeIntersectionPoint(Intersection &in, Vect &intersectionPt
     SColor Cd = in.getColor();
 
     Ray r;
-    r.setOrigin(intersectionPt + N * 0.0001);
+    r.setOrigin(intersectionPt + N * 0.0001f);
     r.setDirection(specularSampleUpperHemisphere(in));
 
     in = scene->intersects(r);
@@ -171,12 +171,12 @@ RayBuffer PathTracer::traceScene() {
     p.setGoal((int) (HEIGHT * WIDTH));
 
     for (uint y = 0; y < HEIGHT; y++) {
-        omp_set_num_threads(16);
-        #pragma omp parallel for
+        // omp_set_num_threads(16);
+        // #pragma omp parallel for
         for (uint x = 0; x < WIDTH; x++) {
 
             bool intersectsScene;
-            int s = 0, t = depth;
+            int s = 0, t = (int) depth;
             float R = 0, G = 0, B = 0;
             for (int ns = 0; ns < numSamples; ns++) {
                 SColor shade;
@@ -209,10 +209,10 @@ RayBuffer PathTracer::traceScene() {
             color.B = (uint8_t) (255 * B);
             buffer.setPixel(x, y, color);
 
-            #pragma omp critical
-            {
-                p.tick();
-            }
+            // #pragma omp critical
+            // {
+            //     p.tick();
+            // }
         }
     }
     return buffer;

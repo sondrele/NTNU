@@ -12,9 +12,11 @@
 #include "rimage.h"
 
 #define SCENES          "./scenes/"
+#define TEXTURES        "./textures/"
 #define ASCII           ".ascii"
 #define OBJ             ".obj"
 #define IMG             ".bmp"
+#define ENV             ".exr"
 #define IMAGE_WIDTH     500
 #define IMAGE_HEIGHT    500
 
@@ -27,8 +29,9 @@ float fattjScale = 1.0f;
 std::string in;
 std::string inObj;
 std::string out;
+std::string envmap;
 
-bool shaders = false;
+bool shaders = true;
 bool area = false;
 bool objScene = false;
 bool pathTracing = false;
@@ -52,7 +55,7 @@ static void loadScene(const char *name, RayTracer *rayTracer) {
     rayTracer->setCamera(cam);
     rayTracer->setScene(rayScene);
     if (environmentMap) {
-        rayTracer->loadEnvMap("textures/uffizi_latlong.exr");
+        rayTracer->loadEnvMap(envmap);
     }
 }
 
@@ -84,7 +87,7 @@ static void loadObjScene(const char *name, RayTracer *rayTracer) {
     rayTracer->setCamera(cam);
     rayTracer->setScene(rayScene);
     if (environmentMap) {
-        rayTracer->loadEnvMap("textures/doge2_latlong.exr");
+        rayTracer->loadEnvMap(envmap);
     }
 }
 
@@ -144,7 +147,7 @@ static void parseCommandLine(int argc, char *argv[]) {
         cout << "-out img_name:     Specify the name of the output image" << endl;
         cout << "-obj:              Set if the scene is in .obj format" << endl;
         cout << "-bi:               Specifies that bidirectional path tracing should be used" << endl;
-        cout << "-env:              Load uffizi environment map" << endl;
+        cout << "-env env_name:     Load spherical .exr environment maps" << endl;
         cout << "-size num_pixels:  Image size, width and height" << endl;
         cout << "-d ray_depth:      Specify depth of reflective rays" << endl;
         cout << "-n num_samples:    Specify number of samples for pathtracing" << endl;
@@ -173,8 +176,10 @@ static void parseCommandLine(int argc, char *argv[]) {
         objScene = true;
     }
 
-    if (ArgParser::CmdOptExists(argv, argv+argc, "-env")) {
+    char *env = ArgParser::GetCmdOpt(argv, argv + argc, "-env");
+    if (env) {
         environmentMap = true;
+        envmap = std::string(TEXTURES) + std::string(env) + std::string(ENV);
     }
 
     char *scene = ArgParser::GetCmdOpt(argv, argv + argc, "-scene");
@@ -227,7 +232,7 @@ int main(int argc, char *argv[]) {
             }
             rayTracer = pathTracer;
         } else {
-            rayTracer = new WhittedTracer(w, h, d);
+            rayTracer = new DirectIllumTracer(w, h, d);
         }
         rayTracer->setFattjScale(fattjScale);
 

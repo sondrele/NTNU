@@ -20,9 +20,6 @@ void RImage::displayImage() {
 }
 
 SColor RImage::getSample(int x, int y, float maxval) {
-    // y = height() - y;
-    // TODO: y must be changed for textures
-
     SColor c;
     c.R(img(x, y, 0, 0) / maxval);
     c.G(img(x, y, 0, 1) / maxval);

@@ -33,7 +33,7 @@ SRCS = src/argparser.cpp\
     src/texture.cpp\
     src/bvhtree.cpp\
     src/envmap.cpp\
-    src/whittedtracer.cpp\
+    src/directillumtracer.cpp\
     src/pathtracer.cpp\
     src/raytracer.cpp
 OBJS = $(SRCS:.cpp=.o) $(LIBS:.cpp=.o) 

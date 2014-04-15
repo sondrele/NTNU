@@ -6,11 +6,10 @@
             [
                 "*.o",
                 "*.d",
+                "*.bmp",
                 "cpputest",
                 "raytracer",
-                "REYES",
-                "TDT4200",
-                "TDT4205"
+                "REYES"
             ],
             "path": "."
         }

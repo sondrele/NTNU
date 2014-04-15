@@ -145,10 +145,10 @@ SColor RayTracer::calculateShadowScalar(Light *lt, Intersection &in, int d, int 
         dir = lt->getDir().invert();
         ori = ori + dir.linearMult(0.001f);
     } else if (lt->getType() == AREA_LIGHT) {
-        // TODO: Do not need to sample this many times of this is a secoundary
+        // TODO: Do not need to sample this many times if this is a secoundary
         // or third bounce
         num_samples *= areaScaling;
-        ori = ori + in.calculateSurfaceNormal() * 0.001;
+        ori = ori + in.calculateSurfaceNormal() * 0.001f;
     } else {
         dir = p - ori;
         dir.normalize();
@@ -192,7 +192,7 @@ SColor RayTracer::calculateShadowScalar(Light *lt, Intersection &in, int d, int 
         }
     }
 
-    Sj /= num_samples;
+    Sj /= (float) num_samples;
     return SColor(Sj, Sj, Sj);
 }
 

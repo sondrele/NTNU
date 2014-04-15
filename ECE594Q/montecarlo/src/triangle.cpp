@@ -148,7 +148,6 @@ Vect Triangle::normal() {
 Vect Triangle::surfaceNormal(Vect dir, Vect pt) {
     Vect N;
     if (hasPerVertexNormal) {
-        // TODO: Har direction noe å si?
         N = interpolatedNormal(pt);
     } else {
         Vect v = getB() - getA();

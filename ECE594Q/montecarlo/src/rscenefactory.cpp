@@ -38,6 +38,7 @@ Light * RSceneFactory::CreateLight(LightIO &lio) {
             break;
         }
         case SPOT_LIGHT:
+        case AREA_LIGHT:
         default:
         break;
     }
@@ -206,7 +207,6 @@ void RSceneFactory::CreateCamera(Camera &c, CameraIO &cio) {
 
 // Parse obj
 Mesh * RSceneFactory::CreateMeshFromObj(tinyobj::mesh_t msh, Material *mat) {
-    Vertex a, b, c;
     Mesh *m = new Mesh();
     std::vector<Vertex> vertexes;
 
@@ -217,7 +217,7 @@ Mesh * RSceneFactory::CreateMeshFromObj(tinyobj::mesh_t msh, Material *mat) {
     }
 
     assert(msh.normals.size() % 3 == 0);
-    int j = 0;
+    uint j = 0;
     for (uint i = 0; i < msh.normals.size(); i += 3) {
         Vect v(msh.normals[i], msh.normals[i + 1], msh.normals[i + 2]);
         vertexes[j].setSurfaceNormal(v);
@@ -229,19 +229,17 @@ Mesh * RSceneFactory::CreateMeshFromObj(tinyobj::mesh_t msh, Material *mat) {
 
     assert(msh.indices.size() % 3 == 0);
     for (uint i = 0; i < msh.indices.size(); i += 3) {
-        int a = msh.indices[i];
-        int b = msh.indices[i + 1];
-        int c = msh.indices[i + 2];
+        uint x = msh.indices[i];
+        uint y = msh.indices[i + 1];
+        uint z = msh.indices[i + 2];
 
         Triangle *t = new Triangle();
-        t->setA(vertexes[a]);
-        t->setB(vertexes[b]);
-        t->setC(vertexes[c]);
+        t->setA(vertexes[x]);
+        t->setB(vertexes[y]);
+        t->setC(vertexes[z]);
         t->setMaterial(mat, 'a');
         m->addTriangle(t);
     }
-
-    // TODO: Add normals
 
     return m;
 }

@@ -43,13 +43,13 @@ TEST(RSceneTest, ray_intersects_with_shape) {
     s.addShape(sphere1);
     Ray r(Vect(0, 0, 0), Vect(0, 0, -1));
 
-    Intersection is = s.calculateRayIntersection(r);
+    Intersection is = s.intersects(r);
     CHECK(is.hasIntersected());
     DOUBLES_EQUAL(1.0, is.getIntersectionPoint(), 0.000001);
     POINTERS_EQUAL(sphere0, is.getShape());
 
     Ray r0(Vect(0, 0, 0), Vect(0, -1, 0));
-    is = s.calculateRayIntersection(r0);
+    is = s.intersects(r0);
     CHECK(is.hasIntersected());
     DOUBLES_EQUAL(2.0, is.getIntersectionPoint(), 0.000001);
 }
